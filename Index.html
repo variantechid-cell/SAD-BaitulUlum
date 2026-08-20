@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <meta
+    name="theme-color"
+    content="#0f172a"
+  >
+
+  <title>
+    Absensi Siswa - Kartu Pelajar
+  </title>
+
+
+  <!-- CSS -->
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+
+  <!--
+    Library Html5 QR Code
+    Versi stabil untuk tahap V1
+  -->
+  <script
+    src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
+  </script>
+
+</head>
+
+
+<body>
+
+
+  <!-- =================================================
+       HEADER
+  ================================================== -->
+
+  <header class="header">
+
+    <div class="header-content">
+
+      <div class="logo">
+        🎓
+      </div>
+
+      <div>
+
+        <h1>
+          ABSENSI SISWA
+        </h1>
+
+        <p>
+          Sistem Absensi Kartu Pelajar
+        </p>
+
+      </div>
+
+    </div>
+
+  </header>
+
+
+
+  <!-- =================================================
+       MAIN
+  ================================================== -->
+
+  <main class="container">
+
+
+    <!-- Scanner Card -->
+
+    <section
+      class="scanner-card"
+      id="scannerCard"
+    >
+
+      <div class="card-header">
+
+        <h2>
+          📷 Scan Kartu Pelajar
+        </h2>
+
+        <p>
+          Arahkan kamera ke QR Code pada kartu siswa
+        </p>
+
+      </div>
+
+
+      <!-- Area Scanner -->
+
+      <div
+        id="reader"
+        class="reader"
+      ></div>
+
+
+      <!-- Status -->
+
+      <div
+        id="status"
+        class="status"
+      >
+        Menyiapkan scanner...
+      </div>
+
+
+      <!-- Tombol -->
+
+      <button
+        id="startButton"
+        class="button primary"
+        type="button"
+      >
+
+        📷 Mulai Scanner
+
+      </button>
+
+    </section>
+
+
+
+    <!-- =================================================
+         HASIL SCAN
+    ================================================== -->
+
+    <section
+      id="result"
+      class="result"
+    >
+
+      <div
+        id="resultIcon"
+        class="result-icon"
+      >
+        🟢
+      </div>
+
+
+      <h2 id="resultTitle">
+        QR TERBACA
+      </h2>
+
+
+      <div class="student-info">
+
+        <div class="info-label">
+          ID Kartu
+        </div>
+
+        <div
+          id="studentId"
+          class="student-id"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <button
+        id="scanAgainButton"
+        class="button primary"
+        type="button"
+      >
+
+        📷 Scan Lagi
+
+      </button>
+
+    </section>
+
+
+
+    <!-- =================================================
+         INFORMASI
+    ================================================== -->
+
+    <section class="info-card">
+
+      <h3>
+        ℹ️ Informasi
+      </h3>
+
+      <ul>
+
+        <li>
+          Pastikan izin kamera diberikan.
+        </li>
+
+        <li>
+          Gunakan pencahayaan yang cukup.
+        </li>
+
+        <li>
+          Arahkan QR Code tepat di dalam kotak scanner.
+        </li>
+
+        <li>
+          Jangan terlalu dekat dengan kamera.
+        </li>
+
+      </ul>
+
+    </section>
+
+
+  </main>
+
+
+
+  <!-- =================================================
+       FOOTER
+  ================================================== -->
+
+  <footer class="footer">
+
+    <p>
+      Sistem Absensi Kartu Pelajar
+    </p>
+
+    <p>
+      V1 • Tahap Pengujian Scanner
+    </p>
+
+  </footer>
+
+
+
+  <!-- JavaScript -->
+
+  <script
+    src="app.js">
+  </script>
+
+
+</body>
+
+</html>

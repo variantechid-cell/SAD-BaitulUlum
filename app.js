@@ -1,10 +1,16 @@
 /* =====================================================
+   GOOGLE APPS SCRIPT API
+===================================================== */
+
+const API_URL =
+  'https://script.google.com/a/macros/guru.smk.belajar.id/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec';
+/* =====================================================
    ABSENSI SISWA
    WEB SCANNER V1
    TAHAP 3B-1
 
    Fokus:
-   - Mengakses kamera
+   - Mengakses kameraonScanSuccess()
    - Membaca QR / Barcode
    - Menampilkan Student ID
 
@@ -390,10 +396,6 @@ function onScanSuccess(
   decodedResult
 ) {
 
-  /*
-   * Cegah scan berulang
-   */
-
   if (
     processingScan
   ) {
@@ -413,28 +415,19 @@ function onScanSuccess(
   );
 
 
-  /*
-   * Bersihkan data
-   */
-
   const studentId =
     String(
       decodedText
     ).trim();
 
 
-  /*
-   * Stop kamera
-   */
-
   stopScanner();
 
 
-  /*
-   * Tampilkan hasil
-   */
+  showProcessing();
 
-  showScanResult(
+
+  processAttendance(
     studentId
   );
 
@@ -691,5 +684,452 @@ function showCameraError(
 
   startButton.style.display =
     'block';
+
+}
+
+/* =====================================================
+   KIRIM ABSENSI KE GOOGLE APPS SCRIPT
+===================================================== */
+
+function processAttendance(
+  studentId
+) {
+
+  console.log(
+    'Mengirim absensi:',
+    studentId
+  );
+
+
+  setStatus(
+    '⏳ Memproses absensi...'
+  );
+
+
+  const url =
+    API_URL +
+    '?action=attendance' +
+    '&studentId=' +
+    encodeURIComponent(
+      studentId
+    );
+
+
+  console.log(
+    'API URL:',
+    url
+  );
+
+
+  fetch(url)
+
+    .then(function (
+      response
+    ) {
+
+      if (
+        !response.ok
+      ) {
+
+        throw new Error(
+          'HTTP Error ' +
+          response.status
+        );
+
+      }
+
+
+      return response.json();
+
+    })
+
+
+    .then(function (
+      result
+    ) {
+
+      console.log(
+        'Response API:',
+        result
+      );
+
+
+      handleAttendanceResult(
+        result
+      );
+
+    })
+
+
+    .catch(function (
+      error
+    ) {
+
+      console.error(
+        'API ERROR:',
+        error
+      );
+
+
+      showApiError(
+        error
+      );
+
+    });
+
+}
+
+/* =====================================================
+   PROSES ABSENSI
+===================================================== */
+
+function showProcessing() {
+
+  scannerCard.style.display =
+    'none';
+
+
+  resultElement.style.display =
+    'block';
+
+
+  resultIconElement.textContent =
+    '⏳';
+
+
+  resultTitleElement.textContent =
+    'MEMPROSES ABSENSI';
+
+
+  studentIdElement.textContent =
+    'Mohon tunggu...';
+
+}
+
+/* =====================================================
+   HASIL ABSENSI
+===================================================== */
+
+function handleAttendanceResult(
+  result
+) {
+
+  console.log(
+    'Hasil absensi:',
+    result
+  );
+
+
+  /*
+   * SUCCESS
+   */
+
+  if (
+    result.status ===
+    'SUCCESS'
+  ) {
+
+    showAttendanceSuccess(
+      result
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * ALREADY
+   */
+
+  if (
+    result.status ===
+    'ALREADY'
+  ) {
+
+    showAttendanceAlready(
+      result
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * NOT FOUND
+   */
+
+  if (
+    result.status ===
+    'NOT_FOUND'
+  ) {
+
+    showAttendanceError(
+      'DATA TIDAK DITEMUKAN',
+      result.message
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * INACTIVE
+   */
+
+  if (
+    result.status ===
+    'INACTIVE'
+  ) {
+
+    showAttendanceError(
+      'SISWA TIDAK AKTIF',
+      result.message
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * ERROR LAIN
+   */
+
+  showAttendanceError(
+
+    'ABSENSI GAGAL',
+
+    result.message ||
+      'Terjadi kesalahan.'
+
+  );
+
+}
+
+function showAttendanceSuccess(
+  result
+) {
+
+  const student =
+    result.student;
+
+
+  const attendance =
+    result.attendance;
+
+
+  scannerCard.style.display =
+    'none';
+
+
+  resultElement.style.display =
+    'block';
+
+
+  resultIconElement.textContent =
+    '🟢';
+
+
+  resultTitleElement.textContent =
+    'ABSENSI BERHASIL';
+
+
+  studentIdElement.innerHTML =
+
+    '<strong>' +
+    escapeHtml(
+      student.nama
+    ) +
+    '</strong>' +
+
+    '<br>' +
+
+    '<span>' +
+    escapeHtml(
+      student.kelas
+    ) +
+    '</span>' +
+
+    '<br><br>' +
+
+    '<strong>' +
+    escapeHtml(
+      attendance.status
+    ) +
+    '</strong>' +
+
+    '<br>' +
+
+    '<small>' +
+    escapeHtml(
+      attendance.tanggal
+    ) +
+    ' • ' +
+    escapeHtml(
+      attendance.jam
+    ) +
+    ' WIB' +
+    '</small>';
+
+}
+
+function showAttendanceAlready(
+  result
+) {
+
+  const student =
+    result.student;
+
+
+  const previous =
+    result.previousAttendance;
+
+
+  scannerCard.style.display =
+    'none';
+
+
+  resultElement.style.display =
+    'block';
+
+
+  resultIconElement.textContent =
+    '🟡';
+
+
+  resultTitleElement.textContent =
+    'SUDAH ABSEN';
+
+
+  studentIdElement.innerHTML =
+
+    '<strong>' +
+    escapeHtml(
+      student.nama
+    ) +
+    '</strong>' +
+
+    '<br>' +
+
+    '<span>' +
+    escapeHtml(
+      student.kelas
+    ) +
+    '</span>' +
+
+    '<br><br>' +
+
+    'Status: ' +
+
+    '<strong>' +
+    escapeHtml(
+      previous.status
+    ) +
+    '</strong>' +
+
+    '<br>' +
+
+    '<small>' +
+    'Absen pukul ' +
+    escapeHtml(
+      previous.jam
+    ) +
+    '</small>';
+
+}
+
+function showAttendanceError(
+  title,
+  message
+) {
+
+  scannerCard.style.display =
+    'none';
+
+
+  resultElement.style.display =
+    'block';
+
+
+  resultIconElement.textContent =
+    '🔴';
+
+
+  resultTitleElement.textContent =
+    title;
+
+
+  studentIdElement.textContent =
+    message ||
+    'Terjadi kesalahan.';
+
+}
+
+function showApiError(
+  error
+) {
+
+  console.error(
+    'API CONNECTION ERROR:',
+    error
+  );
+
+
+  scannerCard.style.display =
+    'none';
+
+
+  resultElement.style.display =
+    'block';
+
+
+  resultIconElement.textContent =
+    '🔴';
+
+
+  resultTitleElement.textContent =
+    'KONEKSI GAGAL';
+
+
+  studentIdElement.textContent =
+    'Tidak dapat terhubung ke server absensi.';
+
+}
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ''
+  )
+
+  .replace(
+    /&/g,
+    '&amp;'
+  )
+
+  .replace(
+    /</g,
+    '&lt;'
+  )
+
+  .replace(
+    />/g,
+    '&gt;'
+  )
+
+  .replace(
+    /"/g,
+    '&quot;'
+  )
+
+  .replace(
+    /'/g,
+    '&#039;'
+  );
 
 }

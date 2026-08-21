@@ -609,23 +609,16 @@ function onScanSuccess(
   decodedResult
 ) {
 
-  if (
-    processingScan
-  ) {
-
+  if (processingScan) {
     return;
-
   }
 
 
-  processingScan =
-    true;
+  processingScan = true;
 
 
   const studentId =
-    String(
-      decodedText
-    ).trim();
+    String(decodedText || '').trim();
 
 
   console.log(
@@ -634,19 +627,39 @@ function onScanSuccess(
   );
 
 
+  /*
+   * LANGSUNG tampilkan proses.
+   * Jangan menunggu kamera berhenti.
+   */
+
+  showProcessing();
+
+
+  /*
+   * Hentikan scanner di background.
+   * Proses server tetap berjalan.
+   */
+
   stopScanner()
-    .finally(function () {
+    .catch(function(error) {
 
-      showProcessing();
-
-      processAttendance(
-        studentId
+      console.warn(
+        'Scanner stop warning:',
+        error
       );
 
     });
 
-}
 
+  /*
+   * LANGSUNG proses data siswa.
+   */
+
+  processAttendance(
+    studentId
+  );
+
+}
 
 /* =====================================================
    SCAN ERROR
@@ -713,6 +726,36 @@ function processAttendance(
   );
 
 
+  /*
+   * Validasi awal
+   */
+
+  if (!studentId) {
+
+    showAttendanceError(
+      'DATA TIDAK DITEMUKAN',
+      'QR Code tidak berisi Student ID.'
+    );
+
+
+    speak(
+      'Data tidak ditemukan'
+    );
+
+
+    processingScan =
+      false;
+
+
+    return;
+
+  }
+
+
+  /*
+   * URL API
+   */
+
   const url =
     API_URL +
     '?action=attendance' +
@@ -722,75 +765,158 @@ function processAttendance(
     );
 
 
-  fetch(url)
+  /*
+   * AbortController
+   * untuk membatasi waktu tunggu
+   */
 
-    .then(function (response) {
+  const controller =
+    new AbortController();
 
-      console.log(
-        'HTTP STATUS:',
+
+  const timeout =
+    setTimeout(
+      function () {
+
+        controller.abort();
+
+      },
+      10000
+    );
+
+
+  setStatus(
+    '🔎 Memeriksa data siswa...'
+  );
+
+
+  fetch(
+    url,
+    {
+      method:
+        'GET',
+
+      signal:
+        controller.signal,
+
+      cache:
+        'no-store'
+    }
+  )
+
+  .then(function(response) {
+
+    console.log(
+      'HTTP STATUS:',
+      response.status
+    );
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        'HTTP ' +
         response.status
       );
 
-
-      if (!response.ok) {
-
-        throw new Error(
-          'HTTP ' +
-          response.status
-        );
-
-      }
+    }
 
 
-      return response.json();
+    return response.json();
 
-    })
+  })
 
-    .then(function (result) {
+  .then(function(result) {
 
-      console.log(
-        'HASIL ABSENSI:',
-        result
-      );
+    console.log(
+      'HASIL ABSENSI:',
+      result
+    );
 
 
-      handleAttendanceResult(
-        result
-      );
+    handleAttendanceResult(
+      result
+    );
 
-    })
+  })
 
-    .catch(function (error) {
+  .catch(function(error) {
 
-      console.error(
-        'API ERROR:',
-        error
-      );
+    console.error(
+      'API ERROR:',
+      error
+    );
 
+
+    /*
+     * Timeout
+     */
+
+    if (
+      error.name ===
+      'AbortError'
+    ) {
 
       countError++;
 
       updateCounters();
-      loadTodaySummary();
 
 
       showAttendanceError(
 
-        'KONEKSI GAGAL',
+        'SERVER TERLAMBAT',
 
-        'Tidak dapat terhubung ke server.'
+        'Server tidak memberikan respons dalam 10 detik.'
 
       );
 
 
       speak(
-        'Koneksi gagal'
+        'Server terlambat'
       );
 
 
       scheduleNextScan();
 
-    });
+      return;
+
+    }
+
+
+    /*
+     * Error koneksi
+     */
+
+    countError++;
+
+    updateCounters();
+
+
+    showAttendanceError(
+
+      'KONEKSI GAGAL',
+
+      'Tidak dapat terhubung ke server.'
+
+    );
+
+
+    speak(
+      'Koneksi gagal'
+    );
+
+
+    scheduleNextScan();
+
+  })
+
+  .finally(function() {
+
+    clearTimeout(
+      timeout
+    );
+
+  });
 
 }
 
@@ -831,24 +957,38 @@ function handleAttendanceResult(
   }
 
 
-  if (
-    result.status ===
-    'NOT_FOUND'
-  ) {
+ if (
+  result.status === 'NOT_FOUND'
+) {
 
-    countError++;
+  countError++;
 
-    updateCounters();
-     loadTodaySummary();
+  updateCounters();
 
 
-    showAttendanceError(
+  loadTodaySummary();
 
-      'DATA TIDAK DITEMUKAN',
 
-      result.message
+  showAttendanceError(
 
-    );
+    'DATA TIDAK DITEMUKAN',
+
+    result.message ||
+    'Student ID tidak terdaftar pada database siswa.'
+
+  );
+
+
+  speak(
+    'Data tidak ditemukan'
+  );
+
+
+  scheduleNextScan();
+
+  return;
+
+}
 
 
     speak(

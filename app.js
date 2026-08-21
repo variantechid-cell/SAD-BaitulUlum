@@ -1657,3 +1657,62 @@ function escapeHtml(
   );
 
 }
+
+
+/* =====================================================
+   DASHBOARD SUMMARY
+===================================================== */
+
+function loadTodaySummary() {
+
+  console.log(
+    'Memuat statistik absensi hari ini...'
+  );
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function (result) {
+
+        console.log(
+          'SUMMARY:',
+          result
+        );
+
+
+        if (
+          !result ||
+          result.success !== true
+        ) {
+
+          console.error(
+            'Summary tidak valid.'
+          );
+
+          return;
+
+        }
+
+
+        updateSummary(
+          result
+        );
+
+      }
+    )
+
+    .withFailureHandler(
+      function (error) {
+
+        console.error(
+          'SUMMARY ERROR:',
+          error
+        );
+
+      }
+    )
+
+    .getTodaySummary();
+
+}

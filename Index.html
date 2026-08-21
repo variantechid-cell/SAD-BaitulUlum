@@ -16,21 +16,15 @@
   >
 
   <title>
-    Absensi Siswa - Kartu Pelajar
+    Absensi Siswa | Kartu Pelajar
   </title>
 
-
-  <!-- CSS -->
   <link
     rel="stylesheet"
     href="style.css"
   >
 
-
-  <!--
-    Library Html5 QR Code
-    Versi stabil untuk tahap V1
-  -->
+  <!-- HTML5 QR Code -->
   <script
     src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
   </script>
@@ -53,14 +47,14 @@
         🎓
       </div>
 
-      <div>
+      <div class="school-info">
 
         <h1>
           ABSENSI SISWA
         </h1>
 
         <p>
-          Sistem Absensi Kartu Pelajar
+          SISTEM ABSENSI KARTU PELAJAR
         </p>
 
       </div>
@@ -78,7 +72,121 @@
   <main class="container">
 
 
-    <!-- Scanner Card -->
+    <!-- ===============================================
+         INFO TANGGAL
+    ================================================ -->
+
+    <section class="date-card">
+
+      <div>
+
+        <span class="date-label">
+          📅 Tanggal
+        </span>
+
+        <strong id="currentDate">
+          -
+        </strong>
+
+      </div>
+
+
+      <div>
+
+        <span class="date-label">
+          🕐 Waktu
+        </span>
+
+        <strong id="currentTime">
+          -
+        </strong>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===============================================
+         COUNTER
+    ================================================ -->
+
+    <section class="counter-grid">
+
+      <div class="counter-card">
+
+        <span class="counter-icon">
+          🟢
+        </span>
+
+        <strong id="countPresent">
+          0
+        </strong>
+
+        <small>
+          Hadir
+        </small>
+
+      </div>
+
+
+      <div class="counter-card">
+
+        <span class="counter-icon">
+          🟡
+        </span>
+
+        <strong id="countLate">
+          0
+        </strong>
+
+        <small>
+          Terlambat
+        </small>
+
+      </div>
+
+
+      <div class="counter-card">
+
+        <span class="counter-icon">
+          🟠
+        </span>
+
+        <strong id="countAlready">
+          0
+        </strong>
+
+        <small>
+          Sudah Absen
+        </small>
+
+      </div>
+
+
+      <div class="counter-card">
+
+        <span class="counter-icon">
+          🔴
+        </span>
+
+        <strong id="countError">
+          0
+        </strong>
+
+        <small>
+          Ditolak
+        </small>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===============================================
+         SCANNER
+    ================================================ -->
 
     <section
       class="scanner-card"
@@ -92,13 +200,11 @@
         </h2>
 
         <p>
-          Arahkan kamera ke QR Code pada kartu siswa
+          Arahkan QR Code kartu siswa ke kamera
         </p>
 
       </div>
 
-
-      <!-- Area Scanner -->
 
       <div
         id="reader"
@@ -106,17 +212,13 @@
       ></div>
 
 
-      <!-- Status -->
-
       <div
         id="status"
         class="status"
       >
-        Menyiapkan scanner...
+        Scanner siap.
       </div>
 
-
-      <!-- Tombol -->
 
       <button
         id="startButton"
@@ -128,13 +230,43 @@
 
       </button>
 
+
+      <!-- AUTO SCAN -->
+
+      <div class="auto-scan-control">
+
+        <span>
+          🔄 Auto Scan
+        </span>
+
+        <label class="switch">
+
+          <input
+            type="checkbox"
+            id="autoScanToggle"
+            checked
+          >
+
+          <span class="slider"></span>
+
+        </label>
+
+        <span
+          id="autoScanLabel"
+          class="auto-label"
+        >
+          AKTIF
+        </span>
+
+      </div>
+
     </section>
 
 
 
-    <!-- =================================================
-         HASIL SCAN
-    ================================================== -->
+    <!-- ===============================================
+         HASIL
+    ================================================ -->
 
     <section
       id="result"
@@ -150,13 +282,24 @@
 
 
       <h2 id="resultTitle">
-        QR TERBACA
+        ABSENSI BERHASIL
       </h2>
+
+
+      <div
+        id="resultMessage"
+        class="result-message"
+      >
+        -
+      </div>
 
 
       <div class="student-info">
 
-        <div class="info-label">
+        <div
+          id="studentIdLabel"
+          class="info-label"
+        >
           ID Kartu
         </div>
 
@@ -184,32 +327,33 @@
 
 
 
-    <!-- =================================================
+    <!-- ===============================================
          INFORMASI
-    ================================================== -->
+    ================================================ -->
 
     <section class="info-card">
 
       <h3>
-        ℹ️ Informasi
+        ℹ️ Petunjuk
       </h3>
 
       <ul>
 
         <li>
-          Pastikan izin kamera diberikan.
+          Pastikan QR Code terlihat jelas.
         </li>
 
         <li>
-          Gunakan pencahayaan yang cukup.
+          Arahkan kartu ke dalam area scanner.
         </li>
 
         <li>
-          Arahkan QR Code tepat di dalam kotak scanner.
+          Tunggu suara dan hasil absensi.
         </li>
 
         <li>
-          Jangan terlalu dekat dengan kamera.
+          Jika Auto Scan aktif, kamera akan kembali
+          secara otomatis.
         </li>
 
       </ul>
@@ -221,9 +365,9 @@
 
 
 
-  <!-- =================================================
+  <!-- ===============================================
        FOOTER
-  ================================================== -->
+  ================================================ -->
 
   <footer class="footer">
 
@@ -232,14 +376,12 @@
     </p>
 
     <p>
-      V1 • Tahap Pengujian Scanner
+      V1 • Scanner Produksi
     </p>
 
   </footer>
 
 
-
-  <!-- JavaScript -->
 
   <script
     src="app.js">

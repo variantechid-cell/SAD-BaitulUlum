@@ -1,65 +1,40 @@
 /* =====================================================
-   GOOGLE APPS SCRIPT API
+   SISTEM ABSENSI KARTU PELAJAR
+   SCANNER V4.1
+   Android + Laptop
 ===================================================== */
 
 const API_URL =
   'https://script.google.com/a/macros/guru.smk.belajar.id/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec';
 /* =====================================================
-   ABSENSI SISWA
-   WEB SCANNER V1
-   TAHAP 3B-1
-
-   Fokus:
-   - Mengakses kameraonScanSuccess()
-   - Membaca QR / Barcode
-   - Menampilkan Student ID
-
-   BELUM TERHUBUNG KE GOOGLE SHEET
-===================================================== */
-
-
-/* =====================================================
    KONFIGURASI
 ===================================================== */
 
-const AUTO_SCAN_DELAY =
-  2500;
+const AUTO_SCAN_DELAY = 2500;
 
 
 /* =====================================================
-   VARIABLE SCANNER
+   VARIABLE
 ===================================================== */
 
-let html5QrCode =
-  null;
+let html5QrCode = null;
 
+let scannerRunning = false;
 
-let scannerRunning =
-  false;
-
-
-let processingScan =
-  false;
+let processingScan = false;
 
 
 /* =====================================================
-   COUNTER SESI
+   COUNTER
 ===================================================== */
 
-let countPresent =
-  0;
+let countPresent = 0;
 
+let countLate = 0;
 
-let countLate =
-  0;
+let countAlready = 0;
 
-
-let countAlready =
-  0;
-
-
-let countError =
-  0;
+let countError = 0;
 
 
 /* =====================================================
@@ -67,169 +42,186 @@ let countError =
 ===================================================== */
 
 const statusElement =
-  document.getElementById(
-    'status'
-  );
-
+  document.getElementById('status');
 
 const resultElement =
-  document.getElementById(
-    'result'
-  );
-
+  document.getElementById('result');
 
 const scannerCard =
-  document.getElementById(
-    'scannerCard'
-  );
-
+  document.getElementById('scannerCard');
 
 const studentIdElement =
-  document.getElementById(
-    'studentId'
-  );
-
+  document.getElementById('studentId');
 
 const resultTitleElement =
-  document.getElementById(
-    'resultTitle'
-  );
-
+  document.getElementById('resultTitle');
 
 const resultIconElement =
-  document.getElementById(
-    'resultIcon'
-  );
-
+  document.getElementById('resultIcon');
 
 const resultMessageElement =
-  document.getElementById(
-    'resultMessage'
-  );
-
+  document.getElementById('resultMessage');
 
 const startButton =
-  document.getElementById(
-    'startButton'
-  );
-
+  document.getElementById('startButton');
 
 const scanAgainButton =
-  document.getElementById(
-    'scanAgainButton'
-  );
-
+  document.getElementById('scanAgainButton');
 
 const autoScanToggle =
-  document.getElementById(
-    'autoScanToggle'
-  );
-
+  document.getElementById('autoScanToggle');
 
 const autoScanLabel =
-  document.getElementById(
-    'autoScanLabel'
-  );
+  document.getElementById('autoScanLabel');
 
 
 /* =====================================================
    LOAD
 ===================================================== */
 
-window.addEventListener(
-  'load',
-  function () {
+window.addEventListener('load', function () {
 
-    console.log(
-      'Scanner V1 siap.'
-    );
+  console.log(
+    '=== ABSENSI V4.1 ==='
+  );
 
-
-    if (
-      typeof Html5Qrcode ===
-      'undefined'
-    ) {
-
-      setStatus(
-        '🔴 Library scanner gagal dimuat.'
-      );
-
-      return;
-
-    }
+  console.log(
+    'Halaman selesai dimuat.'
+  );
 
 
-    updateDateTime();
-
-
-    setInterval(
-      updateDateTime,
-      1000
-    );
-
+  if (
+    typeof Html5Qrcode === 'undefined'
+  ) {
 
     setStatus(
-      '🟢 Scanner siap.'
+      '🔴 Library scanner gagal dimuat.'
     );
 
+    console.error(
+      'Html5Qrcode tidak ditemukan.'
+    );
+
+    return;
   }
-);
+
+
+  updateDateTime();
+
+  setInterval(
+    updateDateTime,
+    1000
+  );
+
+
+  setStatus(
+    '🟢 Scanner siap.'
+  );
+
+
+  /*
+   * Persiapkan audio dari interaksi
+   * pengguna.
+   */
+
+  prepareSpeech();
+
+
+});
 
 
 /* =====================================================
-   BUTTON
+   TOMBOL MULAI
 ===================================================== */
 
-startButton.addEventListener(
-  'click',
-  function () {
+if (startButton) {
 
-    startScanner();
+  startButton.addEventListener(
+    'click',
+    function () {
 
-  }
-);
-
-
-scanAgainButton.addEventListener(
-  'click',
-  function () {
-
-    restartScanner();
-
-  }
-);
+      console.log(
+        'Tombol Mulai Scanner ditekan.'
+      );
 
 
-/* =====================================================
-   AUTO SCAN TOGGLE
-===================================================== */
+      /*
+       * Aktifkan audio dari interaksi
+       * pengguna.
+       */
 
-autoScanToggle.addEventListener(
-  'change',
-  function () {
+      prepareSpeech();
 
-    if (
-      autoScanToggle.checked
-    ) {
 
-      autoScanLabel.textContent =
-        'AKTIF';
+      speak(
+        'Scanner siap'
+      );
 
-      autoScanLabel.style.color =
-        '#16a34a';
 
-    } else {
-
-      autoScanLabel.textContent =
-        'MATI';
-
-      autoScanLabel.style.color =
-        '#64748b';
+      startScanner();
 
     }
+  );
 
-  }
-);
+}
+
+
+/* =====================================================
+   TOMBOL SCAN LAGI
+===================================================== */
+
+if (scanAgainButton) {
+
+  scanAgainButton.addEventListener(
+    'click',
+    function () {
+
+      console.log(
+        'Tombol Scan Lagi ditekan.'
+      );
+
+      restartScanner();
+
+    }
+  );
+
+}
+
+
+/* =====================================================
+   AUTO SCAN
+===================================================== */
+
+if (autoScanToggle) {
+
+  autoScanToggle.addEventListener(
+    'change',
+    function () {
+
+      if (
+        autoScanToggle.checked
+      ) {
+
+        autoScanLabel.textContent =
+          'AKTIF';
+
+        autoScanLabel.style.color =
+          '#16a34a';
+
+      } else {
+
+        autoScanLabel.textContent =
+          'MATI';
+
+        autoScanLabel.style.color =
+          '#64748b';
+
+      }
+
+    }
+  );
+
+}
 
 
 /* =====================================================
@@ -237,6 +229,11 @@ autoScanToggle.addEventListener(
 ===================================================== */
 
 function startScanner() {
+
+  console.log(
+    'Memulai scanner...'
+  );
+
 
   processingScan =
     false;
@@ -251,13 +248,16 @@ function startScanner() {
 
 
   setStatus(
-    '📷 Meminta izin kamera...'
+    '📷 Memeriksa kamera...'
   );
 
 
+  /*
+   * Pastikan library tersedia
+   */
+
   if (
-    typeof Html5Qrcode ===
-    'undefined'
+    typeof Html5Qrcode === 'undefined'
   ) {
 
     setStatus(
@@ -269,33 +269,36 @@ function startScanner() {
   }
 
 
+  /*
+   * Jika scanner lama masih aktif
+   */
+
   if (
     html5QrCode &&
     scannerRunning
   ) {
 
-    html5QrCode
-      .stop()
+    console.log(
+      'Scanner lama masih aktif.'
+    );
+
+
+    stopScanner()
       .then(function () {
 
-        scannerRunning =
-          false;
-
-        createScanner();
+        getCameraAndStart();
 
       })
       .catch(function () {
 
-        scannerRunning =
-          false;
-
-        createScanner();
+        getCameraAndStart();
 
       });
 
+
   } else {
 
-    createScanner();
+    getCameraAndStart();
 
   }
 
@@ -303,10 +306,153 @@ function startScanner() {
 
 
 /* =====================================================
-   CREATE SCANNER
+   DETEKSI KAMERA
 ===================================================== */
 
-function createScanner() {
+function getCameraAndStart() {
+
+  setStatus(
+    '📷 Meminta izin kamera...'
+  );
+
+
+  console.log(
+    'Memanggil Html5Qrcode.getCameras()'
+  );
+
+
+  Html5Qrcode
+    .getCameras()
+
+    .then(function (cameras) {
+
+      console.log(
+        'Daftar kamera:',
+        cameras
+      );
+
+
+      if (
+        !cameras ||
+        cameras.length === 0
+      ) {
+
+        setStatus(
+          '🔴 Kamera tidak ditemukan.'
+        );
+
+        return;
+
+      }
+
+
+      /*
+       * Tampilkan jumlah kamera
+       */
+
+      console.log(
+        'Jumlah kamera:',
+        cameras.length
+      );
+
+
+      /*
+       * Pilih kamera
+       */
+
+      let selectedCamera =
+        cameras[0];
+
+
+      /*
+       * Prioritaskan kamera belakang
+       */
+
+      for (
+        let i = 0;
+        i < cameras.length;
+        i++
+      ) {
+
+        const label =
+          String(
+            cameras[i].label || ''
+          ).toLowerCase();
+
+
+        if (
+
+          label.includes('back') ||
+
+          label.includes('rear') ||
+
+          label.includes('environment') ||
+
+          label.includes('belakang')
+
+        ) {
+
+          selectedCamera =
+            cameras[i];
+
+          break;
+
+        }
+
+      }
+
+
+      console.log(
+        'Kamera terpilih:',
+        selectedCamera
+      );
+
+
+      startCamera(
+        selectedCamera.id
+      );
+
+    })
+
+    .catch(function (error) {
+
+      console.error(
+        'GET CAMERA ERROR:',
+        error
+      );
+
+
+      showCameraError(
+        error
+      );
+
+    });
+
+}
+
+
+/* =====================================================
+   START CAMERA
+===================================================== */
+
+function startCamera(
+  cameraId
+) {
+
+  setStatus(
+    '📷 Menyalakan kamera...'
+  );
+
+
+  console.log(
+    'Camera ID:',
+    cameraId
+  );
+
+
+  /*
+   * Bersihkan reader
+   */
 
   const reader =
     document.getElementById(
@@ -314,15 +460,38 @@ function createScanner() {
     );
 
 
+  if (!reader) {
+
+    console.error(
+      'Element #reader tidak ditemukan.'
+    );
+
+    setStatus(
+      '🔴 Area scanner tidak ditemukan.'
+    );
+
+    return;
+
+  }
+
+
   reader.innerHTML =
     '';
 
+
+  /*
+   * Buat instance baru
+   */
 
   html5QrCode =
     new Html5Qrcode(
       'reader'
     );
 
+
+  /*
+   * Konfigurasi
+   */
 
   const config = {
 
@@ -331,18 +500,16 @@ function createScanner() {
 
     qrbox:
       function (
-        viewfinderWidth,
-        viewfinderHeight
+        width,
+        height
       ) {
 
         const size =
           Math.floor(
-
             Math.min(
-              viewfinderWidth,
-              viewfinderHeight
+              width,
+              height
             ) * 0.70
-
           );
 
 
@@ -356,19 +523,24 @@ function createScanner() {
 
         };
 
-      }
+      },
+
+    aspectRatio:
+      1.0
 
   };
+
+
+  console.log(
+    'Menjalankan kamera...'
+  );
 
 
   html5QrCode
 
     .start(
 
-      {
-        facingMode:
-          'environment'
-      },
+      cameraId,
 
       config,
 
@@ -394,17 +566,21 @@ function createScanner() {
 
 
       console.log(
-        'Kamera aktif.'
+        'KAMERA BERHASIL AKTIF.'
       );
 
     })
 
-    .catch(function (
-      error
-    ) {
+    .catch(function (error) {
 
       scannerRunning =
         false;
+
+
+      console.error(
+        'START CAMERA ERROR:',
+        error
+      );
 
 
       showCameraError(
@@ -445,20 +621,21 @@ function onScanSuccess(
 
 
   console.log(
-    'QR:',
+    'QR TERBACA:',
     studentId
   );
 
 
-  stopScanner();
+  stopScanner()
+    .finally(function () {
 
+      showProcessing();
 
-  showProcessing();
+      processAttendance(
+        studentId
+      );
 
-
-  processAttendance(
-    studentId
-  );
+    });
 
 }
 
@@ -472,7 +649,7 @@ function onScanError(
 ) {
 
   /*
-   * Sengaja kosong.
+   * Jangan tampilkan error scan biasa.
    */
 
 }
@@ -515,12 +692,18 @@ function showProcessing() {
 
 
 /* =====================================================
-   API ABSENSI
+   API
 ===================================================== */
 
 function processAttendance(
   studentId
 ) {
+
+  console.log(
+    'Mengirim ID:',
+    studentId
+  );
+
 
   const url =
     API_URL +
@@ -531,21 +714,17 @@ function processAttendance(
     );
 
 
-  console.log(
-    'Mengirim ke API:',
-    url
-  );
-
-
   fetch(url)
 
-    .then(function (
-      response
-    ) {
+    .then(function (response) {
 
-      if (
-        !response.ok
-      ) {
+      console.log(
+        'HTTP STATUS:',
+        response.status
+      );
+
+
+      if (!response.ok) {
 
         throw new Error(
           'HTTP ' +
@@ -559,12 +738,10 @@ function processAttendance(
 
     })
 
-    .then(function (
-      result
-    ) {
+    .then(function (result) {
 
       console.log(
-        'API RESULT:',
+        'HASIL ABSENSI:',
         result
       );
 
@@ -575,9 +752,7 @@ function processAttendance(
 
     })
 
-    .catch(function (
-      error
-    ) {
+    .catch(function (error) {
 
       console.error(
         'API ERROR:',
@@ -594,7 +769,7 @@ function processAttendance(
 
         'KONEKSI GAGAL',
 
-        'Tidak dapat terhubung ke server absensi.'
+        'Tidak dapat terhubung ke server.'
 
       );
 
@@ -612,7 +787,7 @@ function processAttendance(
 
 
 /* =====================================================
-   HANDLE RESULT
+   RESULT
 ===================================================== */
 
 function handleAttendanceResult(
@@ -752,14 +927,9 @@ function handleSuccess(
 
   const status =
     String(
-      attendance.status ||
-      ''
+      attendance.status || ''
     ).toLowerCase();
 
-
-  /*
-   * Tentukan Hadir / Terlambat
-   */
 
   if (
     status.includes(
@@ -778,10 +948,6 @@ function handleSuccess(
 
   updateCounters();
 
-
-  /*
-   * TAMPILKAN
-   */
 
   scannerCard.style.display =
     'none';
@@ -845,37 +1011,30 @@ function handleSuccess(
   studentIdElement.innerHTML =
 
     '<strong>' +
-
     escapeHtml(
       student.nama
     ) +
-
     '</strong>' +
 
     '<br>' +
 
     '<span>' +
-
     escapeHtml(
       student.kelas
     ) +
-
     '</span>' +
 
     '<br><br>' +
 
     '<strong>' +
-
     escapeHtml(
       attendance.status
     ) +
-
     '</strong>' +
 
     '<br>' +
 
     '<small>' +
-
     escapeHtml(
       attendance.tanggal
     ) +
@@ -886,9 +1045,7 @@ function handleSuccess(
       attendance.jam
     ) +
 
-    ' WIB' +
-
-    '</small>';
+    ' WIB</small>';
 
 
   scheduleNextScan();
@@ -944,28 +1101,22 @@ function handleAlready(
   studentIdElement.innerHTML =
 
     '<strong>' +
-
     escapeHtml(
       student.nama
     ) +
-
     '</strong>' +
 
     '<br>' +
 
     '<span>' +
-
     escapeHtml(
       student.kelas
     ) +
-
     '</span>' +
 
     '<br><br>' +
 
-    'Status: ' +
-
-    '<strong>' +
+    'Status: <strong>' +
 
     escapeHtml(
       previous.status
@@ -1037,15 +1188,10 @@ function showAttendanceError(
 
 
 /* =====================================================
-   AUTO NEXT SCAN
+   NEXT SCAN
 ===================================================== */
 
 function scheduleNextScan() {
-
-  /*
-   * Kalau Auto Scan MATI,
-   * berhenti di halaman hasil.
-   */
 
   if (
     !autoScanToggle.checked
@@ -1076,6 +1222,11 @@ function scheduleNextScan() {
 
 function restartScanner() {
 
+  console.log(
+    'Restart scanner...'
+  );
+
+
   processingScan =
     false;
 
@@ -1098,31 +1249,16 @@ function restartScanner() {
     scannerRunning
   ) {
 
-    html5QrCode
+    stopScanner()
+      .finally(function () {
 
-      .stop()
-
-      .then(function () {
-
-        scannerRunning =
-          false;
-
-        createScanner();
-
-      })
-
-      .catch(function () {
-
-        scannerRunning =
-          false;
-
-        createScanner();
+        getCameraAndStart();
 
       });
 
   } else {
 
-    createScanner();
+    getCameraAndStart();
 
   }
 
@@ -1135,42 +1271,58 @@ function restartScanner() {
 
 function stopScanner() {
 
-  if (
-    html5QrCode &&
-    scannerRunning
-  ) {
+  return new Promise(
+    function (resolve) {
 
-    html5QrCode
-
-      .stop()
-
-      .then(function () {
-
-        scannerRunning =
-          false;
-
-
-        console.log(
-          'Scanner dihentikan.'
-        );
-
-      })
-
-      .catch(function (
-        error
+      if (
+        !html5QrCode ||
+        !scannerRunning
       ) {
 
-        console.error(
-          'Stop scanner error:',
-          error
-        );
-
         scannerRunning =
           false;
 
-      });
+        resolve();
 
-  }
+        return;
+
+      }
+
+
+      console.log(
+        'Menghentikan kamera...'
+      );
+
+
+      html5QrCode
+
+        .stop()
+
+        .then(function () {
+
+          scannerRunning =
+            false;
+
+          resolve();
+
+        })
+
+        .catch(function (error) {
+
+          console.error(
+            'STOP ERROR:',
+            error
+          );
+
+          scannerRunning =
+            false;
+
+          resolve();
+
+        });
+
+    }
+  );
 
 }
 
@@ -1208,7 +1360,7 @@ function updateCounters() {
 
 
 /* =====================================================
-   DATE & TIME
+   DATE
 ===================================================== */
 
 function updateDateTime() {
@@ -1267,16 +1419,10 @@ function updateDateTime() {
 
 
 /* =====================================================
-   SUARA
+   SPEECH
 ===================================================== */
 
-function speak(
-  text
-) {
-
-  /*
-   * Cek dukungan browser
-   */
+function prepareSpeech() {
 
   if (
     !(
@@ -1286,7 +1432,7 @@ function speak(
   ) {
 
     console.warn(
-      'Speech synthesis tidak tersedia.'
+      'Speech Synthesis tidak tersedia.'
     );
 
     return;
@@ -1295,37 +1441,85 @@ function speak(
 
 
   /*
-   * Hentikan suara sebelumnya
+   * Cancel speech sebelumnya.
    */
 
   window.speechSynthesis.cancel();
 
+}
 
-  const utterance =
-    new SpeechSynthesisUtterance(
-      text
+
+/* =====================================================
+   SPEAK
+===================================================== */
+
+function speak(
+  text
+) {
+
+  if (
+    !(
+      'speechSynthesis'
+      in window
+    )
+  ) {
+
+    console.warn(
+      'Browser tidak mendukung suara.'
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    window.speechSynthesis.cancel();
+
+
+    const utterance =
+      new SpeechSynthesisUtterance(
+        text
+      );
+
+
+    utterance.lang =
+      'id-ID';
+
+
+    utterance.rate =
+      0.9;
+
+
+    utterance.pitch =
+      1;
+
+
+    utterance.volume =
+      1;
+
+
+    window.speechSynthesis.speak(
+      utterance
     );
 
 
-  utterance.lang =
-    'id-ID';
+    console.log(
+      'VOICE:',
+      text
+    );
 
+  }
 
-  utterance.rate =
-    0.95;
+  catch (error) {
 
+    console.error(
+      'VOICE ERROR:',
+      error
+    );
 
-  utterance.pitch =
-    1;
-
-
-  utterance.volume =
-    1;
-
-
-  window.speechSynthesis.speak(
-    utterance
-  );
+  }
 
 }
 
@@ -1347,6 +1541,12 @@ function setStatus(
 
   }
 
+
+  console.log(
+    'STATUS:',
+    message
+  );
+
 }
 
 
@@ -1359,7 +1559,10 @@ function showCameraError(
 ) {
 
   console.error(
-    'CAMERA ERROR:',
+    '=== CAMERA ERROR ==='
+  );
+
+  console.error(
     error
   );
 
@@ -1369,32 +1572,37 @@ function showCameraError(
 
 
   if (
-    error &&
-    error.name
+    error
   ) {
 
-    message +=
-      ' [' +
-      error.name +
-      ']';
+    if (
+      error.name
+    ) {
 
-  }
+      message +=
+        ' [' +
+        error.name +
+        ']';
+
+    }
 
 
-  if (
-    error &&
-    error.message
-  ) {
+    if (
+      error.message
+    ) {
 
-    message +=
-      ' ' +
-      error.message;
+      message +=
+        ' ' +
+        error.message;
+
+    }
 
   }
 
 
   setStatus(
-    '🔴 ' + message
+    '🔴 ' +
+    message
   );
 
 
@@ -1415,33 +1623,6 @@ function escapeHtml(
   return String(
     value ?? ''
   )
-
-  .replace(
-    /&/g,
-    '&amp;'
-  )
-
-  .replace(
-    /</g,
-    '&lt;'
-  )
-
-  .replace(
-    />/g,
-    '&gt;'
-  )
-
-  .replace(
-    /"/g,
-    '&quot;'
-  )
-
-  .replace(
-    /'/g,
-    '&#039;'
-  );
-
-}
 
   .replace(
     /&/g,

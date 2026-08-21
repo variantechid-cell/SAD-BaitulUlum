@@ -959,3 +959,106 @@ body {
   }
 
 }
+/* =====================================================
+   DASHBOARD SUMMARY
+===================================================== */
+
+.summary-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 15px;
+
+  width: 100%;
+
+  margin: 20px 0;
+
+}
+
+
+.summary-card {
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  padding: 18px;
+
+  text-align: center;
+
+  box-shadow:
+    0 4px 15px
+    rgba(0,0,0,0.08);
+
+}
+
+
+.summary-icon {
+
+  font-size: 28px;
+
+  margin-bottom: 8px;
+
+}
+
+
+.summary-label {
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  color: #64748b;
+
+  letter-spacing:
+    0.5px;
+
+}
+
+
+.summary-value {
+
+  font-size: 32px;
+
+  font-weight: 800;
+
+  margin-top: 5px;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (
+  max-width: 700px
+) {
+
+  .summary-grid {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+    gap: 10px;
+
+  }
+
+
+  .summary-card {
+
+    padding: 14px;
+
+  }
+
+
+  .summary-value {
+
+    font-size: 26px;
+
+  }
+
+}

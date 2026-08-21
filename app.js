@@ -839,6 +839,7 @@ function handleAttendanceResult(
     countError++;
 
     updateCounters();
+     loadTodaySummary();
 
 
     showAttendanceError(

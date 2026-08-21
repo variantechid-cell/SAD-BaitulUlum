@@ -121,16 +121,17 @@ window.addEventListener('load', function () {
   );
 
 
+  /*
+   * Muat statistik absensi
+   */
+
+  loadTodaySummary();
+
+
   setStatus(
     '🟢 Scanner siap.'
   );
 
-   loadTodaySummary();
-
-  /*
-   * Persiapkan audio dari interaksi
-   * pengguna.
-   */
 
   prepareSpeech();
 

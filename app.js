@@ -770,6 +770,7 @@ function processAttendance(
       countError++;
 
       updateCounters();
+      loadTodaySummary();
 
 
       showAttendanceError(

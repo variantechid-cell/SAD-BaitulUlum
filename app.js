@@ -1081,7 +1081,7 @@ function handleAlready(
   countAlready++;
 
   updateCounters();
-  loadTodaySummary();
+ 
 
 
   scannerCard.style.display =

@@ -125,6 +125,7 @@ window.addEventListener('load', function () {
     '🟢 Scanner siap.'
   );
 
+   loadTodaySummary();
 
   /*
    * Persiapkan audio dari interaksi
@@ -132,7 +133,6 @@ window.addEventListener('load', function () {
    */
 
   prepareSpeech();
-
 
 });
 
@@ -1714,5 +1714,67 @@ function loadTodaySummary() {
     )
 
     .getTodaySummary();
+
+}
+
+/* =====================================================
+   UPDATE SUMMARY
+===================================================== */
+
+function updateSummary(
+  result
+) {
+
+  const total =
+    document.getElementById(
+      'summaryTotal'
+    );
+
+  const hadir =
+    document.getElementById(
+      'summaryHadir'
+    );
+
+  const terlambat =
+    document.getElementById(
+      'summaryTerlambat'
+    );
+
+  const sudahAbsen =
+    document.getElementById(
+      'summarySudahAbsen'
+    );
+
+
+  if (total) {
+
+    total.textContent =
+      result.total || 0;
+
+  }
+
+
+  if (hadir) {
+
+    hadir.textContent =
+      result.hadir || 0;
+
+  }
+
+
+  if (terlambat) {
+
+    terlambat.textContent =
+      result.terlambat || 0;
+
+  }
+
+
+  if (sudahAbsen) {
+
+    sudahAbsen.textContent =
+      result.sudahAbsen || 0;
+
+  }
 
 }

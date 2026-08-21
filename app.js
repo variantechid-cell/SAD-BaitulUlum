@@ -4,8 +4,15 @@
    Android + Laptop
 ===================================================== */
 
+
+/* =====================================================
+   API
+===================================================== */
+
 const API_URL =
-  'https://script.google.com/a/macros/guru.smk.belajar.id/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec';
+  'https://script.google.com/macros/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec';
+
+
 /* =====================================================
    KONFIGURASI
 ===================================================== */

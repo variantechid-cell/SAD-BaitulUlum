@@ -18,20 +18,6 @@
 const API_URL =
   'https://script.google.com/macros/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec';
 
-/* =====================================================
-   SISTEM ABSENSI KARTU PELAJAR
-   SCANNER V4.1
-   Android + Laptop
-===================================================== */
-
-
-/* =====================================================
-   API
-===================================================== */
-
-const API_URL =
-  'MASUKKAN_URL_WEB_APP_APPS_SCRIPT_DI_SINI';
-
 
 /* =====================================================
    KONFIGURASI

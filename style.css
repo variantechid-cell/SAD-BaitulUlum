@@ -3,9 +3,16 @@
 ===================================================== */
 
 * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+
+  box-sizing:
+    border-box;
+
+  margin:
+    0;
+
+  padding:
+    0;
+
 }
 
 
@@ -44,7 +51,8 @@ body {
     18px 20px;
 
   box-shadow:
-    0 2px 10px rgba(
+    0 2px 10px
+    rgba(
       0,
       0,
       0,
@@ -57,7 +65,7 @@ body {
 .header-content {
 
   max-width:
-    600px;
+    700px;
 
   margin:
     auto;
@@ -77,10 +85,10 @@ body {
 .logo {
 
   width:
-    48px;
+    50px;
 
   height:
-    48px;
+    50px;
 
   border-radius:
     12px;
@@ -103,12 +111,12 @@ body {
     center;
 
   font-size:
-    26px;
+    27px;
 
 }
 
 
-.header h1 {
+.school-info h1 {
 
   font-size:
     20px;
@@ -119,16 +127,19 @@ body {
 }
 
 
-.header p {
+.school-info p {
 
   margin-top:
     4px;
 
   font-size:
-    13px;
+    12px;
 
   opacity:
     0.75;
+
+  letter-spacing:
+    0.5px;
 
 }
 
@@ -145,10 +156,168 @@ body {
     );
 
   max-width:
-    600px;
+    700px;
 
   margin:
-    25px auto;
+    20px auto;
+
+}
+
+
+/* =====================================================
+   DATE CARD
+===================================================== */
+
+.date-card {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:
+    10px;
+
+  margin-bottom:
+    12px;
+
+}
+
+
+.date-card > div {
+
+  background:
+    white;
+
+  border-radius:
+    12px;
+
+  padding:
+    12px 15px;
+
+  box-shadow:
+    0 3px 12px
+    rgba(
+      15,
+      23,
+      42,
+      0.06
+    );
+
+}
+
+
+.date-label {
+
+  display:
+    block;
+
+  color:
+    #64748b;
+
+  font-size:
+    11px;
+
+  margin-bottom:
+    5px;
+
+}
+
+
+.date-card strong {
+
+  display:
+    block;
+
+  font-size:
+    14px;
+
+}
+
+
+/* =====================================================
+   COUNTER
+===================================================== */
+
+.counter-grid {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      1fr
+    );
+
+  gap:
+    8px;
+
+  margin-bottom:
+    14px;
+
+}
+
+
+.counter-card {
+
+  background:
+    white;
+
+  border-radius:
+    12px;
+
+  padding:
+    10px 5px;
+
+  text-align:
+    center;
+
+  box-shadow:
+    0 3px 12px
+    rgba(
+      15,
+      23,
+      42,
+      0.06
+    );
+
+}
+
+
+.counter-icon {
+
+  display:
+    block;
+
+  font-size:
+    17px;
+
+}
+
+
+.counter-card strong {
+
+  display:
+    block;
+
+  font-size:
+    21px;
+
+  margin:
+    2px 0;
+
+}
+
+
+.counter-card small {
+
+  color:
+    #64748b;
+
+  font-size:
+    10px;
 
 }
 
@@ -171,10 +340,11 @@ body {
     20px;
 
   margin-bottom:
-    18px;
+    15px;
 
   box-shadow:
-    0 4px 18px rgba(
+    0 4px 18px
+    rgba(
       15,
       23,
       42,
@@ -194,7 +364,7 @@ body {
     center;
 
   margin-bottom:
-    18px;
+    15px;
 
 }
 
@@ -202,7 +372,7 @@ body {
 .card-header h2 {
 
   font-size:
-    20px;
+    19px;
 
 }
 
@@ -210,16 +380,13 @@ body {
 .card-header p {
 
   margin-top:
-    7px;
+    6px;
 
   color:
     #64748b;
 
   font-size:
-    14px;
-
-  line-height:
-    1.5;
+    13px;
 
 }
 
@@ -234,10 +401,10 @@ body {
     100%;
 
   max-width:
-    420px;
+    450px;
 
   margin:
-    0 auto;
+    auto;
 
   overflow:
     hidden;
@@ -247,11 +414,6 @@ body {
 
 }
 
-
-/*
-   Library html5-qrcode akan membuat
-   elemen video di dalam #reader.
-*/
 
 #reader video {
 
@@ -264,6 +426,14 @@ body {
 }
 
 
+#reader img {
+
+  max-width:
+    100%;
+
+}
+
+
 /* =====================================================
    STATUS
 ===================================================== */
@@ -271,10 +441,10 @@ body {
 .status {
 
   margin-top:
-    15px;
+    13px;
 
   padding:
-    13px;
+    12px;
 
   border-radius:
     10px;
@@ -289,10 +459,10 @@ body {
     center;
 
   font-size:
-    14px;
+    13px;
 
   font-weight:
-    600;
+    700;
 
 }
 
@@ -316,28 +486,16 @@ body {
     14px 18px;
 
   margin-top:
-    15px;
+    14px;
 
   font-size:
-    15px;
+    14px;
 
   font-weight:
     700;
 
   cursor:
     pointer;
-
-  transition:
-    transform 0.15s ease,
-    opacity 0.15s ease;
-
-}
-
-
-.button:active {
-
-  transform:
-    scale(0.98);
 
 }
 
@@ -353,10 +511,166 @@ body {
 }
 
 
-.button:hover {
+.button:active {
+
+  transform:
+    scale(
+      0.98
+    );
+
+}
+
+
+/* =====================================================
+   AUTO SCAN
+===================================================== */
+
+.auto-scan-control {
+
+  margin-top:
+    15px;
+
+  padding:
+    11px 13px;
+
+  border-radius:
+    10px;
+
+  background:
+    #f8fafc;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    9px;
+
+  font-size:
+    13px;
+
+  font-weight:
+    700;
+
+}
+
+
+.auto-label {
+
+  color:
+    #16a34a;
+
+  font-size:
+    11px;
+
+}
+
+
+/* =====================================================
+   SWITCH
+===================================================== */
+
+.switch {
+
+  position:
+    relative;
+
+  width:
+    44px;
+
+  height:
+    24px;
+
+}
+
+
+.switch input {
 
   opacity:
-    0.9;
+    0;
+
+  width:
+    0;
+
+  height:
+    0;
+
+}
+
+
+.slider {
+
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  background:
+    #cbd5e1;
+
+  border-radius:
+    20px;
+
+  cursor:
+    pointer;
+
+}
+
+
+.slider::before {
+
+  content:
+    "";
+
+  position:
+    absolute;
+
+  width:
+    18px;
+
+  height:
+    18px;
+
+  left:
+    3px;
+
+  top:
+    3px;
+
+  background:
+    white;
+
+  border-radius:
+    50%;
+
+  transition:
+    0.2s;
+
+}
+
+
+.switch input:checked
++ .slider {
+
+  background:
+    #16a34a;
+
+}
+
+
+.switch input:checked
++ .slider::before {
+
+  transform:
+    translateX(
+      20px
+    );
 
 }
 
@@ -367,11 +681,11 @@ body {
 
 .result {
 
-  text-align:
-    center;
-
   display:
     none;
+
+  text-align:
+    center;
 
 }
 
@@ -379,10 +693,10 @@ body {
 .result-icon {
 
   font-size:
-    55px;
+    58px;
 
   margin-bottom:
-    8px;
+    6px;
 
 }
 
@@ -390,29 +704,15 @@ body {
 .result h2 {
 
   font-size:
-    20px;
+    21px;
 
 }
 
 
-.student-info {
+.result-message {
 
   margin-top:
-    20px;
-
-  padding:
-    18px;
-
-  background:
-    #f8fafc;
-
-  border-radius:
-    12px;
-
-}
-
-
-.info-label {
+    7px;
 
   color:
     #64748b;
@@ -423,19 +723,87 @@ body {
 }
 
 
+.student-info {
+
+  margin-top:
+    17px;
+
+  padding:
+    18px;
+
+  border-radius:
+    12px;
+
+  background:
+    #f8fafc;
+
+}
+
+
+.info-label {
+
+  color:
+    #64748b;
+
+  font-size:
+    12px;
+
+}
+
+
 .student-id {
 
   margin-top:
-    7px;
+    8px;
 
   font-size:
-    22px;
+    20px;
 
   font-weight:
     800;
 
-  letter-spacing:
-    0.5px;
+  line-height:
+    1.6;
+
+}
+
+
+/* =====================================================
+   RESULT STATUS
+===================================================== */
+
+.result.success {
+
+  border-top:
+    6px solid
+    #16a34a;
+
+}
+
+
+.result.late {
+
+  border-top:
+    6px solid
+    #eab308;
+
+}
+
+
+.result.already {
+
+  border-top:
+    6px solid
+    #f97316;
+
+}
+
+
+.result.error {
+
+  border-top:
+    6px solid
+    #dc2626;
 
 }
 
@@ -447,10 +815,10 @@ body {
 .info-card h3 {
 
   font-size:
-    17px;
+    16px;
 
   margin-bottom:
-    12px;
+    10px;
 
 }
 
@@ -458,7 +826,7 @@ body {
 .info-card ul {
 
   padding-left:
-    20px;
+    19px;
 
 }
 
@@ -466,13 +834,13 @@ body {
 .info-card li {
 
   margin-bottom:
-    8px;
+    7px;
 
   color:
     #475569;
 
   font-size:
-    14px;
+    13px;
 
   line-height:
     1.4;
@@ -490,13 +858,13 @@ body {
     center;
 
   padding:
-    20px;
+    15px;
 
   color:
     #64748b;
 
   font-size:
-    12px;
+    11px;
 
 }
 
@@ -504,7 +872,7 @@ body {
 .footer p + p {
 
   margin-top:
-    4px;
+    3px;
 
 }
 
@@ -521,11 +889,11 @@ body {
 
     width:
       calc(
-        100% - 20px
+        100% - 16px
       );
 
     margin-top:
-      15px;
+      12px;
 
   }
 
@@ -535,7 +903,7 @@ body {
   .info-card {
 
     padding:
-      15px;
+      14px;
 
     border-radius:
       15px;
@@ -543,18 +911,50 @@ body {
   }
 
 
-  .header {
+  .counter-grid {
 
-    padding:
-      15px;
+    gap:
+      5px;
 
   }
 
 
-  .header h1 {
+  .counter-card {
+
+    padding:
+      8px 3px;
+
+  }
+
+
+  .counter-card strong {
 
     font-size:
       18px;
+
+  }
+
+
+  .counter-card small {
+
+    font-size:
+      9px;
+
+  }
+
+
+  .school-info h1 {
+
+    font-size:
+      17px;
+
+  }
+
+
+  .school-info p {
+
+    font-size:
+      10px;
 
   }
 

@@ -92,55 +92,61 @@ const autoScanLabel =
    LOAD
 ===================================================== */
 
-window.addEventListener('load', function () {
+window.addEventListener(
+  'load',
+  function () {
 
-  console.log(
-    '=== ABSENSI V4.1 ==='
-  );
+    console.log(
+      '=== ABSENSI V4.1 ==='
+    );
 
-  console.log(
-    'Halaman selesai dimuat.'
-  );
+    console.log(
+      'Halaman selesai dimuat.'
+    );
 
 
-  if (
-    typeof Html5Qrcode === 'undefined'
-  ) {
+    if (
+      typeof Html5Qrcode === 'undefined'
+    ) {
+
+      setStatus(
+        '🔴 Library scanner gagal dimuat.'
+      );
+
+      console.error(
+        'Html5Qrcode tidak ditemukan.'
+      );
+
+      return;
+    }
+
+
+    updateDateTime();
+
+    setInterval(
+      updateDateTime,
+      1000
+    );
+
 
     setStatus(
-      '🔴 Library scanner gagal dimuat.'
+      '🟢 Scanner siap.'
     );
 
-    console.error(
-      'Html5Qrcode tidak ditemukan.'
-    );
 
-    return;
+    prepareSpeech();
+
+
+    /*
+     * =====================================
+     * LOAD REKAP ABSENSI
+     * =====================================
+     */
+
+    loadTodaySummary();
+
   }
-
-
-  updateDateTime();
-
-  setInterval(
-    updateDateTime,
-    1000
-  );
-
-
-  setStatus(
-    '🟢 Scanner siap.'
-  );
-
-
-  /*
-   * Persiapkan audio dari interaksi
-   * pengguna.
-   */
-
-  prepareSpeech();
-
-
-});
+);
 
 
 /* =====================================================

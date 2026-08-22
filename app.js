@@ -1,20 +1,30 @@
 /* =====================================================
    SISTEM ABSENSI KARTU PELAJAR
-   APP.JS V5.1
+   SMP BAITUL ULUM BOARDING SCHOOL
 
-   FUNGSI:
+   APP.JS V6.0
+
+   FITUR:
    - Scanner QR
    - Kamera HP / Laptop
    - Validasi siswa
    - Absensi Google Sheet
-   - Status Hadir
-   - Status Terlambat
+   - Hadir
+   - Terlambat
    - Sudah Absen
-   - Siswa Tidak Ditemukan
+   - Data Tidak Ditemukan
+   - Siswa Tidak Aktif
    - Error Server
-   - Timeout Server
-   - Auto recovery scanner
+   - Auto Scan
+   - Rekap Absensi Hari Ini
+   - Rekap tetap muncul setelah refresh
 ===================================================== */
+
+
+/* =====================================================
+   API
+===================================================== */
+
 const API_URL =
   'https://script.google.com/macros/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec';
 
@@ -25,9 +35,11 @@ const API_URL =
 
 const AUTO_SCAN_DELAY = 2500;
 
+const SUMMARY_REFRESH_DELAY = 1500;
+
 
 /* =====================================================
-   VARIABLE
+   SCANNER VARIABLE
 ===================================================== */
 
 let html5QrCode = null;
@@ -89,68 +101,91 @@ const autoScanLabel =
 
 
 /* =====================================================
-   LOAD
+   LOAD HALAMAN
 ===================================================== */
 
-window.addEventListener('load', function () {
+window.addEventListener(
+  'load',
+  function () {
 
-  console.log(
-    '=== ABSENSI V4.1 ==='
-  );
+    console.log(
+      '===================================='
+    );
 
-  console.log(
-    'Halaman selesai dimuat.'
-  );
+    console.log(
+      'SISTEM ABSENSI KARTU PELAJAR V6.0'
+    );
+
+    console.log(
+      'Halaman selesai dimuat.'
+    );
+
+    console.log(
+      '===================================='
+    );
 
 
-  if (
-    typeof Html5Qrcode === 'undefined'
-  ) {
+    /* ---------------------------------
+       CEK LIBRARY QR
+    --------------------------------- */
+
+    if (
+      typeof Html5Qrcode === 'undefined'
+    ) {
+
+      setStatus(
+        '🔴 Library scanner gagal dimuat.'
+      );
+
+      console.error(
+        'Html5Qrcode tidak ditemukan.'
+      );
+
+      return;
+
+    }
+
+
+    /* ---------------------------------
+       JAM DAN TANGGAL
+    --------------------------------- */
+
+    updateDateTime();
+
+    setInterval(
+      updateDateTime,
+      1000
+    );
+
+
+    /* ---------------------------------
+       STATUS
+    --------------------------------- */
 
     setStatus(
-      '🔴 Library scanner gagal dimuat.'
+      '🟢 Scanner siap.'
     );
 
-    console.error(
-      'Html5Qrcode tidak ditemukan.'
-    );
 
-    return;
+    /* ---------------------------------
+       AUDIO
+    --------------------------------- */
+
+    prepareSpeech();
+
+
+    /* ---------------------------------
+       LOAD REKAP HARI INI
+    --------------------------------- */
+
+    loadTodaySummary();
+
   }
+);
 
-
-  updateDateTime();
-
-  setInterval(
-    updateDateTime,
-    1000
-  );
-
-
-  setStatus(
-    '🟢 Scanner siap.'
-  );
-
-
-  /*
-   * Persiapkan audio
-   */
-
-  prepareSpeech();
-
-
-  /*
-   * ==========================================
-   * LOAD REKAP ABSENSI HARI INI
-   * ==========================================
-   */
-
-  loadTodaySummary();
-
-});
 
 /* =====================================================
-   TOMBOL MULAI
+   TOMBOL MULAI SCANNER
 ===================================================== */
 
 if (startButton) {
@@ -164,13 +199,7 @@ if (startButton) {
       );
 
 
-      /*
-       * Aktifkan audio dari interaksi
-       * pengguna.
-       */
-
       prepareSpeech();
-
 
       speak(
         'Scanner siap'
@@ -199,6 +228,7 @@ if (scanAgainButton) {
         'Tombol Scan Lagi ditekan.'
       );
 
+
       restartScanner();
 
     }
@@ -221,19 +251,27 @@ if (autoScanToggle) {
         autoScanToggle.checked
       ) {
 
-        autoScanLabel.textContent =
-          'AKTIF';
+        if (autoScanLabel) {
 
-        autoScanLabel.style.color =
-          '#16a34a';
+          autoScanLabel.textContent =
+            'AKTIF';
+
+          autoScanLabel.style.color =
+            '#16a34a';
+
+        }
 
       } else {
 
-        autoScanLabel.textContent =
-          'MATI';
+        if (autoScanLabel) {
 
-        autoScanLabel.style.color =
-          '#64748b';
+          autoScanLabel.textContent =
+            'MATI';
+
+          autoScanLabel.style.color =
+            '#64748b';
+
+        }
 
       }
 
@@ -258,22 +296,26 @@ function startScanner() {
     false;
 
 
-  resultElement.style.display =
-    'none';
+  if (resultElement) {
+
+    resultElement.style.display =
+      'none';
+
+  }
 
 
-  scannerCard.style.display =
-    'block';
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'block';
+
+  }
 
 
   setStatus(
     '📷 Memeriksa kamera...'
   );
 
-
-  /*
-   * Pastikan library tersedia
-   */
 
   if (
     typeof Html5Qrcode === 'undefined'
@@ -288,32 +330,19 @@ function startScanner() {
   }
 
 
-  /*
-   * Jika scanner lama masih aktif
-   */
-
   if (
     html5QrCode &&
     scannerRunning
   ) {
 
-    console.log(
-      'Scanner lama masih aktif.'
-    );
-
-
     stopScanner()
-      .then(function () {
+      .finally(
+        function () {
 
-        getCameraAndStart();
+          getCameraAndStart();
 
-      })
-      .catch(function () {
-
-        getCameraAndStart();
-
-      });
-
+        }
+      );
 
   } else {
 
@@ -325,7 +354,7 @@ function startScanner() {
 
 
 /* =====================================================
-   DETEKSI KAMERA
+   MENCARI KAMERA
 ===================================================== */
 
 function getCameraAndStart() {
@@ -343,115 +372,101 @@ function getCameraAndStart() {
   Html5Qrcode
     .getCameras()
 
-    .then(function (cameras) {
+    .then(
+      function (cameras) {
 
-      console.log(
-        'Daftar kamera:',
-        cameras
-      );
-
-
-      if (
-        !cameras ||
-        cameras.length === 0
-      ) {
-
-        setStatus(
-          '🔴 Kamera tidak ditemukan.'
+        console.log(
+          'Daftar kamera:',
+          cameras
         );
-
-        return;
-
-      }
-
-
-      /*
-       * Tampilkan jumlah kamera
-       */
-
-      console.log(
-        'Jumlah kamera:',
-        cameras.length
-      );
-
-
-      /*
-       * Pilih kamera
-       */
-
-      let selectedCamera =
-        cameras[0];
-
-
-      /*
-       * Prioritaskan kamera belakang
-       */
-
-      for (
-        let i = 0;
-        i < cameras.length;
-        i++
-      ) {
-
-        const label =
-          String(
-            cameras[i].label || ''
-          ).toLowerCase();
 
 
         if (
-
-          label.includes('back') ||
-
-          label.includes('rear') ||
-
-          label.includes('environment') ||
-
-          label.includes('belakang')
-
+          !cameras ||
+          cameras.length === 0
         ) {
 
-          selectedCamera =
-            cameras[i];
+          setStatus(
+            '🔴 Kamera tidak ditemukan.'
+          );
 
-          break;
+          return;
 
         }
 
+
+        let selectedCamera =
+          cameras[0];
+
+
+        for (
+          let i = 0;
+          i < cameras.length;
+          i++
+        ) {
+
+          const label =
+            String(
+              cameras[i].label || ''
+            ).toLowerCase();
+
+
+          if (
+
+            label.includes('back') ||
+
+            label.includes('rear') ||
+
+            label.includes('environment') ||
+
+            label.includes('belakang')
+
+          ) {
+
+            selectedCamera =
+              cameras[i];
+
+            break;
+
+          }
+
+        }
+
+
+        console.log(
+          'Kamera terpilih:',
+          selectedCamera
+        );
+
+
+        startCamera(
+          selectedCamera.id
+        );
+
       }
+    )
+
+    .catch(
+      function (error) {
+
+        console.error(
+          'GET CAMERA ERROR:',
+          error
+        );
 
 
-      console.log(
-        'Kamera terpilih:',
-        selectedCamera
-      );
+        showCameraError(
+          error
+        );
 
-
-      startCamera(
-        selectedCamera.id
-      );
-
-    })
-
-    .catch(function (error) {
-
-      console.error(
-        'GET CAMERA ERROR:',
-        error
-      );
-
-
-      showCameraError(
-        error
-      );
-
-    });
+      }
+    );
 
 }
 
 
 /* =====================================================
-   START CAMERA
+   MENJALANKAN KAMERA
 ===================================================== */
 
 function startCamera(
@@ -463,16 +478,6 @@ function startCamera(
   );
 
 
-  console.log(
-    'Camera ID:',
-    cameraId
-  );
-
-
-  /*
-   * Bersihkan reader
-   */
-
   const reader =
     document.getElementById(
       'reader'
@@ -480,10 +485,6 @@ function startCamera(
 
 
   if (!reader) {
-
-    console.error(
-      'Element #reader tidak ditemukan.'
-    );
 
     setStatus(
       '🔴 Area scanner tidak ditemukan.'
@@ -498,19 +499,11 @@ function startCamera(
     '';
 
 
-  /*
-   * Buat instance baru
-   */
-
   html5QrCode =
     new Html5Qrcode(
       'reader'
     );
 
-
-  /*
-   * Konfigurasi
-   */
 
   const config = {
 
@@ -550,11 +543,6 @@ function startCamera(
   };
 
 
-  console.log(
-    'Menjalankan kamera...'
-  );
-
-
   html5QrCode
 
     .start(
@@ -569,50 +557,58 @@ function startCamera(
 
     )
 
-    .then(function () {
+    .then(
+      function () {
 
-      scannerRunning =
-        true;
-
-
-      setStatus(
-        '🟢 SIAP SCAN KARTU'
-      );
+        scannerRunning =
+          true;
 
 
-      startButton.style.display =
-        'none';
+        setStatus(
+          '🟢 SIAP SCAN KARTU'
+        );
 
 
-      console.log(
-        'KAMERA BERHASIL AKTIF.'
-      );
+        if (startButton) {
 
-    })
+          startButton.style.display =
+            'none';
 
-    .catch(function (error) {
-
-      scannerRunning =
-        false;
+        }
 
 
-      console.error(
-        'START CAMERA ERROR:',
-        error
-      );
+        console.log(
+          'KAMERA BERHASIL AKTIF.'
+        );
+
+      }
+    )
+
+    .catch(
+      function (error) {
+
+        scannerRunning =
+          false;
 
 
-      showCameraError(
-        error
-      );
+        console.error(
+          'START CAMERA ERROR:',
+          error
+        );
 
-    });
+
+        showCameraError(
+          error
+        );
+
+      }
+    );
 
 }
 
 
 /* =====================================================
-   QR SUCCESS
+   QR BERHASIL DIBACA
 ===================================================== */
 
 function onScanSuccess(
@@ -646,21 +642,23 @@ function onScanSuccess(
 
 
   stopScanner()
-    .finally(function () {
+    .finally(
+      function () {
 
-      showProcessing();
+        showProcessing();
 
-      processAttendance(
-        studentId
-      );
+        processAttendance(
+          studentId
+        );
 
-    });
+      }
+    );
 
 }
 
 
 /* =====================================================
-   SCAN ERROR
+   ERROR SCAN BIASA
 ===================================================== */
 
 function onScanError(
@@ -668,200 +666,216 @@ function onScanError(
 ) {
 
   /*
-   * Jangan tampilkan error scan biasa.
+   * Sengaja dikosongkan.
+   *
+   * Error seperti QR belum terbaca
+   * bukan merupakan error sistem.
    */
 
 }
 
 
 /* =====================================================
-   PROCESSING
+   TAMPILAN PROCESSING
 ===================================================== */
 
 function showProcessing() {
 
-  scannerCard.style.display =
-    'none';
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'none';
+
+  }
 
 
-  resultElement.style.display =
-    'block';
+  if (resultElement) {
+
+    resultElement.style.display =
+      'block';
+
+    resultElement.className =
+      'result';
+
+  }
 
 
-  resultElement.className =
-    'result';
+  if (resultIconElement) {
+
+    resultIconElement.textContent =
+      '⏳';
+
+  }
 
 
-  resultIconElement.textContent =
-    '⏳';
+  if (resultTitleElement) {
+
+    resultTitleElement.textContent =
+      'MEMPROSES ABSENSI';
+
+  }
 
 
-  resultTitleElement.textContent =
-    'MEMPROSES ABSENSI';
+  if (resultMessageElement) {
+
+    resultMessageElement.textContent =
+      'Menghubungkan ke server...';
+
+  }
 
 
-  resultMessageElement.textContent =
-    'Menghubungkan ke server...';
+  if (studentIdElement) {
 
+    studentIdElement.textContent =
+      'Mohon tunggu';
 
-  studentIdElement.textContent =
-    'Mohon tunggu';
+  }
 
 }
 
 
 /* =====================================================
-   API
+   PROSES ABSENSI
 ===================================================== */
 
-/* =====================================================
-   LOAD REKAP ABSENSI HARI INI
-===================================================== */
-
-function loadTodaySummary() {
+function processAttendance(
+  studentId
+) {
 
   console.log(
-    'Memuat rekap absensi hari ini...'
+    'Mengirim ID:',
+    studentId
   );
 
 
   const url =
     API_URL +
-    '?action=summary';
+    '?action=attendance' +
+    '&studentId=' +
+    encodeURIComponent(
+      studentId
+    );
 
 
   fetch(url)
 
-    .then(function(response) {
+    .then(
+      function (response) {
 
-      console.log(
-        'SUMMARY HTTP STATUS:',
-        response.status
-      );
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          'HTTP ' +
+        console.log(
+          'HTTP STATUS:',
           response.status
         );
 
-      }
 
+        if (!response.ok) {
 
-      return response.json();
+          throw new Error(
+            'HTTP ' +
+            response.status
+          );
 
-    })
-
-    .then(function(result) {
-
-      console.log(
-        'SUMMARY:',
-        result
-      );
-
-
-      if (
-        !result ||
-        result.success !== true
-      ) {
-
-        throw new Error(
-          result.message ||
-          'Data rekap tidak valid.'
-        );
-
-      }
-
-
-      /*
-       * ======================================
-       * SIMPAN KE VARIABLE
-       * ======================================
-       */
-
-      countPresent =
-        Number(
-          result.hadir || 0
-        );
-
-
-      countLate =
-        Number(
-          result.terlambat || 0
-        );
-
-
-      countAlready =
-        Number(
-          result.sudahAbsen || 0
-        );
-
-
-      countError =
-        Number(
-          result.error || 0
-        );
-
-
-      /*
-       * ======================================
-       * UPDATE TAMPILAN
-       * ======================================
-       */
-
-      updateCounters();
-
-
-      console.log(
-        'Rekap berhasil dimuat:',
-        {
-          total:
-            result.total,
-
-          hadir:
-            countPresent,
-
-          terlambat:
-            countLate,
-
-          sudahAbsen:
-            countAlready,
-
-          error:
-            countError
         }
-      );
-
-    })
-
-    .catch(function(error) {
-
-      console.error(
-        'Gagal memuat rekap:',
-        error
-      );
 
 
-      /*
-       * Jika gagal mengambil data,
-       * jangan menghapus data yang
-       * sedang tampil.
-       */
+        return response.json();
 
-    });
+      }
+    )
+
+    .then(
+      function (result) {
+
+        console.log(
+          'HASIL ABSENSI:',
+          result
+        );
+
+
+        handleAttendanceResult(
+          result
+        );
+
+      }
+    )
+
+    .catch(
+      function (error) {
+
+        console.error(
+          'API ERROR:',
+          error
+        );
+
+
+        countError++;
+
+        updateCounters();
+
+
+        showAttendanceError(
+
+          'KONEKSI GAGAL',
+
+          'Tidak dapat terhubung ke server.'
+
+        );
+
+
+        speak(
+          'Koneksi gagal'
+        );
+
+
+        scheduleNextScan();
+
+      }
+    );
 
 }
 
 
 /* =====================================================
-   RESULT
+   HASIL ABSENSI
 ===================================================== */
 
 function handleAttendanceResult(
   result
 ) {
+
+  if (
+    !result
+  ) {
+
+    countError++;
+
+    updateCounters();
+
+
+    showAttendanceError(
+
+      'ERROR SERVER',
+
+      'Server tidak mengirim data.'
+
+    );
+
+
+    speak(
+      'Server tidak merespon'
+    );
+
+
+    scheduleNextScan();
+
+    return;
+
+  }
+
+
+  /* ---------------------------------
+     BERHASIL
+  --------------------------------- */
 
   if (
     result.status ===
@@ -877,6 +891,10 @@ function handleAttendanceResult(
   }
 
 
+  /* ---------------------------------
+     SUDAH ABSEN
+  --------------------------------- */
+
   if (
     result.status ===
     'ALREADY'
@@ -890,6 +908,10 @@ function handleAttendanceResult(
 
   }
 
+
+  /* ---------------------------------
+     TIDAK DITEMUKAN
+  --------------------------------- */
 
   if (
     result.status ===
@@ -905,7 +927,8 @@ function handleAttendanceResult(
 
       'DATA TIDAK DITEMUKAN',
 
-      result.message
+      result.message ||
+      'Kartu tidak terdaftar.'
 
     );
 
@@ -922,6 +945,10 @@ function handleAttendanceResult(
   }
 
 
+  /* ---------------------------------
+     TIDAK AKTIF
+  --------------------------------- */
+
   if (
     result.status ===
     'INACTIVE'
@@ -936,7 +963,8 @@ function handleAttendanceResult(
 
       'SISWA TIDAK AKTIF',
 
-      result.message
+      result.message ||
+      'Siswa tidak aktif.'
 
     );
 
@@ -953,6 +981,10 @@ function handleAttendanceResult(
   }
 
 
+  /* ---------------------------------
+     ERROR LAIN
+  --------------------------------- */
+
   countError++;
 
   updateCounters();
@@ -963,7 +995,7 @@ function handleAttendanceResult(
     'ABSENSI GAGAL',
 
     result.message ||
-      'Terjadi kesalahan.'
+    'Terjadi kesalahan.'
 
   );
 
@@ -976,149 +1008,10 @@ function handleAttendanceResult(
   scheduleNextScan();
 
 }
-/* =====================================================
-   LOAD REKAP ABSENSI HARI INI
-===================================================== */
-
-function loadTodaySummary() {
-
-  console.log(
-    'Memuat rekap absensi hari ini...'
-  );
-
-
-  const url =
-    API_URL +
-    '?action=summary';
-
-
-  fetch(url)
-
-    .then(function (response) {
-
-      console.log(
-        'SUMMARY HTTP STATUS:',
-        response.status
-      );
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          'HTTP ' +
-          response.status
-        );
-
-      }
-
-
-      return response.json();
-
-    })
-
-    .then(function (result) {
-
-      console.log(
-        'SUMMARY RESULT:',
-        result
-      );
-
-
-      if (
-        !result ||
-        result.success !== true
-      ) {
-
-        throw new Error(
-          result.message ||
-          'Data rekap tidak valid.'
-        );
-
-      }
-
-
-      /*
-       * ======================================
-       * UPDATE KARTU
-       * ======================================
-       */
-
-      setElementText(
-        'countTotal',
-        result.total
-      );
-
-
-      setElementText(
-        'countPresent',
-        result.hadir
-      );
-
-
-      setElementText(
-        'countLate',
-        result.terlambat
-      );
-
-
-      setElementText(
-        'countAlready',
-        result.sudahAbsen
-      );
-
-
-      console.log(
-        'Rekap berhasil diperbarui.'
-      );
-
-    })
-
-    .catch(function (error) {
-
-      console.error(
-        'SUMMARY ERROR:',
-        error
-      );
-
-    });
-
-}
 
 
 /* =====================================================
-   HELPER UPDATE ELEMENT
-===================================================== */
-
-function setElementText(
-  elementId,
-  value
-) {
-
-  const element =
-    document.getElementById(
-      elementId
-    );
-
-
-  if (!element) {
-
-    console.warn(
-      'Element tidak ditemukan:',
-      elementId
-    );
-
-    return;
-
-  }
-
-
-  element.textContent =
-    value ?? 0;
-
-}
-
-/* =====================================================
-   SUCCESS
+   ABSENSI BERHASIL
 ===================================================== */
 
 function handleSuccess(
@@ -1157,12 +1050,20 @@ function handleSuccess(
   updateCounters();
 
 
-  scannerCard.style.display =
-    'none';
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'none';
+
+  }
 
 
-  resultElement.style.display =
-    'block';
+  if (resultElement) {
+
+    resultElement.style.display =
+      'block';
+
+  }
 
 
   if (
@@ -1219,30 +1120,37 @@ function handleSuccess(
   studentIdElement.innerHTML =
 
     '<strong>' +
+
     escapeHtml(
       student.nama
     ) +
+
     '</strong>' +
 
     '<br>' +
 
     '<span>' +
+
     escapeHtml(
       student.kelas
     ) +
+
     '</span>' +
 
     '<br><br>' +
 
     '<strong>' +
+
     escapeHtml(
       attendance.status
     ) +
+
     '</strong>' +
 
     '<br>' +
 
     '<small>' +
+
     escapeHtml(
       attendance.tanggal
     ) +
@@ -1256,13 +1164,30 @@ function handleSuccess(
     ' WIB</small>';
 
 
+  /*
+   * Sinkronisasi dengan Google Sheet.
+   *
+   * Ini penting agar dashboard tidak hanya
+   * mengandalkan counter lokal.
+   */
+
+  setTimeout(
+    function () {
+
+      loadTodaySummary();
+
+    },
+    SUMMARY_REFRESH_DELAY
+  );
+
+
   scheduleNextScan();
 
 }
 
 
 /* =====================================================
-   ALREADY
+   SUDAH ABSEN
 ===================================================== */
 
 function handleAlready(
@@ -1282,16 +1207,23 @@ function handleAlready(
   updateCounters();
 
 
-  scannerCard.style.display =
-    'none';
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'none';
+
+  }
 
 
-  resultElement.style.display =
-    'block';
+  if (resultElement) {
 
+    resultElement.style.display =
+      'block';
 
-  resultElement.className =
-    'result already';
+    resultElement.className =
+      'result already';
+
+  }
 
 
   resultIconElement.textContent =
@@ -1309,17 +1241,21 @@ function handleAlready(
   studentIdElement.innerHTML =
 
     '<strong>' +
+
     escapeHtml(
       student.nama
     ) +
+
     '</strong>' +
 
     '<br>' +
 
     '<span>' +
+
     escapeHtml(
       student.kelas
     ) +
+
     '</span>' +
 
     '<br><br>' +
@@ -1350,13 +1286,20 @@ function handleAlready(
   );
 
 
+  /*
+   * Ambil ulang rekap server.
+   */
+
+  loadTodaySummary();
+
+
   scheduleNextScan();
 
 }
 
 
 /* =====================================================
-   ERROR
+   ERROR ABSENSI
 ===================================================== */
 
 function showAttendanceError(
@@ -1364,16 +1307,23 @@ function showAttendanceError(
   message
 ) {
 
-  scannerCard.style.display =
-    'none';
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'none';
+
+  }
 
 
-  resultElement.style.display =
-    'block';
+  if (resultElement) {
 
+    resultElement.style.display =
+      'block';
 
-  resultElement.className =
-    'result error';
+    resultElement.className =
+      'result error';
+
+  }
 
 
   resultIconElement.textContent =
@@ -1396,12 +1346,13 @@ function showAttendanceError(
 
 
 /* =====================================================
-   NEXT SCAN
+   AUTO SCAN BERIKUTNYA
 ===================================================== */
 
 function scheduleNextScan() {
 
   if (
+    !autoScanToggle ||
     !autoScanToggle.checked
   ) {
 
@@ -1416,16 +1367,14 @@ function scheduleNextScan() {
       restartScanner();
 
     },
-
     AUTO_SCAN_DELAY
-
   );
 
 }
 
 
 /* =====================================================
-   RESTART
+   RESTART SCANNER
 ===================================================== */
 
 function restartScanner() {
@@ -1439,12 +1388,20 @@ function restartScanner() {
     false;
 
 
-  resultElement.style.display =
-    'none';
+  if (resultElement) {
+
+    resultElement.style.display =
+      'none';
+
+  }
 
 
-  scannerCard.style.display =
-    'block';
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'block';
+
+  }
 
 
   setStatus(
@@ -1458,11 +1415,13 @@ function restartScanner() {
   ) {
 
     stopScanner()
-      .finally(function () {
+      .finally(
+        function () {
 
-        getCameraAndStart();
+          getCameraAndStart();
 
-      });
+        }
+      );
 
   } else {
 
@@ -1474,7 +1433,7 @@ function restartScanner() {
 
 
 /* =====================================================
-   STOP
+   STOP SCANNER
 ===================================================== */
 
 function stopScanner() {
@@ -1506,28 +1465,33 @@ function stopScanner() {
 
         .stop()
 
-        .then(function () {
+        .then(
+          function () {
 
-          scannerRunning =
-            false;
+            scannerRunning =
+              false;
 
-          resolve();
+            resolve();
 
-        })
+          }
+        )
 
-        .catch(function (error) {
+        .catch(
+          function (error) {
 
-          console.error(
-            'STOP ERROR:',
-            error
-          );
+            console.error(
+              'STOP ERROR:',
+              error
+            );
 
-          scannerRunning =
-            false;
 
-          resolve();
+            scannerRunning =
+              false;
 
-        });
+            resolve();
+
+          }
+        );
 
     }
   );
@@ -1536,14 +1500,15 @@ function stopScanner() {
 
 
 /* =====================================================
-   COUNTER
+   UPDATE COUNTER TAMPILAN
 ===================================================== */
 
 function updateCounters() {
 
   /*
-   * TOTAL ABSEN
+   * TOTAL = HADIR + TERLAMBAT
    */
+
   const total =
     countPresent +
     countLate;
@@ -1620,8 +1585,160 @@ function updateCounters() {
 
 }
 
+
 /* =====================================================
-   DATE
+   LOAD REKAP ABSENSI HARI INI
+===================================================== */
+
+function loadTodaySummary() {
+
+  console.log(
+    'Memuat rekap absensi hari ini...'
+  );
+
+
+  const url =
+    API_URL +
+    '?action=summary' +
+    '&_=' +
+    Date.now();
+
+
+  fetch(url)
+
+    .then(
+      function (response) {
+
+        console.log(
+          'SUMMARY HTTP STATUS:',
+          response.status
+        );
+
+
+        if (!response.ok) {
+
+          throw new Error(
+            'HTTP ' +
+            response.status
+          );
+
+        }
+
+
+        return response.json();
+
+      }
+    )
+
+    .then(
+      function (result) {
+
+        console.log(
+          'SUMMARY RESULT:',
+          result
+        );
+
+
+        if (
+          !result ||
+          result.success !== true
+        ) {
+
+          throw new Error(
+            result.message ||
+            'Data rekap tidak valid.'
+          );
+
+        }
+
+
+        /*
+         * ======================================
+         * AMBIL DATA DARI SERVER
+         * ======================================
+         */
+
+        countPresent =
+          Number(
+            result.hadir || 0
+          );
+
+
+        countLate =
+          Number(
+            result.terlambat || 0
+          );
+
+
+        countAlready =
+          Number(
+            result.sudahAbsen || 0
+          );
+
+
+        countError =
+          Number(
+            result.error || 0
+          );
+
+
+        /*
+         * ======================================
+         * UPDATE TAMPILAN
+         * ======================================
+         */
+
+        updateCounters();
+
+
+        console.log(
+          'REKAP HARI INI:',
+          {
+            total:
+              result.total,
+
+            hadir:
+              countPresent,
+
+            terlambat:
+              countLate,
+
+            sudahAbsen:
+              countAlready,
+
+            error:
+              countError,
+
+            tanggal:
+              result.tanggal
+
+          }
+        );
+
+      }
+    )
+
+    .catch(
+      function (error) {
+
+        console.error(
+          'SUMMARY ERROR:',
+          error
+        );
+
+        /*
+         * Jangan mengosongkan counter
+         * jika server gagal merespons.
+         */
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   UPDATE TANGGAL DAN JAM
 ===================================================== */
 
 function updateDateTime() {
@@ -1665,22 +1782,38 @@ function updateDateTime() {
     );
 
 
-  document.getElementById(
-    'currentDate'
-  ).textContent =
-    date;
+  const currentDate =
+    document.getElementById(
+      'currentDate'
+    );
 
 
-  document.getElementById(
-    'currentTime'
-  ).textContent =
-    time;
+  const currentTime =
+    document.getElementById(
+      'currentTime'
+    );
+
+
+  if (currentDate) {
+
+    currentDate.textContent =
+      date;
+
+  }
+
+
+  if (currentTime) {
+
+    currentTime.textContent =
+      time;
+
+  }
 
 }
 
 
 /* =====================================================
-   SPEECH
+   PERSIAPAN AUDIO
 ===================================================== */
 
 function prepareSpeech() {
@@ -1701,17 +1834,13 @@ function prepareSpeech() {
   }
 
 
-  /*
-   * Cancel speech sebelumnya.
-   */
-
   window.speechSynthesis.cancel();
 
 }
 
 
 /* =====================================================
-   SPEAK
+   SUARA
 ===================================================== */
 
 function speak(
@@ -1724,10 +1853,6 @@ function speak(
       in window
     )
   ) {
-
-    console.warn(
-      'Browser tidak mendukung suara.'
-    );
 
     return;
 
@@ -1823,6 +1948,7 @@ function showCameraError(
     '=== CAMERA ERROR ==='
   );
 
+
   console.error(
     error
   );
@@ -1867,8 +1993,12 @@ function showCameraError(
   );
 
 
-  startButton.style.display =
-    'block';
+  if (startButton) {
+
+    startButton.style.display =
+      'block';
+
+  }
 
 }
 

@@ -805,146 +805,56 @@ function loadTodaySummary() {
         );
 
 
-      /* =====================================================
-   LOAD REKAP ABSENSI HARI INI
-===================================================== */
-
-function loadTodaySummary() {
-
-  console.log(
-    'Memuat rekap absensi hari ini...'
-  );
-
-
-  const url =
-    API_URL +
-    '?action=summary';
-
-
-  fetch(url)
-
-    .then(function (response) {
-
-      console.log(
-        'SUMMARY HTTP STATUS:',
-        response.status
-      );
-
-
-      if (!response.ok) {
-
-        throw new Error(
-          'HTTP ' +
-          response.status
-        );
-
-      }
-
-
-      return response.json();
-
-    })
-
-    .then(function (result) {
-
-      console.log(
-        'SUMMARY RESULT:',
-        result
-      );
-
-
-      if (
-        !result ||
-        result.success !== true
-      ) {
-
-        throw new Error(
-          result.message ||
-          'Data rekap tidak valid.'
-        );
-
-      }
-
-
       /*
        * ======================================
-       * UPDATE KARTU
+       * UPDATE TAMPILAN
        * ======================================
        */
 
-      setElementText(
-        'countTotal',
-        result.total
-      );
-
-
-      setElementText(
-        'countPresent',
-        result.hadir
-      );
-
-
-      setElementText(
-        'countLate',
-        result.terlambat
-      );
-
-
-      setElementText(
-        'countAlready',
-        result.sudahAbsen
-      );
+      updateCounters();
 
 
       console.log(
-        'Rekap berhasil diperbarui.'
+        'Rekap berhasil dimuat:',
+        {
+          total:
+            result.total,
+
+          hadir:
+            countPresent,
+
+          terlambat:
+            countLate,
+
+          sudahAbsen:
+            countAlready,
+
+          error:
+            countError
+        }
       );
 
     })
 
-    .catch(function (error) {
+    .catch(function(error) {
 
       console.error(
-        'SUMMARY ERROR:',
+        'Gagal memuat rekap:',
         error
       );
+
+
+      /*
+       * Jika gagal mengambil data,
+       * jangan menghapus data yang
+       * sedang tampil.
+       */
 
     });
 
 }
 
 
-/* =====================================================
-   HELPER UPDATE ELEMENT
-===================================================== */
-
-function setElementText(
-  elementId,
-  value
-) {
-
-  const element =
-    document.getElementById(
-      elementId
-    );
-
-
-  if (!element) {
-
-    console.warn(
-      'Element tidak ditemukan:',
-      elementId
-    );
-
-    return;
-
-  }
-
-
-  element.textContent =
-    value ?? 0;
-
-}
 /* =====================================================
    RESULT
 ===================================================== */

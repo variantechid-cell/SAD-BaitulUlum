@@ -92,62 +92,62 @@ const autoScanLabel =
    LOAD
 ===================================================== */
 
-window.addEventListener(
-  'load',
-  function () {
+window.addEventListener('load', function () {
 
-    console.log(
-      '=== ABSENSI V4.1 ==='
-    );
+  console.log(
+    '=== ABSENSI V4.1 ==='
+  );
 
-    console.log(
-      'Halaman selesai dimuat.'
-    );
+  console.log(
+    'Halaman selesai dimuat.'
+  );
 
 
-    if (
-      typeof Html5Qrcode === 'undefined'
-    ) {
-
-      setStatus(
-        '🔴 Library scanner gagal dimuat.'
-      );
-
-      console.error(
-        'Html5Qrcode tidak ditemukan.'
-      );
-
-      return;
-    }
-
-
-    updateDateTime();
-
-    setInterval(
-      updateDateTime,
-      1000
-    );
-
+  if (
+    typeof Html5Qrcode === 'undefined'
+  ) {
 
     setStatus(
-      '🟢 Scanner siap.'
+      '🔴 Library scanner gagal dimuat.'
     );
 
+    console.error(
+      'Html5Qrcode tidak ditemukan.'
+    );
 
-    prepareSpeech();
-
-
-    /*
-     * =====================================
-     * LOAD REKAP ABSENSI
-     * =====================================
-     */
-
-    loadTodaySummary();
-
+    return;
   }
-);
 
+
+  updateDateTime();
+
+  setInterval(
+    updateDateTime,
+    1000
+  );
+
+
+  setStatus(
+    '🟢 Scanner siap.'
+  );
+
+
+  /*
+   * Persiapkan audio
+   */
+
+  prepareSpeech();
+
+
+  /*
+   * ==========================================
+   * LOAD REKAP ABSENSI HARI INI
+   * ==========================================
+   */
+
+  loadTodaySummary();
+
+});
 
 /* =====================================================
    TOMBOL MULAI
@@ -714,31 +714,28 @@ function showProcessing() {
    API
 ===================================================== */
 
-function processAttendance(
-  studentId
-) {
+/* =====================================================
+   LOAD REKAP ABSENSI HARI INI
+===================================================== */
+
+function loadTodaySummary() {
 
   console.log(
-    'Mengirim ID:',
-    studentId
+    'Memuat rekap absensi hari ini...'
   );
 
 
   const url =
     API_URL +
-    '?action=attendance' +
-    '&studentId=' +
-    encodeURIComponent(
-      studentId
-    );
+    '?action=summary';
 
 
   fetch(url)
 
-    .then(function (response) {
+    .then(function(response) {
 
       console.log(
-        'HTTP STATUS:',
+        'SUMMARY HTTP STATUS:',
         response.status
       );
 
@@ -757,48 +754,101 @@ function processAttendance(
 
     })
 
-    .then(function (result) {
+    .then(function(result) {
 
       console.log(
-        'HASIL ABSENSI:',
+        'SUMMARY:',
         result
       );
 
 
-      handleAttendanceResult(
-        result
-      );
+      if (
+        !result ||
+        result.success !== true
+      ) {
 
-    })
+        throw new Error(
+          result.message ||
+          'Data rekap tidak valid.'
+        );
 
-    .catch(function (error) {
-
-      console.error(
-        'API ERROR:',
-        error
-      );
+      }
 
 
-      countError++;
+      /*
+       * ======================================
+       * SIMPAN KE VARIABLE
+       * ======================================
+       */
+
+      countPresent =
+        Number(
+          result.hadir || 0
+        );
+
+
+      countLate =
+        Number(
+          result.terlambat || 0
+        );
+
+
+      countAlready =
+        Number(
+          result.sudahAbsen || 0
+        );
+
+
+      countError =
+        Number(
+          result.error || 0
+        );
+
+
+      /*
+       * ======================================
+       * UPDATE TAMPILAN
+       * ======================================
+       */
 
       updateCounters();
 
 
-      showAttendanceError(
+      console.log(
+        'Rekap berhasil dimuat:',
+        {
+          total:
+            result.total,
 
-        'KONEKSI GAGAL',
+          hadir:
+            countPresent,
 
-        'Tidak dapat terhubung ke server.'
+          terlambat:
+            countLate,
 
+          sudahAbsen:
+            countAlready,
+
+          error:
+            countError
+        }
+      );
+
+    })
+
+    .catch(function(error) {
+
+      console.error(
+        'Gagal memuat rekap:',
+        error
       );
 
 
-      speak(
-        'Koneksi gagal'
-      );
-
-
-      scheduleNextScan();
+      /*
+       * Jika gagal mengambil data,
+       * jangan menghapus data yang
+       * sedang tampil.
+       */
 
     });
 
@@ -1491,31 +1541,84 @@ function stopScanner() {
 
 function updateCounters() {
 
-  document.getElementById(
-    'countPresent'
-  ).textContent =
-    countPresent;
-
-
-  document.getElementById(
-    'countLate'
-  ).textContent =
+  /*
+   * TOTAL ABSEN
+   */
+  const total =
+    countPresent +
     countLate;
 
 
-  document.getElementById(
-    'countAlready'
-  ).textContent =
-    countAlready;
+  const totalElement =
+    document.getElementById(
+      'countTotal'
+    );
 
 
-  document.getElementById(
-    'countError'
-  ).textContent =
-    countError;
+  const presentElement =
+    document.getElementById(
+      'countPresent'
+    );
+
+
+  const lateElement =
+    document.getElementById(
+      'countLate'
+    );
+
+
+  const alreadyElement =
+    document.getElementById(
+      'countAlready'
+    );
+
+
+  const errorElement =
+    document.getElementById(
+      'countError'
+    );
+
+
+  if (totalElement) {
+
+    totalElement.textContent =
+      total;
+
+  }
+
+
+  if (presentElement) {
+
+    presentElement.textContent =
+      countPresent;
+
+  }
+
+
+  if (lateElement) {
+
+    lateElement.textContent =
+      countLate;
+
+  }
+
+
+  if (alreadyElement) {
+
+    alreadyElement.textContent =
+      countAlready;
+
+  }
+
+
+  if (errorElement) {
+
+    errorElement.textContent =
+      countError;
+
+  }
 
 }
-
 
 /* =====================================================
    DATE

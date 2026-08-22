@@ -920,7 +920,146 @@ function handleAttendanceResult(
   scheduleNextScan();
 
 }
+/* =====================================================
+   LOAD REKAP ABSENSI HARI INI
+===================================================== */
 
+function loadTodaySummary() {
+
+  console.log(
+    'Memuat rekap absensi hari ini...'
+  );
+
+
+  const url =
+    API_URL +
+    '?action=summary';
+
+
+  fetch(url)
+
+    .then(function (response) {
+
+      console.log(
+        'SUMMARY HTTP STATUS:',
+        response.status
+      );
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          'HTTP ' +
+          response.status
+        );
+
+      }
+
+
+      return response.json();
+
+    })
+
+    .then(function (result) {
+
+      console.log(
+        'SUMMARY RESULT:',
+        result
+      );
+
+
+      if (
+        !result ||
+        result.success !== true
+      ) {
+
+        throw new Error(
+          result.message ||
+          'Data rekap tidak valid.'
+        );
+
+      }
+
+
+      /*
+       * ======================================
+       * UPDATE KARTU
+       * ======================================
+       */
+
+      setElementText(
+        'countTotal',
+        result.total
+      );
+
+
+      setElementText(
+        'countPresent',
+        result.hadir
+      );
+
+
+      setElementText(
+        'countLate',
+        result.terlambat
+      );
+
+
+      setElementText(
+        'countAlready',
+        result.sudahAbsen
+      );
+
+
+      console.log(
+        'Rekap berhasil diperbarui.'
+      );
+
+    })
+
+    .catch(function (error) {
+
+      console.error(
+        'SUMMARY ERROR:',
+        error
+      );
+
+    });
+
+}
+
+
+/* =====================================================
+   HELPER UPDATE ELEMENT
+===================================================== */
+
+function setElementText(
+  elementId,
+  value
+) {
+
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+
+  if (!element) {
+
+    console.warn(
+      'Element tidak ditemukan:',
+      elementId
+    );
+
+    return;
+
+  }
+
+
+  element.textContent =
+    value ?? 0;
+
+}
 
 /* =====================================================
    SUCCESS

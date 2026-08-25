@@ -173,15 +173,14 @@ window.addEventListener(
 
     prepareSpeech();
 
+// ==========================================
+  // MUAT URUTAN ABSENSI HARI INI
+  // ==========================================
 
-    /* ---------------------------------
-       LOAD REKAP HARI INI
-    --------------------------------- */
+  loadTodayAttendanceList();
 
-    loadTodaySummary();
+  }};
 
-  }
-);
 
 
 /* =====================================================

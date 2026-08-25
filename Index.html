@@ -1,41 +1,35 @@
 <!DOCTYPE html>
-<html lang="id">
+
+<html>
 
 <head>
 
-  <meta charset="UTF-8">
+  <base target="_top">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
 
-  <meta
-    name="theme-color"
-    content="#0b4f9c"
-  >
-
   <title>
-    Absensi Siswa - SMP Baitul Ulum
+    Absensi Siswa
   </title>
 
 
-  <!-- ==================================================
+  <!-- =================================================
+       CSS
+  ================================================== -->
+
+  <?!= include('Style'); ?>
+
+
+  <!-- =================================================
        LIBRARY QR SCANNER
-  =================================================== -->
+  ================================================== -->
 
   <script
     src="https://unpkg.com/html5-qrcode"
   ></script>
-
-
-  <!-- ==================================================
-       STYLE
-  =================================================== -->
-
-  <style>
-    <?!= include('style.css'); ?>
-  </style>
 
 </head>
 
@@ -43,494 +37,416 @@
 <body>
 
 
-  <!-- ==================================================
-       BACKGROUND OVERLAY
-  =================================================== -->
+<div class="container">
 
-  <div class="page-background"></div>
 
+  <!-- =================================================
+       HEADER
+  ================================================== -->
 
-  <!-- ==================================================
-       MAIN CONTAINER
-  =================================================== -->
+  <header class="header">
 
-  <main class="app-container">
 
+    <!-- LOGO SEKOLAH -->
 
-    <!-- =================================================
-         HEADER
-    ================================================== -->
-
-    <header class="app-header">
-
-
-      <!-- LOGO SEKOLAH -->
-
-      <div class="school-logo-wrapper">
-
-        <img
-          id="schoolLogo"
-          class="school-logo"
-          src="https://placehold.co/180x180/png?text=LOGO"
-          alt="Logo Sekolah"
-        >
-
-      </div>
-
-
-      <!-- IDENTITAS SEKOLAH -->
-
-      <div class="school-information">
-
-        <div class="school-name">
-          SMP BAITUL ULUM
-        </div>
-
-        <div class="school-subtitle">
-          BOARDING SCHOOL
-        </div>
-
-        <div class="school-location">
-          Sistem Absensi Kartu Pelajar
-        </div>
-
-      </div>
-
-
-    </header>
-
-
-    <!-- =================================================
-         TANGGAL DAN JAM
-    ================================================== -->
-
-    <section class="datetime-card">
-
-      <div class="date-box">
-
-        <span class="date-label">
-          HARI / TANGGAL
-        </span>
-
-        <strong id="currentDate">
-          -
-        </strong>
-
-      </div>
-
-
-      <div class="time-box">
-
-        <span class="date-label">
-          WAKTU
-        </span>
-
-        <strong id="currentTime">
-          -
-        </strong>
-
-      </div>
-
-    </section>
-
-
-
-    <!-- =================================================
-         DASHBOARD COUNTER
-    ================================================== -->
-
-    <section class="dashboard-grid">
-
-
-      <!-- TOTAL -->
-
-      <div class="stat-card total-card">
-
-        <div class="stat-icon">
-          👥
-        </div>
-
-        <div class="stat-label">
-          TOTAL ABSEN
-        </div>
-
-        <div
-          id="totalAbsen"
-          class="stat-number"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <!-- HADIR -->
-
-      <div class="stat-card hadir-card">
-
-        <div class="stat-icon">
-          🟢
-        </div>
-
-        <div class="stat-label">
-          HADIR
-        </div>
-
-        <div
-          id="countPresent"
-          class="stat-number"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <!-- TERLAMBAT -->
-
-      <div class="stat-card terlambat-card">
-
-        <div class="stat-icon">
-          🟡
-        </div>
-
-        <div class="stat-label">
-          TERLAMBAT
-        </div>
-
-        <div
-          id="countLate"
-          class="stat-number"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <!-- SUDAH ABSEN -->
-
-      <div class="stat-card sudah-card">
-
-        <div class="stat-icon">
-          🟠
-        </div>
-
-        <div class="stat-label">
-          SUDAH ABSEN
-        </div>
-
-        <div
-          id="countAlready"
-          class="stat-number"
-        >
-          0
-        </div>
-
-      </div>
-
-
-    </section>
-
-
-
-    <!-- =================================================
-         SCANNER
-    ================================================== -->
-
-    <section
-      id="scannerCard"
-      class="scanner-card"
+    <img
+      class="logo"
+      id="schoolLogo"
+      src="https://via.placeholder.com/150?text=LOGO"
+      alt="Logo Sekolah"
     >
 
 
-      <div class="scanner-header">
+    <div class="header-info">
 
-        <div>
+      <h1>
+        SMP BAITUL ULUM
+        <br>
+        BOARDING SCHOOL
+      </h1>
 
-          <h2>
-            📷 Scan Kartu Pelajar
-          </h2>
+      <p>
+        Sistem Absensi Kartu Pelajar
+      </p>
 
-          <p>
-            Arahkan QR Code kartu pelajar
-            ke kamera.
-          </p>
-
-        </div>
-
-      </div>
+    </div>
 
 
-      <!-- STATUS -->
+    <div class="datetime">
 
       <div
-        id="status"
-        class="scanner-status"
+        class="date"
+        id="currentDate"
       >
-        🟢 Scanner siap.
+        -
       </div>
-
-
-      <!-- READER -->
 
       <div
-        id="reader"
-        class="reader"
-      ></div>
-
-
-      <!-- START BUTTON -->
-
-      <button
-        id="startButton"
-        class="primary-button"
-        type="button"
+        class="time"
+        id="currentTime"
       >
-        📷 Mulai Scanner
-      </button>
-
-
-      <!-- AUTO SCAN -->
-
-      <div class="auto-scan-wrapper">
-
-        <label class="switch-label">
-
-          <input
-            type="checkbox"
-            id="autoScanToggle"
-            checked
-          >
-
-          <span class="switch-slider"></span>
-
-          <span>
-            Auto Scan
-          </span>
-
-        </label>
-
-
-        <strong
-          id="autoScanLabel"
-          class="auto-status"
-        >
-          AKTIF
-        </strong>
-
+        -
       </div>
 
-
-    </section>
-
+    </div>
 
 
-    <!-- =================================================
-         HASIL SCAN
-    ================================================== -->
+  </header>
 
-    <section
-      id="result"
-      class="result"
-      style="display:none;"
+
+
+  <!-- =================================================
+       SUMMARY
+  ================================================== -->
+
+  <section class="summary-grid">
+
+
+    <div
+      class="summary-card card-total"
     >
 
+      <div class="summary-icon">
+        👥
+      </div>
+
+      <div class="summary-label">
+        Total Absen
+      </div>
+
       <div
-        id="resultIcon"
-        class="result-icon"
+        class="summary-number"
+        id="countTotal"
       >
+        0
+      </div>
+
+    </div>
+
+
+    <div
+      class="summary-card card-hadir"
+    >
+
+      <div class="summary-icon">
         🟢
       </div>
 
-
-      <h2 id="resultTitle">
-        ABSENSI BERHASIL
-      </h2>
-
-
-      <p id="resultMessage">
-        -
-      </p>
-
+      <div class="summary-label">
+        Hadir
+      </div>
 
       <div
-        id="studentId"
-        class="student-result"
+        class="summary-number"
+        id="countPresent"
       >
-        -
+        0
       </div>
 
-
-      <button
-        id="scanAgainButton"
-        class="secondary-button"
-        type="button"
-      >
-        📷 Scan Siswa Berikutnya
-      </button>
-
-    </section>
+    </div>
 
 
+    <div
+      class="summary-card card-terlambat"
+    >
 
-    <!-- =================================================
-         REKAP ABSENSI HARI INI
-    ================================================== -->
-
-    <section class="attendance-section">
-
-
-      <div class="section-heading">
-
-        <div>
-
-          <h2>
-            📋 Urutan Absensi Hari Ini
-          </h2>
-
-          <p>
-            Siswa yang melakukan absensi
-            lebih awal akan berada di urutan atas.
-          </p>
-
-        </div>
-
-
-        <div class="live-indicator">
-
-          <span class="live-dot"></span>
-
-          LIVE
-
-        </div>
-
+      <div class="summary-icon">
+        🟡
       </div>
 
-
-
-      <!-- =================================================
-           DESKTOP TABLE
-      ================================================== -->
-
-      <div class="attendance-table-wrapper">
-
-        <table class="attendance-table">
-
-          <thead>
-
-            <tr>
-
-              <th class="rank-column">
-                No.
-              </th>
-
-              <th>
-                Nama Siswa
-              </th>
-
-              <th>
-                Kelas
-              </th>
-
-              <th>
-                Jam Absen
-              </th>
-
-              <th>
-                Status
-              </th>
-
-            </tr>
-
-          </thead>
-
-
-          <tbody
-            id="attendanceTableBody"
-          >
-
-            <tr>
-
-              <td
-                colspan="5"
-                class="loading-cell"
-              >
-
-                <div class="loading-spinner"></div>
-
-                Memuat data absensi...
-
-              </td>
-
-            </tr>
-
-          </tbody>
-
-        </table>
-
+      <div class="summary-label">
+        Terlambat
       </div>
-
-
-
-      <!-- =================================================
-           MOBILE CARD
-      ================================================== -->
 
       <div
-        id="attendanceCardList"
-        class="attendance-card-list"
+        class="summary-number"
+        id="countLate"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div
+      class="summary-card card-sudah"
+    >
+
+      <div class="summary-icon">
+        🟠
+      </div>
+
+      <div class="summary-label">
+        Sudah Absen
+      </div>
+
+      <div
+        class="summary-number"
+        id="countAlready"
+      >
+        0
+      </div>
+
+    </div>
+
+
+  </section>
+
+
+
+  <!-- =================================================
+       SCANNER
+  ================================================== -->
+
+  <section
+    class="scanner-card"
+    id="scannerCard"
+  >
+
+    <div class="scanner-title">
+      📷 Scan Kartu Pelajar
+    </div>
+
+
+    <div class="scanner-description">
+
+      Arahkan QR Code kartu pelajar
+      ke kamera.
+
+    </div>
+
+
+    <div id="reader"></div>
+
+
+    <div
+      class="scanner-status"
+      id="status"
+    >
+      🟢 Scanner siap.
+    </div>
+
+
+    <button
+      class="btn-primary"
+      id="startButton"
+      type="button"
+    >
+
+      📷 Mulai Scanner
+
+    </button>
+
+
+    <label class="auto-scan">
+
+      <input
+        type="checkbox"
+        id="autoScanToggle"
+        checked
       >
 
-        <div class="loading-card">
+      Auto Scan
 
-          <div class="loading-spinner"></div>
+      <span id="autoScanLabel">
+        AKTIF
+      </span>
 
-          <span>
-            Memuat data absensi...
-          </span>
+    </label>
 
-        </div>
+
+  </section>
+
+
+
+  <!-- =================================================
+       RESULT
+  ================================================== -->
+
+  <section
+    class="result"
+    id="result"
+    style="display:none;"
+  >
+
+    <div
+      class="result-icon"
+      id="resultIcon"
+    >
+      ⏳
+    </div>
+
+
+    <div
+      class="result-title"
+      id="resultTitle"
+    >
+      MEMPROSES ABSENSI
+    </div>
+
+
+    <div
+      class="result-message"
+      id="resultMessage"
+    >
+      -
+    </div>
+
+
+    <div
+      class="student-info"
+      id="studentId"
+    >
+      -
+    </div>
+
+
+    <br>
+
+
+    <button
+      class="btn-secondary"
+      id="scanAgainButton"
+      type="button"
+    >
+
+      📷 Scan Lagi
+
+    </button>
+
+
+  </section>
+
+
+
+  <!-- =================================================
+       URUTAN ABSENSI
+  ================================================== -->
+
+  <section class="attendance-section">
+
+
+    <div class="attendance-title">
+
+      📋 Urutan Absensi Hari Ini
+
+    </div>
+
+
+    <div class="attendance-subtitle">
+
+      Siswa yang melakukan absensi
+      lebih awal akan berada di urutan atas.
+
+    </div>
+
+
+    <!-- DESKTOP -->
+
+    <div
+      class="attendance-table-wrapper"
+      id="attendanceTableWrapper"
+    >
+
+      <table class="attendance-table">
+
+        <thead>
+
+          <tr>
+
+            <th>
+              No.
+            </th>
+
+            <th>
+              Nama Siswa
+            </th>
+
+            <th>
+              Kelas
+            </th>
+
+            <th>
+              Jam
+            </th>
+
+            <th>
+              Status
+            </th>
+
+          </tr>
+
+        </thead>
+
+
+        <tbody
+          id="attendanceTableBody"
+        >
+
+          <tr>
+
+            <td
+              colspan="5"
+              class="loading"
+            >
+
+              Memuat data absensi...
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+
+    <!-- MOBILE -->
+
+    <div
+      class="attendance-mobile"
+      id="attendanceMobile"
+    >
+
+      <div class="loading">
+
+        Memuat data absensi...
 
       </div>
 
-
-    </section>
-
+    </div>
 
 
-    <!-- =================================================
-         FOOTER
-    ================================================== -->
-
-    <footer class="app-footer">
-
-      <div class="footer-school">
-        SMP BAITUL ULUM BOARDING SCHOOL
-      </div>
-
-      <div>
-        Sistem Absensi Kartu Pelajar
-      </div>
-
-      <div class="footer-small">
-        Data tersimpan otomatis pada Google Sheets
-      </div>
-
-    </footer>
-
-
-  </main>
+  </section>
 
 
 
-  <!-- ==================================================
-       JAVASCRIPT
-  =================================================== -->
+  <!-- =================================================
+       FOOTER
+  ================================================== -->
 
-  <script>
-    <?!= include('app.js'); ?>
-  </script>
+  <footer class="footer">
+
+    SMP Baitul Ulum Boarding School
+
+    <br>
+
+    Sistem Absensi Kartu Pelajar
+
+  </footer>
+
+
+</div>
+
+
+
+<!-- ===================================================
+     JAVASCRIPT
+=================================================== -->
+
+<?!= include('App'); ?>
 
 
 </body>

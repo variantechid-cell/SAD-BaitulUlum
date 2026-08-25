@@ -1,43 +1,38 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="id">
 
 <head>
 
-  <base target="_top">
+  <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0"
   >
 
+  <meta
+    name="theme-color"
+    content="#0f172a"
+  >
+
   <title>
-    Absensi Siswa
+    SAD-BaitulUlum
   </title>
 
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
-  <!-- =================================================
-       CSS
-  ================================================== -->
-
-  <?!= include('Style'); ?>
-
-
-  <!-- =================================================
-       LIBRARY QR SCANNER
-  ================================================== -->
-
+  <!-- HTML5 QR Code -->
   <script
-    src="https://unpkg.com/html5-qrcode"
-  ></script>
+    src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
+  </script>
 
 </head>
 
 
 <body>
-
-
-<div class="container">
 
 
   <!-- =================================================
@@ -46,407 +41,414 @@
 
   <header class="header">
 
+    <div class="header-content">
 
-    <!-- LOGO SEKOLAH -->
-
-    <img
-      class="logo"
-      id="schoolLogo"
-      src="https://via.placeholder.com/150?text=LOGO"
-      alt="Logo Sekolah"
-    >
-
-
-    <div class="header-info">
-
-      <h1>
-        SMP BAITUL ULUM
-        <br>
-        BOARDING SCHOOL
-      </h1>
-
-      <p>
-        Sistem Absensi Kartu Pelajar
-      </p>
-
-    </div>
-
-
-    <div class="datetime">
-
-      <div
-        class="date"
-        id="currentDate"
-      >
-        -
+      <div class="logo">
+        🎓
       </div>
 
-      <div
-        class="time"
-        id="currentTime"
-      >
-        -
+      <div class="school-info">
+
+        <h1>
+          ABSENSI SISWA
+        </h1>
+
+        <p>
+          SMP & SMA BAITUL ULUM BOARDING SCHOOL
+        </p>
+
       </div>
 
     </div>
-
 
   </header>
 
 
 
   <!-- =================================================
-       SUMMARY
+       MAIN
   ================================================== -->
 
-  <section class="summary-grid">
+  <main class="container">
 
 
-    <div
-      class="summary-card card-total"
+    <!-- ===============================================
+         INFO TANGGAL
+    ================================================ -->
+
+    <section class="date-card">
+
+      <div>
+
+        <span class="date-label">
+          📅 Tanggal
+        </span>
+
+        <strong id="currentDate">
+          -
+        </strong>
+
+      </div>
+
+
+      <div>
+
+        <span class="date-label">
+          🕐 Waktu
+        </span>
+
+        <strong id="currentTime">
+          -
+        </strong>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===============================================
+         COUNTER
+    ================================================ -->
+
+    <section class="counter-grid">
+
+      <div class="counter-card">
+
+        <span class="counter-icon">
+          🟢
+        </span>
+
+        <strong id="countPresent">
+          0
+        </strong>
+
+        <small>
+          Hadir
+        </small>
+
+      </div>
+
+
+      <div class="counter-card">
+
+        <span class="counter-icon">
+          🟡
+        </span>
+
+        <strong id="countLate">
+          0
+        </strong>
+
+        <small>
+          Terlambat
+        </small>
+
+      </div>
+
+
+      <div class="counter-card">
+
+        <span class="counter-icon">
+          🟠
+        </span>
+
+        <strong id="countAlready">
+          0
+        </strong>
+
+        <small>
+          Sudah Absen
+        </small>
+
+      </div>
+
+
+      <div class="counter-card">
+
+        <span class="counter-icon">
+          🔴
+        </span>
+
+        <strong id="countError">
+          0
+        </strong>
+
+        <small>
+          Ditolak
+        </small>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===============================================
+         SCANNER
+    ================================================ -->
+
+    <section
+      class="scanner-card"
+      id="scannerCard"
     >
 
-      <div class="summary-icon">
-        👥
+      <div class="card-header">
+
+        <h2>
+          📷 Scan Kartu Pelajar
+        </h2>
+
+        <p>
+          Arahkan QR Code kartu siswa ke kamera
+        </p>
+
       </div>
 
-      <div class="summary-label">
-        Total Absen
-      </div>
 
       <div
-        class="summary-number"
-        id="countTotal"
+        id="reader"
+        class="reader"
+      ></div>
+
+
+      <div
+        id="status"
+        class="status"
       >
-        0
+        Scanner siap.
       </div>
 
-    </div>
+
+      <button
+        id="startButton"
+        class="button primary"
+        type="button"
+      >
+
+        📷 Mulai Scanner
+
+      </button>
 
 
-    <div
-      class="summary-card card-hadir"
+      <!-- AUTO SCAN -->
+
+      <div class="auto-scan-control">
+
+        <span>
+          🔄 Auto Scan
+        </span>
+
+        <label class="switch">
+
+          <input
+            type="checkbox"
+            id="autoScanToggle"
+            checked
+          >
+
+          <span class="slider"></span>
+
+        </label>
+
+        <span
+          id="autoScanLabel"
+          class="auto-label"
+        >
+          AKTIF
+        </span>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- ===============================================
+         HASIL
+    ================================================ -->
+
+    <section
+      id="result"
+      class="result"
     >
 
-      <div class="summary-icon">
+      <div
+        id="resultIcon"
+        class="result-icon"
+      >
         🟢
       </div>
 
-      <div class="summary-label">
-        Hadir
-      </div>
+
+      <h2 id="resultTitle">
+        ABSENSI BERHASIL
+      </h2>
+
 
       <div
-        class="summary-number"
-        id="countPresent"
+        id="resultMessage"
+        class="result-message"
       >
-        0
+        -
       </div>
 
+
+      <div class="student-info">
+
+        <div
+          id="studentIdLabel"
+          class="info-label"
+        >
+          ID Kartu
+        </div>
+
+        <div
+          id="studentId"
+          class="student-id"
+        >
+          -
+        </div>
+
+      </div>
+
+
+      <button
+        id="scanAgainButton"
+        class="button primary"
+        type="button"
+      >
+
+        📷 Scan Lagi
+
+      </button>
+
+    </section>
+    <!-- =========================================
+     STATISTIK ABSENSI HARI INI
+========================================= -->
+
+<div class="scanner-card">
+
+  <div class="summary-card">
+
+    <div class="summary-icon">
+      👥
     </div>
 
-
-    <div
-      class="summary-card card-terlambat"
-    >
-
-      <div class="summary-icon">
-        🟡
-      </div>
-
-      <div class="summary-label">
-        Terlambat
-      </div>
-
-      <div
-        class="summary-number"
-        id="countLate"
-      >
-        0
-      </div>
-
+    <div class="summary-label">
+      TOTAL ABSEN
     </div>
 
-
-    <div
-      class="summary-card card-sudah"
-    >
-
-      <div class="summary-icon">
-        🟠
-      </div>
-
-      <div class="summary-label">
-        Sudah Absen
-      </div>
-
-      <div
-        class="summary-number"
-        id="countAlready"
-      >
+     <div
+        id="countTotal"
+        class="stat-number"
+     >
         0
-      </div>
+    </div>
+    
+ </div>
 
+ <section class="attendance-section">
+
+  <div class="attendance-section-header">
+
+    <div>
+      <h2>📋 Urutan Absensi Hari Ini</h2>
+      <p>
+        Siswa yang melakukan absensi lebih awal akan berada di urutan atas.
+      </p>
     </div>
 
-
-  </section>
-
+  </div>
 
 
-  <!-- =================================================
-       SCANNER
-  ================================================== -->
-
-  <section
-    class="scanner-card"
-    id="scannerCard"
+  <div
+    id="attendanceListLoading"
+    class="attendance-list-loading"
   >
-
-    <div class="scanner-title">
-      📷 Scan Kartu Pelajar
-    </div>
+    ⏳ Memuat data absensi...
+  </div>
 
 
-    <div class="scanner-description">
-
-      Arahkan QR Code kartu pelajar
-      ke kamera.
-
-    </div>
-
-
-    <div id="reader"></div>
-
-
-    <div
-      class="scanner-status"
-      id="status"
-    >
-      🟢 Scanner siap.
-    </div>
-
-
-    <button
-      class="btn-primary"
-      id="startButton"
-      type="button"
-    >
-
-      📷 Mulai Scanner
-
-    </button>
-
-
-    <label class="auto-scan">
-
-      <input
-        type="checkbox"
-        id="autoScanToggle"
-        checked
-      >
-
-      Auto Scan
-
-      <span id="autoScanLabel">
-        AKTIF
-      </span>
-
-    </label>
-
-
-  </section>
-
-
-
-  <!-- =================================================
-       RESULT
-  ================================================== -->
-
-  <section
-    class="result"
-    id="result"
+  <div
+    id="attendanceListEmpty"
+    class="attendance-list-empty"
     style="display:none;"
   >
-
-    <div
-      class="result-icon"
-      id="resultIcon"
-    >
-      ⏳
-    </div>
+    Belum ada siswa yang melakukan absensi hari ini.
+  </div>
 
 
-    <div
-      class="result-title"
-      id="resultTitle"
-    >
-      MEMPROSES ABSENSI
-    </div>
+  <div
+    id="attendanceList"
+    class="attendance-list"
+  ></div>
+
+</section>
+
+ </div>
 
 
-    <div
-      class="result-message"
-      id="resultMessage"
-    >
-      -
-    </div>
+    <!-- ===============================================
+         INFORMASI
+    ================================================ -->
+
+    <section class="info-card">
+
+      <h3>
+        ℹ️ Petunjuk
+      </h3>
+
+      <ul>
+
+        <li>
+          Pastikan QR Code terlihat jelas.
+        </li>
+
+        <li>
+          Arahkan kartu ke dalam area scanner.
+        </li>
+
+        <li>
+          Tunggu suara dan hasil absensi.
+        </li>
+
+        <li>
+          Jika Auto Scan aktif, kamera akan kembali
+          secara otomatis.
+        </li>
+
+      </ul>
+
+    </section>
 
 
-    <div
-      class="student-info"
-      id="studentId"
-    >
-      -
-    </div>
-
-
-    <br>
-
-
-    <button
-      class="btn-secondary"
-      id="scanAgainButton"
-      type="button"
-    >
-
-      📷 Scan Lagi
-
-    </button>
-
-
-  </section>
-
-
-
-  <!-- =================================================
-       URUTAN ABSENSI
-  ================================================== -->
-
-  <section class="attendance-section">
-
-
-    <div class="attendance-title">
-
-      📋 Urutan Absensi Hari Ini
-
-    </div>
-
-
-    <div class="attendance-subtitle">
-
-      Siswa yang melakukan absensi
-      lebih awal akan berada di urutan atas.
-
-    </div>
-
-
-    <!-- DESKTOP -->
-
-    <div
-      class="attendance-table-wrapper"
-      id="attendanceTableWrapper"
-    >
-
-      <table class="attendance-table">
-
-        <thead>
-
-          <tr>
-
-            <th>
-              No.
-            </th>
-
-            <th>
-              Nama Siswa
-            </th>
-
-            <th>
-              Kelas
-            </th>
-
-            <th>
-              Jam
-            </th>
-
-            <th>
-              Status
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody
-          id="attendanceTableBody"
-        >
-
-          <tr>
-
-            <td
-              colspan="5"
-              class="loading"
-            >
-
-              Memuat data absensi...
-
-            </td>
-
-          </tr>
-
-        </tbody>
-
-      </table>
-
-    </div>
-
-
-    <!-- MOBILE -->
-
-    <div
-      class="attendance-mobile"
-      id="attendanceMobile"
-    >
-
-      <div class="loading">
-
-        Memuat data absensi...
-
-      </div>
-
-    </div>
-
-
-  </section>
+  </main>
 
 
 
-  <!-- =================================================
+  <!-- ===============================================
        FOOTER
-  ================================================== -->
+  ================================================ -->
 
   <footer class="footer">
 
-    SMP Baitul Ulum Boarding School
+    <p>
+      Sistem Absensi Kartu Pelajar
+    </p>
 
-    <br>
-
-    Sistem Absensi Kartu Pelajar
+    <p>
+      V1 • vaRianTech
+    </p>
 
   </footer>
 
 
-</div>
 
-
-
-<!-- ===================================================
-     JAVASCRIPT
-=================================================== -->
-
-<?!= include('App'); ?>
+  <script
+    src="app.js">
+  </script>
 
 
 </body>

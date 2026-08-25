@@ -885,7 +885,7 @@ function handleAttendanceResult(
     handleSuccess(
       result
     );
-
+   loadTodayAttendanceList();
     return;
 
   }
@@ -1297,7 +1297,9 @@ function handleAlready(
 
   refreshAttendanceList();
 
-  scheduleNextScan();
+  scheduleNextScan(); 
+
+ loadTodayAttendanceList();
   
 
 }

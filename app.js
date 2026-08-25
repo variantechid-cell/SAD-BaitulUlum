@@ -2626,3 +2626,25 @@ function refreshAttendanceList() {
   loadTodayAttendanceList();
 
 }
+
+/**
+ * =====================================================
+ * TEST REKAP ABSENSI HARIAN
+ * =====================================================
+ */
+
+function testTodayAttendanceList() {
+
+  const result =
+    getTodayAttendanceList();
+
+
+  Logger.log(
+    JSON.stringify(
+      result,
+      null,
+      2
+    )
+  );
+
+}

@@ -16,7 +16,7 @@
   >
 
   <title>
-    SAD-BaitulUlum
+    Absensi Siswa | Kartu Pelajar
   </title>
 
   <link
@@ -54,7 +54,7 @@
         </h1>
 
         <p>
-          SMP & SMA BAITUL ULUM BOARDING SCHOOL
+          SISTEM ABSENSI KARTU PELAJAR
         </p>
 
       </div>
@@ -349,6 +349,43 @@
     
  </div>
 
+ <section class="attendance-section">
+
+  <div class="attendance-section-header">
+
+    <div>
+      <h2>📋 Urutan Absensi Hari Ini</h2>
+      <p>
+        Siswa yang melakukan absensi lebih awal akan berada di urutan atas.
+      </p>
+    </div>
+
+  </div>
+
+
+  <div
+    id="attendanceListLoading"
+    class="attendance-list-loading"
+  >
+    ⏳ Memuat data absensi...
+  </div>
+
+
+  <div
+    id="attendanceListEmpty"
+    class="attendance-list-empty"
+    style="display:none;"
+  >
+    Belum ada siswa yang melakukan absensi hari ini.
+  </div>
+
+
+  <div
+    id="attendanceList"
+    class="attendance-list"
+  ></div>
+
+</section>
 
  </div>
 

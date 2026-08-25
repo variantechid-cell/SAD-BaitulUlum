@@ -938,8 +938,7 @@ function handleAttendanceResult(
     );
 
 
-    refreshAttendanceList();
-    
+       
     scheduleNextScan();
 
     return;
@@ -1183,6 +1182,8 @@ function handleSuccess(
   );
 
 
+  refreshAttendanceList();
+  
   scheduleNextScan();
 
 }

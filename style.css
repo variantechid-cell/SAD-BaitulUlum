@@ -1062,3 +1062,768 @@ body {
   }
 
 }
+/* =====================================================
+   ABSENSI HARI INI
+   V5.2.8
+   DESKTOP TABLE + MOBILE CARD
+===================================================== */
+
+.attendance-section {
+
+  width: 100%;
+
+  margin-top: 24px;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 4px 18px rgba(15, 23, 42, 0.08);
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.attendance-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+
+}
+
+
+.attendance-title {
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+}
+
+
+.attendance-title-icon {
+
+  font-size: 28px;
+
+  line-height: 1;
+
+}
+
+
+.attendance-title h2 {
+
+  margin: 0;
+
+  font-size: 22px;
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+}
+
+
+.attendance-title p {
+
+  margin: 5px 0 0;
+
+  font-size: 14px;
+
+  color: #64748b;
+
+}
+
+
+.attendance-date {
+
+  background: #eff6ff;
+
+  color: #1d4ed8;
+
+  border-radius: 10px;
+
+  padding: 8px 12px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.attendance-loading {
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 10px;
+
+  padding: 35px 20px;
+
+  color: #64748b;
+
+  font-size: 14px;
+
+}
+
+
+.loading-spinner {
+
+  width: 20px;
+
+  height: 20px;
+
+  border: 3px solid #e2e8f0;
+
+  border-top-color: #2563eb;
+
+  border-radius: 50%;
+
+  animation:
+    attendanceSpin 0.8s linear infinite;
+
+}
+
+
+@keyframes attendanceSpin {
+
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+
+}
+
+
+/* =====================================================
+   EMPTY
+===================================================== */
+
+.attendance-empty {
+
+  text-align: center;
+
+  padding: 40px 20px;
+
+  color: #64748b;
+
+}
+
+
+.empty-icon {
+
+  font-size: 42px;
+
+  margin-bottom: 10px;
+
+}
+
+
+.attendance-empty h3 {
+
+  margin: 0;
+
+  color: #334155;
+
+  font-size: 18px;
+
+}
+
+
+.attendance-empty p {
+
+  margin: 7px 0 0;
+
+  font-size: 14px;
+
+}
+
+
+/* =====================================================
+   DESKTOP TABLE
+===================================================== */
+
+.attendance-desktop {
+
+  width: 100%;
+
+}
+
+
+.attendance-table-wrapper {
+
+  width: 100%;
+
+  overflow-x: auto;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 14px;
+
+}
+
+
+.attendance-table {
+
+  width: 100%;
+
+  border-collapse: collapse;
+
+  min-width: 650px;
+
+}
+
+
+.attendance-table thead {
+
+  background: #f8fafc;
+
+}
+
+
+.attendance-table th {
+
+  padding: 14px 16px;
+
+  text-align: left;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #475569;
+
+  border-bottom: 1px solid #e2e8f0;
+
+}
+
+
+.attendance-table td {
+
+  padding: 13px 16px;
+
+  font-size: 14px;
+
+  color: #334155;
+
+  border-bottom: 1px solid #f1f5f9;
+
+}
+
+
+.attendance-table tbody tr {
+
+  transition:
+    background 0.2s ease;
+
+}
+
+
+.attendance-table tbody tr:hover {
+
+  background: #f8fafc;
+
+}
+
+
+.attendance-table tbody tr:last-child td {
+
+  border-bottom: none;
+
+}
+
+
+.rank-column {
+
+  width: 70px;
+
+  text-align: center !important;
+
+}
+
+
+/* =====================================================
+   RANK
+===================================================== */
+
+.rank-number {
+
+  display: inline-flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  min-width: 32px;
+
+  height: 32px;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+}
+
+
+.rank-medal {
+
+  font-size: 25px;
+
+  line-height: 1;
+
+}
+
+
+/* =====================================================
+   STUDENT NAME
+===================================================== */
+
+.student-name {
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+}
+
+
+.student-class {
+
+  font-weight: 600;
+
+  color: #475569;
+
+}
+
+
+/* =====================================================
+   TIME
+===================================================== */
+
+.attendance-time {
+
+  font-family:
+    "Segoe UI",
+    Arial,
+    sans-serif;
+
+  font-weight: 600;
+
+  color: #334155;
+
+}
+
+
+/* =====================================================
+   STATUS BADGE
+===================================================== */
+
+.status-badge {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  padding: 6px 10px;
+
+  border-radius: 999px;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+}
+
+
+.status-hadir {
+
+  background: #dcfce7;
+
+  color: #15803d;
+
+}
+
+
+.status-terlambat {
+
+  background: #fef3c7;
+
+  color: #b45309;
+
+}
+
+
+.status-other {
+
+  background: #e2e8f0;
+
+  color: #475569;
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+.attendance-mobile {
+
+  display: none;
+
+}
+
+
+.attendance-card-list {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 10px;
+
+}
+
+
+/* =====================================================
+   MOBILE CARD
+===================================================== */
+
+.attendance-card {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 13px;
+
+  background: #ffffff;
+
+  border: 1px solid #e2e8f0;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 2px 7px rgba(15, 23, 42, 0.05);
+
+}
+
+
+.attendance-card-rank {
+
+  width: 40px;
+
+  min-width: 40px;
+
+  height: 40px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  font-weight: 700;
+
+  color: #475569;
+
+}
+
+
+.attendance-card-rank.medal {
+
+  font-size: 27px;
+
+}
+
+
+.attendance-card-content {
+
+  flex: 1;
+
+  min-width: 0;
+
+}
+
+
+.attendance-card-name {
+
+  font-size: 15px;
+
+  font-weight: 700;
+
+  color: #0f172a;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+}
+
+
+.attendance-card-class {
+
+  margin-top: 2px;
+
+  font-size: 12px;
+
+  color: #64748b;
+
+}
+
+
+.attendance-card-bottom {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 7px;
+
+}
+
+
+.attendance-card-time {
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  color: #475569;
+
+}
+
+
+.attendance-card-status {
+
+  flex-shrink: 0;
+
+}
+
+
+/* =====================================================
+   SISWA PERTAMA
+===================================================== */
+
+.attendance-card:first-child {
+
+  border-color: #bfdbfe;
+
+  background:
+    linear-gradient(
+      135deg,
+      #eff6ff,
+      #ffffff
+    );
+
+}
+
+
+/* =====================================================
+   TABLET / HP
+===================================================== */
+
+@media (max-width: 768px) {
+
+  .attendance-section {
+
+    margin-top: 18px;
+
+    padding: 15px;
+
+    border-radius: 15px;
+
+  }
+
+
+  .attendance-header {
+
+    align-items: flex-start;
+
+    margin-bottom: 15px;
+
+  }
+
+
+  .attendance-title {
+
+    gap: 9px;
+
+  }
+
+
+  .attendance-title-icon {
+
+    font-size: 23px;
+
+  }
+
+
+  .attendance-title h2 {
+
+    font-size: 18px;
+
+  }
+
+
+  .attendance-title p {
+
+    font-size: 12px;
+
+    line-height: 1.4;
+
+  }
+
+
+  .attendance-date {
+
+    display: none;
+
+  }
+
+
+  .attendance-desktop {
+
+    display: none !important;
+
+  }
+
+
+  .attendance-mobile {
+
+    display: block !important;
+
+  }
+
+}
+
+
+/* =====================================================
+   HP KECIL
+===================================================== */
+
+@media (max-width: 480px) {
+
+  .attendance-section {
+
+    padding: 13px;
+
+  }
+
+
+  .attendance-title h2 {
+
+    font-size: 17px;
+
+  }
+
+
+  .attendance-title p {
+
+    font-size: 11px;
+
+  }
+
+
+  .attendance-card {
+
+    padding: 11px;
+
+    gap: 9px;
+
+  }
+
+
+  .attendance-card-rank {
+
+    width: 34px;
+
+    min-width: 34px;
+
+    height: 34px;
+
+  }
+
+
+  .attendance-card-rank.medal {
+
+    font-size: 24px;
+
+  }
+
+
+  .attendance-card-name {
+
+    font-size: 14px;
+
+  }
+
+
+  .attendance-card-class {
+
+    font-size: 11px;
+
+  }
+
+
+  .attendance-card-bottom {
+
+    margin-top: 5px;
+
+  }
+
+
+  .attendance-card-time {
+
+    font-size: 11px;
+
+  }
+
+
+  .status-badge {
+
+    padding: 5px 8px;
+
+    font-size: 10px;
+
+  }
+
+}

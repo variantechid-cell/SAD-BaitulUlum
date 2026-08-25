@@ -104,84 +104,47 @@ const autoScanLabel =
    LOAD HALAMAN
 ===================================================== */
 
-window.addEventListener(
-  'load',
-  function () {
+window.addEventListener('load', function () {
 
-    console.log(
-      '===================================='
-    );
+  console.log(
+    '=== ABSENSI V5.2.8 ==='
+  );
 
-    console.log(
-      'SISTEM ABSENSI KARTU PELAJAR V6.0'
-    );
-
-    console.log(
-      'Halaman selesai dimuat.'
-    );
-
-    console.log(
-      '===================================='
-    );
-
-
-    /* ---------------------------------
-       CEK LIBRARY QR
-    --------------------------------- */
-
-    if (
-      typeof Html5Qrcode === 'undefined'
-    ) {
-
-      setStatus(
-        '🔴 Library scanner gagal dimuat.'
-      );
-
-      console.error(
-        'Html5Qrcode tidak ditemukan.'
-      );
-
-      return;
-
-    }
-
-
-    /* ---------------------------------
-       JAM DAN TANGGAL
-    --------------------------------- */
-
-    updateDateTime();
-
-    setInterval(
-      updateDateTime,
-      1000
-    );
-
-
-    /* ---------------------------------
-       STATUS
-    --------------------------------- */
+  if (
+    typeof Html5Qrcode === 'undefined'
+  ) {
 
     setStatus(
-      '🟢 Scanner siap.'
+      '🔴 Library scanner gagal dimuat.'
     );
 
-
-    /* ---------------------------------
-       AUDIO
-    --------------------------------- */
-
-    prepareSpeech();
-
-
-    /* ---------------------------------
-       LOAD REKAP HARI INI
-    --------------------------------- */
-
-    loadTodaySummary();
-
+    return;
   }
-);
+
+
+  updateDateTime();
+
+  setInterval(
+    updateDateTime,
+    1000
+  );
+
+
+  setStatus(
+    '🟢 Scanner siap.'
+  );
+
+
+  prepareSpeech();
+
+
+  // ==========================================
+  // MUAT URUTAN ABSENSI HARI INI
+  // ==========================================
+
+  loadTodayAttendanceList();
+
+});
 
 
 /* =====================================================

@@ -2048,140 +2048,203 @@ function escapeHtml(
 }
 
 /* =====================================================
-   V5.2.8 - DAFTAR ABSENSI HARI INI
-   TABLE DESKTOP + CARD HP
-   SMP BAITUL ULUM BOARDING SCHOOL
+   URUTAN ABSENSI HARI INI
+   V5.2.8
+
+   DESKTOP  : TABLE
+   MOBILE   : CARD
+
+   FITUR:
+   - Ranking
+   - 🥇 🥈 🥉
+   - Nomor 4 dst
+   - Nama
+   - Kelas
+   - Jam
+   - Status
+   - Responsive
 ===================================================== */
-
-/* =====================================================
-   ELEMENT
-===================================================== */
-
-const attendanceListElement =
-  document.getElementById('attendanceList');
-
-const attendanceTableBodyElement =
-  document.getElementById('attendanceTableBody');
-
-const attendanceListEmptyElement =
-  document.getElementById('attendanceListEmpty');
-
-const attendanceListLoadingElement =
-  document.getElementById('attendanceListLoading');
-
-
-/* =====================================================
-   LOAD SAAT HALAMAN DIBUKA
-===================================================== */
-
-window.addEventListener(
-  'load',
-  function () {
-
-    console.log(
-      '===================================='
-    );
-
-    console.log(
-      'V5.2.8 - LOAD DAFTAR ABSENSI'
-    );
-
-    console.log(
-      '===================================='
-    );
-
-    loadTodayAttendanceList();
-
-  }
-);
 
 
 /* =====================================================
    LOAD DAFTAR ABSENSI HARI INI
-   V5.2
 ===================================================== */
 
 function loadTodayAttendanceList() {
 
   console.log(
-    'Mengambil daftar absensi hari ini...'
+    '=== LOAD ABSENSI HARI INI V5.2.8 ==='
   );
 
 
-  showAttendanceListLoading();
+  const loading =
+    document.getElementById(
+      'attendanceLoading'
+    );
+
+  const empty =
+    document.getElementById(
+      'attendanceEmpty'
+    );
+
+  const desktop =
+    document.getElementById(
+      'attendanceDesktop'
+    );
+
+  const mobile =
+    document.getElementById(
+      'attendanceMobile'
+    );
 
 
-  const url =
-    API_URL +
-    '?action=attendanceList';
+  /*
+   * Tampilkan loading
+   */
+
+  if (loading) {
+
+    loading.style.display =
+      'flex';
+
+  }
 
 
-  console.log(
-    'Attendance List URL:',
-    url
-  );
+  if (empty) {
+
+    empty.style.display =
+      'none';
+
+  }
 
 
-  fetch(url)
+  if (desktop) {
 
-    .then(
-      function(response) {
+    desktop.style.display =
+      'none';
+
+  }
+
+
+  if (mobile) {
+
+    mobile.style.display =
+      'none';
+
+  }
+
+
+  /*
+   * Tanggal hari ini
+   */
+
+  updateAttendanceDate();
+
+
+  /*
+   * Panggil fungsi Apps Script
+   */
+
+  if (
+    typeof google === 'undefined' ||
+    !google.script ||
+    !google.script.run
+  ) {
+
+    console.error(
+      'google.script.run tidak tersedia.'
+    );
+
+
+    showAttendanceListError(
+      'Koneksi ke server tidak tersedia.'
+    );
+
+    return;
+
+  }
+
+
+  google.script.run
+
+    .withSuccessHandler(
+      function (result) {
 
         console.log(
-          'ATTENDANCE LIST HTTP:',
-          response.status
-        );
-
-
-        if (
-          !response.ok
-        ) {
-
-          throw new Error(
-            'HTTP ' +
-            response.status
-          );
-
-        }
-
-
-        return response.json();
-
-      }
-    )
-
-    .then(
-      function(result) {
-
-        console.log(
-          'ATTENDANCE LIST RESULT:',
+          'DATA ABSENSI HARI INI:',
           result
         );
 
 
-        handleTodayAttendanceList(
+        renderTodayAttendance(
           result
         );
 
       }
     )
 
-    .catch(
-      function(error) {
+    .withFailureHandler(
+      function (error) {
 
         console.error(
-          'ATTENDANCE LIST ERROR:',
+          'GAGAL MEMUAT ABSENSI:',
           error
         );
-
-
-        hideAttendanceListLoading();
 
 
         showAttendanceListError(
-          error
+          error &&
+          error.message
+            ? error.message
+            : 'Gagal mengambil data absensi.'
         );
 
+      }
+    )
+
+    .getTodayAttendanceList();
+
+}
+
+
+/* =====================================================
+   TANGGAL ABSENSI
+===================================================== */
+
+function updateAttendanceDate() {
+
+  const element =
+    document.getElementById(
+      'attendanceDate'
+    );
+
+
+  if (!element) {
+
+    return;
+
+  }
+
+
+  const now =
+    new Date();
+
+
+  element.textContent =
+    now.toLocaleDateString(
+      'id-ID',
+      {
+        weekday:
+          'long',
+
+        day:
+          'numeric',
+
+        month:
+          'long',
+
+        year:
+          'numeric'
       }
     );
 
@@ -2189,98 +2252,277 @@ function loadTodayAttendanceList() {
 
 
 /* =====================================================
-   HANDLE DAFTAR ABSENSI
+   RENDER DATA
 ===================================================== */
 
-function handleTodayAttendanceList(
+function renderTodayAttendance(
   result
 ) {
 
   console.log(
-    'Memproses data daftar absensi:',
+    'Render absensi:',
     result
   );
 
 
-  hideAttendanceListLoading();
+  const loading =
+    document.getElementById(
+      'attendanceLoading'
+    );
+
+  const empty =
+    document.getElementById(
+      'attendanceEmpty'
+    );
+
+  const desktop =
+    document.getElementById(
+      'attendanceDesktop'
+    );
+
+  const mobile =
+    document.getElementById(
+      'attendanceMobile'
+    );
 
 
-  if (
-    !result
-  ) {
+  /*
+   * Matikan loading
+   */
 
-    showAttendanceListError();
+  if (loading) {
 
-    return;
+    loading.style.display =
+      'none';
 
   }
 
 
+  /*
+   * Ambil array data
+   *
+   * Mendukung beberapa bentuk
+   * response backend.
+   */
+
+  let data = [];
+
+
   if (
-    result.success !== true
+    Array.isArray(result)
   ) {
 
-    console.error(
-      'Backend mengembalikan error:',
-      result.message
-    );
-
-
-    showAttendanceListError(
-      result.message
-    );
-
-    return;
+    data =
+      result;
 
   }
 
-
-  const data =
+  else if (
+    result &&
     Array.isArray(
       result.data
     )
-      ? result.data
-      : [];
+  ) {
+
+    data =
+      result.data;
+
+  }
+
+  else if (
+    result &&
+    Array.isArray(
+      result.list
+    )
+  ) {
+
+    data =
+      result.list;
+
+  }
+
+  else if (
+    result &&
+    Array.isArray(
+      result.attendance
+    )
+  ) {
+
+    data =
+      result.attendance;
+
+  }
 
 
-  console.log(
-    'Jumlah siswa:',
-    data.length
-  );
-
+  /*
+   * Tidak ada data
+   */
 
   if (
     data.length === 0
   ) {
 
-    showAttendanceListEmpty();
+    if (empty) {
+
+      empty.style.display =
+        'block';
+
+    }
+
+
+    if (desktop) {
+
+      desktop.style.display =
+        'none';
+
+    }
+
+
+    if (mobile) {
+
+      mobile.style.display =
+        'none';
+
+    }
+
 
     return;
 
   }
 
 
-  renderAttendanceList(
+  /*
+   * Pastikan urutan berdasarkan
+   * waktu absensi paling awal.
+   */
+
+  data =
+    normalizeAttendanceData(
+      data
+    );
+
+
+  /*
+   * Render desktop
+   */
+
+  renderAttendanceTable(
     data
+  );
+
+
+  /*
+   * Render mobile
+   */
+
+  renderAttendanceCards(
+    data
+  );
+
+
+  /*
+   * Tampilkan sesuai ukuran
+   */
+
+  showAttendanceLayouts();
+
+}
+
+
+/* =====================================================
+   NORMALISASI DATA
+===================================================== */
+
+function normalizeAttendanceData(
+  data
+) {
+
+  return data.map(
+    function (
+      item,
+      index
+    ) {
+
+      const name =
+        item.nama ||
+        item.NAMA ||
+        item.name ||
+        item.NAMA_SISWA ||
+        '-';
+
+
+      const kelas =
+        item.kelas ||
+        item.KELAS ||
+        item.class ||
+        '-';
+
+
+      const jam =
+        item.jam ||
+        item.JAM ||
+        item.time ||
+        item.waktu ||
+        '-';
+
+
+      const status =
+        item.status ||
+        item.STATUS ||
+        '-';
+
+
+      return {
+
+        rank:
+          index + 1,
+
+        nama:
+          String(
+            name
+          ),
+
+        kelas:
+          String(
+            kelas
+          ),
+
+        jam:
+          String(
+            jam
+          ),
+
+        status:
+          String(
+            status
+          )
+
+      };
+
+    }
   );
 
 }
 
 
 /* =====================================================
-   RENDER DAFTAR ABSENSI
+   DESKTOP TABLE
 ===================================================== */
 
-function renderAttendanceList(
+function renderAttendanceTable(
   data
 ) {
 
-  if (
-    !attendanceListElement
-  ) {
+  const tbody =
+    document.getElementById(
+      'attendanceTableBody'
+    );
+
+
+  if (!tbody) {
 
     console.error(
-      'Element #attendanceList tidak ditemukan.'
+      '#attendanceTableBody tidak ditemukan.'
     );
 
     return;
@@ -2288,324 +2530,458 @@ function renderAttendanceList(
   }
 
 
-  attendanceListElement.innerHTML =
+  tbody.innerHTML =
     '';
 
 
   data.forEach(
-    function(
-      item,
+    function (
+      student,
       index
     ) {
 
-      const nomor =
-        Number(
-          item.nomor
-        ) ||
+      const rank =
         index + 1;
 
 
-      const urutan =
-        item.urutan ||
-        getAttendanceRank(
-          nomor
-        );
-
-
-      const nama =
-        escapeHtml(
-          item.nama || '-'
-        );
-
-
-      const kelas =
-        escapeHtml(
-          item.kelas || '-'
-        );
-
-
-      const jam =
-        escapeHtml(
-          item.jam || '-'
-        );
-
-
-      const status =
-        escapeHtml(
-          item.status || '-'
-        );
-
-
-      const statusText =
-        String(
-          item.status || ''
-        ).toLowerCase();
-
-
-      let statusClass =
-        'status-hadir';
-
-
-      let statusIcon =
-        '🟢';
-
-
-      if (
-        statusText.includes(
-          'terlambat'
-        )
-      ) {
-
-        statusClass =
-          'status-terlambat';
-
-        statusIcon =
-          '🟡';
-
-      }
-
-
-      const itemElement =
+      const row =
         document.createElement(
-          'div'
+          'tr'
         );
 
 
-      itemElement.className =
-        'attendance-item';
+      /*
+       * Ranking
+       */
+
+      const rankCell =
+        document.createElement(
+          'td'
+        );
 
 
-      itemElement.innerHTML =
-
-        '<div class="attendance-rank">' +
-
-          escapeHtml(
-            urutan
-          ) +
-
-        '</div>' +
+      rankCell.className =
+        'rank-column';
 
 
-        '<div class="attendance-info">' +
-
-          '<div class="attendance-name">' +
-
-            nama +
-
-          '</div>' +
-
-          '<div class="attendance-class">' +
-
-            'Kelas ' +
-
-            kelas +
-
-          '</div>' +
-
-        '</div>' +
+      rankCell.innerHTML =
+        getRankHtml(
+          rank
+        );
 
 
-        '<div class="attendance-time">' +
+      /*
+       * Nama
+       */
 
-          jam +
-
-        '</div>' +
-
-
-        '<div class="attendance-status ' +
-
-          statusClass +
-
-        '">' +
-
-          statusIcon +
-
-          ' ' +
-
-          status +
-
-        '</div>';
+      const nameCell =
+        document.createElement(
+          'td'
+        );
 
 
-      attendanceListElement.appendChild(
-        itemElement
+      nameCell.innerHTML =
+        '<span class="student-name">' +
+        escapeHtml(
+          student.nama
+        ) +
+        '</span>';
+
+
+      /*
+       * Kelas
+       */
+
+      const classCell =
+        document.createElement(
+          'td'
+        );
+
+
+      classCell.innerHTML =
+        '<span class="student-class">' +
+        escapeHtml(
+          student.kelas
+        ) +
+        '</span>';
+
+
+      /*
+       * Jam
+       */
+
+      const timeCell =
+        document.createElement(
+          'td'
+        );
+
+
+      timeCell.innerHTML =
+        '<span class="attendance-time">' +
+        '🕐 ' +
+        escapeHtml(
+          student.jam
+        ) +
+        '</span>';
+
+
+      /*
+       * Status
+       */
+
+      const statusCell =
+        document.createElement(
+          'td'
+        );
+
+
+      statusCell.innerHTML =
+        getStatusBadgeHtml(
+          student.status
+        );
+
+
+      row.appendChild(
+        rankCell
+      );
+
+      row.appendChild(
+        nameCell
+      );
+
+      row.appendChild(
+        classCell
+      );
+
+      row.appendChild(
+        timeCell
+      );
+
+      row.appendChild(
+        statusCell
+      );
+
+
+      tbody.appendChild(
+        row
       );
 
     }
   );
 
-
-  attendanceListElement.style.display =
-    'block';
-
-
-  if (
-    attendanceListEmptyElement
-  ) {
-
-    attendanceListEmptyElement.style.display =
-      'none';
-
-  }
-
 }
 
+
 /* =====================================================
-   RANK
+   MOBILE CARD
 ===================================================== */
 
-function getAttendanceRank(
-  nomor
+function renderAttendanceCards(
+  data
 ) {
 
-  nomor =
-    Number(
-      nomor
+  const container =
+    document.getElementById(
+      'attendanceCardList'
     );
 
 
-  if (
-    nomor === 1
-  ) {
+  if (!container) {
 
-    return '🥇';
+    console.error(
+      '#attendanceCardList tidak ditemukan.'
+    );
 
-  }
-
-
-  if (
-    nomor === 2
-  ) {
-
-    return '🥈';
+    return;
 
   }
 
 
-  if (
-    nomor === 3
-  ) {
-
-    return '🥉';
-
-  }
+  container.innerHTML =
+    '';
 
 
-  return String(
-    nomor
+  data.forEach(
+    function (
+      student,
+      index
+    ) {
+
+      const rank =
+        index + 1;
+
+
+      const card =
+        document.createElement(
+          'div'
+        );
+
+
+      card.className =
+        'attendance-card';
+
+
+      /*
+       * Ranking
+       */
+
+      const rankHtml =
+        getRankHtml(
+          rank
+        );
+
+
+      /*
+       * Status
+       */
+
+      const statusHtml =
+        getStatusBadgeHtml(
+          student.status
+        );
+
+
+      card.innerHTML =
+
+        '<div class="attendance-card-rank ' +
+
+        (
+          rank <= 3
+            ? 'medal'
+            : ''
+        ) +
+
+        '">' +
+
+        rankHtml +
+
+        '</div>' +
+
+
+        '<div class="attendance-card-content">' +
+
+          '<div class="attendance-card-name">' +
+
+            escapeHtml(
+              student.nama
+            ) +
+
+          '</div>' +
+
+
+          '<div class="attendance-card-class">' +
+
+            'Kelas ' +
+
+            escapeHtml(
+              removeKelasPrefix(
+                student.kelas
+              )
+            ) +
+
+          '</div>' +
+
+
+          '<div class="attendance-card-bottom">' +
+
+            '<div class="attendance-card-time">' +
+
+              '🕐 ' +
+
+              escapeHtml(
+                student.jam
+              ) +
+
+            '</div>' +
+
+
+            '<div class="attendance-card-status">' +
+
+              statusHtml +
+
+            '</div>' +
+
+          '</div>' +
+
+        '</div>';
+
+
+      container.appendChild(
+        card
+      );
+
+    }
   );
 
 }
 
 
 /* =====================================================
-   LOADING
+   RANKING
 ===================================================== */
 
-function showAttendanceListLoading() {
+function getRankHtml(
+  rank
+) {
 
   if (
-    attendanceListLoadingElement
+    rank === 1
   ) {
 
-    attendanceListLoadingElement
-      .style
-      .display =
-      'block';
+    return (
+      '<span class="rank-medal">🥇</span>'
+    );
 
   }
 
 
   if (
-    attendanceListEmptyElement
+    rank === 2
   ) {
 
-    attendanceListEmptyElement
-      .style
-      .display =
-      'none';
+    return (
+      '<span class="rank-medal">🥈</span>'
+    );
 
   }
 
 
   if (
-    attendanceListElement
+    rank === 3
   ) {
 
-    attendanceListElement
-      .style
-      .display =
-      'none';
+    return (
+      '<span class="rank-medal">🥉</span>'
+    );
 
   }
+
+
+  return (
+    '<span class="rank-number">' +
+    rank +
+    '</span>'
+  );
 
 }
 
 
 /* =====================================================
-   HIDE LOADING
+   STATUS BADGE
 ===================================================== */
 
-function hideAttendanceListLoading() {
+function getStatusBadgeHtml(
+  status
+) {
+
+  const text =
+    String(
+      status || '-'
+    );
+
+
+  const lower =
+    text.toLowerCase();
+
 
   if (
-    attendanceListLoadingElement
+    lower.includes(
+      'terlambat'
+    )
   ) {
 
-    attendanceListLoadingElement
-      .style
-      .display =
-      'none';
+    return (
+
+      '<span class="status-badge status-terlambat">' +
+
+      '🟡 ' +
+
+      escapeHtml(
+        text
+      ) +
+
+      '</span>'
+
+    );
 
   }
+
+
+  if (
+    lower.includes(
+      'hadir'
+    )
+  ) {
+
+    return (
+
+      '<span class="status-badge status-hadir">' +
+
+      '🟢 ' +
+
+      escapeHtml(
+        text
+      ) +
+
+      '</span>'
+
+    );
+
+  }
+
+
+  return (
+
+    '<span class="status-badge status-other">' +
+
+    escapeHtml(
+      text
+    ) +
+
+    '</span>'
+
+  );
 
 }
 
 
 /* =====================================================
-   DATA KOSONG
+   TAMPILKAN LAYOUT
 ===================================================== */
 
-function showAttendanceListEmpty() {
+function showAttendanceLayouts() {
 
-  if (
-    attendanceTableBodyElement
-  ) {
+  const desktop =
+    document.getElementById(
+      'attendanceDesktop'
+    );
 
-    attendanceTableBodyElement.innerHTML =
-      '';
-
-  }
-
-
-  if (
-    attendanceListElement
-  ) {
-
-    attendanceListElement.innerHTML =
-      '';
-
-    attendanceListElement
-      .style
-      .display =
-      'none';
-
-  }
+  const mobile =
+    document.getElementById(
+      'attendanceMobile'
+    );
 
 
-  if (
-    attendanceListEmptyElement
-  ) {
+  /*
+   * Kita tampilkan keduanya.
+   *
+   * CSS yang menentukan:
+   * Desktop = table
+   * HP = card
+   */
 
-    attendanceListEmptyElement
-      .style
-      .display =
+  if (desktop) {
+
+    desktop.style.display =
       'block';
 
+  }
 
-    attendanceListEmptyElement
-      .textContent =
-      '📋 Belum ada siswa yang melakukan absensi hari ini.';
+
+  if (mobile) {
+
+    mobile.style.display =
+      'block';
 
   }
 
@@ -2620,56 +2996,100 @@ function showAttendanceListError(
   message
 ) {
 
-  if (
-    attendanceTableBodyElement
-  ) {
-
-    attendanceTableBodyElement.innerHTML =
-      '';
-
-  }
+  const loading =
+    document.getElementById(
+      'attendanceLoading'
+    );
 
 
-  if (
-    attendanceListElement
-  ) {
+  if (loading) {
 
-    attendanceListElement.innerHTML =
-      '';
+    loading.innerHTML =
 
-    attendanceListElement
-      .style
-      .display =
-      'none';
+      '<div style="' +
 
-  }
+      'text-align:center;' +
 
+      'color:#dc2626;' +
 
-  if (
-    attendanceListEmptyElement
-  ) {
+      'padding:20px;' +
 
-    attendanceListEmptyElement
-      .style
-      .display =
-      'block';
+      '">' +
 
+      '🔴 ' +
 
-    attendanceListEmptyElement
-      .textContent =
-
-      '⚠️ ' +
-
-      (
+      escapeHtml(
         message ||
-        'Daftar absensi tidak dapat dimuat.'
-      );
+        'Gagal memuat data absensi.'
+      ) +
+
+      '</div>';
 
   }
 
 }
 
 
+/* =====================================================
+   HAPUS PREFIX KELAS
+===================================================== */
+
+function removeKelasPrefix(
+  value
+) {
+
+  return String(
+    value || ''
+  )
+
+  .replace(
+    /^kelas\s+/i,
+    ''
+  )
+
+  .trim();
+
+}
+
+
+/* =====================================================
+   ESCAPE HTML
+===================================================== */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ''
+  )
+
+  .replace(
+    /&/g,
+    '&amp;'
+  )
+
+  .replace(
+    /</g,
+    '&lt;'
+  )
+
+  .replace(
+    />/g,
+    '&gt;'
+  )
+
+  .replace(
+    /"/g,
+    '&quot;'
+  )
+
+  .replace(
+    /'/g,
+    '&#039;'
+  );
+
+}
 /* =====================================================
    REFRESH SETELAH SCAN
 ===================================================== */

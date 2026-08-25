@@ -1974,45 +1974,6 @@ function showCameraError(
 
 
 /* =====================================================
-   ESCAPE HTML
-===================================================== */
-
-function escapeHtml(
-  value
-) {
-
-  return String(
-    value ?? ''
-  )
-
-  .replace(
-    /&/g,
-    '&amp;'
-  )
-
-  .replace(
-    /</g,
-    '&lt;'
-  )
-
-  .replace(
-    />/g,
-    '&gt;'
-  )
-
-  .replace(
-    /"/g,
-    '&quot;'
-  )
-
-  .replace(
-    /'/g,
-    '&#039;'
-  );
-
-}
-
-/* =====================================================
    V5.2.8 - DAFTAR ABSENSI HARI INI
    TABLE DESKTOP + CARD HP
    SMP BAITUL ULUM BOARDING SCHOOL

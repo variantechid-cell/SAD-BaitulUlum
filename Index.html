@@ -324,145 +324,72 @@
       </button>
 
     </section>
-   <!-- =====================================================
-     URUTAN ABSENSI HARI INI
-     V5.2.8
-===================================================== -->
+    <!-- =========================================
+     STATISTIK ABSENSI HARI INI
+========================================= -->
 
-<section class="attendance-section">
+<div class="scanner-card">
 
-  <div class="attendance-header">
+  <div class="summary-card">
 
-    <div class="attendance-title">
-
-      <span class="attendance-title-icon">
-        📋
-      </span>
-
-      <div>
-        <h2>Urutan Absensi Hari Ini</h2>
-
-        <p>
-          Siswa yang melakukan absensi lebih awal
-          akan berada di urutan atas.
-        </p>
-      </div>
-
+    <div class="summary-icon">
+      👥
     </div>
 
-    <div
-      id="attendanceDate"
-      class="attendance-date">
+    <div class="summary-label">
+      TOTAL ABSEN
+    </div>
+
+     <div
+        id="countTotal"
+        class="stat-number"
+     >
+        0
+    </div>
+    <section class="attendance-section">
+
+  <div class="attendance-section-header">
+
+    <div>
+      <h2>📋 Urutan Absensi Hari Ini</h2>
+      <p>
+        Siswa yang melakukan absensi lebih awal akan berada di urutan atas.
+      </p>
     </div>
 
   </div>
 
-
-  <!-- LOADING -->
 
   <div
-    id="attendanceLoading"
-    class="attendance-loading">
-
-    <div class="loading-spinner"></div>
-
-    <span>
-      Memuat data absensi...
-    </span>
-
+    id="attendanceListLoading"
+    class="attendance-list-loading"
+  >
+    ⏳ Memuat data absensi...
   </div>
 
-
-  <!-- KOSONG -->
 
   <div
-    id="attendanceEmpty"
-    class="attendance-empty"
-    style="display:none;">
-
-    <div class="empty-icon">
-      📭
-    </div>
-
-    <h3>Belum ada absensi</h3>
-
-    <p>
-      Belum ada siswa yang melakukan absensi
-      hari ini.
-    </p>
-
+    id="attendanceListEmpty"
+    class="attendance-list-empty"
+    style="display:none;"
+  >
+    Belum ada siswa yang melakukan absensi hari ini.
   </div>
 
-
-  <!-- =================================================
-       DESKTOP TABLE
-  ================================================== -->
 
   <div
-    id="attendanceDesktop"
-    class="attendance-desktop"
-    style="display:none;">
-
-    <div class="attendance-table-wrapper">
-
-      <table class="attendance-table">
-
-        <thead>
-
-          <tr>
-
-            <th class="rank-column">
-              No.
-            </th>
-
-            <th>
-              Nama Siswa
-            </th>
-
-            <th>
-              Kelas
-            </th>
-
-            <th>
-              Jam Absensi
-            </th>
-
-            <th>
-              Status
-            </th>
-
-          </tr>
-
-        </thead>
-
-        <tbody
-          id="attendanceTableBody">
-        </tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- =================================================
-       MOBILE CARD
-  ================================================== -->
-
-  <div
-    id="attendanceMobile"
-    class="attendance-mobile"
-    style="display:none;">
-
-    <div
-      id="attendanceCardList"
-      class="attendance-card-list">
-    </div>
-
-  </div>
+    id="attendanceList"
+    class="attendance-list"
+  ></div>
 
 </section>
+
+ </div>
+ </div>
+
+ 
+
+
     <!-- ===============================================
          INFORMASI
     ================================================ -->

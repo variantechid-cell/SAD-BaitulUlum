@@ -1827,3 +1827,157 @@ body {
   }
 
 }
+
+/* =====================================================
+   V5.3
+   FILTER JUMLAH ABSENSI
+===================================================== */
+
+.attendance-filter {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin: 12px 0 16px;
+  font-size: 14px;
+}
+
+.attendance-filter label {
+  font-weight: 600;
+}
+
+.attendance-filter select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+
+/* =====================================================
+   DESKTOP
+===================================================== */
+
+#attendanceDesktop {
+  display: block;
+}
+
+#attendanceMobile {
+  display: none;
+}
+
+
+/* =====================================================
+   TABEL
+===================================================== */
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.attendance-table th {
+  font-weight: 700;
+}
+
+
+/* =====================================================
+   HP
+===================================================== */
+
+@media (max-width: 768px) {
+
+  #attendanceDesktop {
+    display: none !important;
+  }
+
+  #attendanceMobile {
+    display: block !important;
+  }
+
+
+  .attendance-filter {
+    justify-content: space-between;
+    margin-top: 12px;
+  }
+
+
+  .attendance-filter select {
+    flex: 1;
+    max-width: 150px;
+  }
+
+
+  .attendance-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    margin-bottom: 8px;
+    border-radius: 10px;
+    border: 1px solid #e5e7eb;
+    background: #ffffff;
+  }
+
+
+  .attendance-card-rank {
+    min-width: 42px;
+    text-align: center;
+    font-size: 20px;
+  }
+
+
+  .attendance-card-rank.medal {
+    font-size: 25px;
+  }
+
+
+  .attendance-card-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+
+  .attendance-card-name {
+    font-weight: 700;
+    font-size: 14px;
+    word-break: break-word;
+  }
+
+
+  .attendance-card-class {
+    font-size: 12px;
+    margin-top: 3px;
+  }
+
+
+  .attendance-card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 7px;
+  }
+
+
+  .attendance-card-time {
+    font-size: 12px;
+  }
+
+
+  .attendance-card-status {
+    font-size: 12px;
+  }
+
+}

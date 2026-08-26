@@ -2613,3 +2613,23 @@ function escapeHtml(
   );
 
 }
+
+const CONFIG = {
+
+  SPREADSHEET_ID: '',
+
+  SHEET_SISWA: 'SISWA',
+
+  SHEET_ABSENSI: 'ABSENSI',
+
+  SHEET_LOG: 'LOG',
+
+  TIMEZONE: 'Asia/Jakarta',
+
+  JAM_MASUK:
+    '07:00',
+
+  BATAS_TERLAMBAT:
+    '07:30'
+
+};

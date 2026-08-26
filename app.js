@@ -1706,7 +1706,10 @@ function loadTodaySummary() {
 
 /* =====================================================
    LOAD DAFTAR ABSENSI HARI INI
-   V6.1
+   V5.2.8 FIX
+
+   Menggunakan API_URL + fetch()
+   Sama seperti scanner dan summary.
 ===================================================== */
 
 function loadTodayAttendanceList() {
@@ -1716,7 +1719,7 @@ function loadTodayAttendanceList() {
   );
 
   console.log(
-    'LOAD DAFTAR ABSENSI HARI INI'
+    'LOAD ABSENSI HARI INI V5.2.8'
   );
 
   console.log(
@@ -1746,7 +1749,7 @@ function loadTodayAttendanceList() {
 
 
   /* ---------------------------------
-     RESET TAMPILAN
+     TAMPILKAN LOADING
   --------------------------------- */
 
   if (loading) {
@@ -1755,8 +1758,8 @@ function loadTodayAttendanceList() {
       'flex';
 
     loading.innerHTML =
-      '<div class="attendance-loading-content">' +
-        '⏳ Memuat data absensi...' +
+      '<div style="text-align:center;padding:20px;">' +
+      '⏳ Memuat data absensi...' +
       '</div>';
 
   }
@@ -1786,169 +1789,119 @@ function loadTodayAttendanceList() {
   }
 
 
+  /* ---------------------------------
+     UPDATE TANGGAL
+  --------------------------------- */
+
   updateAttendanceDate();
 
 
   /* ---------------------------------
-     CEK GOOGLE SCRIPT RUN
+     URL API
   --------------------------------- */
 
-  if (
-    typeof google === 'undefined' ||
-    !google.script ||
-    !google.script.run
-  ) {
-
-    console.error(
-      'google.script.run tidak tersedia.'
-    );
+  const url =
+    API_URL +
+    '?action=attendanceList' +
+    '&_=' +
+    Date.now();
 
 
-    showAttendanceListError(
-      'Koneksi server Apps Script tidak tersedia.'
-    );
-
-    return;
-
-  }
+  console.log(
+    'MEMANGGIL API ABSENSI:',
+    url
+  );
 
 
   /* ---------------------------------
-     HAPUS TIMER SEBELUMNYA
+     REQUEST KE APPS SCRIPT
   --------------------------------- */
 
-  if (attendanceListTimer) {
+  fetch(url, {
+    method:
+      'GET',
 
-    clearTimeout(
-      attendanceListTimer
-    );
+    cache:
+      'no-store'
+  })
 
-  }
+  .then(
+    function (response) {
+
+      console.log(
+        'ATTENDANCE LIST HTTP STATUS:',
+        response.status
+      );
 
 
-  /* ---------------------------------
-     TIMEOUT
-  --------------------------------- */
+      if (!response.ok) {
 
-  attendanceListTimer =
-    setTimeout(
-      function () {
-
-        console.error(
-          'TIMEOUT getTodayAttendanceList()'
+        throw new Error(
+          'HTTP ' +
+          response.status
         );
 
+      }
 
-        showAttendanceListError(
-          'Server terlalu lama mengirim data absensi.'
+
+      return response.json();
+
+    }
+  )
+
+  .then(
+    function (result) {
+
+      console.log(
+        'ATTENDANCE LIST RESULT:',
+        result
+      );
+
+
+      /*
+       * Pastikan server mengirim
+       * response yang valid.
+       */
+
+      if (!result) {
+
+        throw new Error(
+          'Server tidak mengirim data.'
         );
 
-      },
-      ATTENDANCE_LIST_TIMEOUT
-    );
+      }
 
 
-  /* ---------------------------------
-     PANGGIL CODE.GS
-  --------------------------------- */
+      /*
+       * Render data
+       */
 
-  try {
+      renderTodayAttendance(
+        result
+      );
 
-    google.script.run
+    }
+  )
 
-      .withSuccessHandler(
-        function (result) {
+  .catch(
+    function (error) {
 
-          clearTimeout(
-            attendanceListTimer
-          );
-
-
-          attendanceListTimer =
-            null;
-
-
-          console.log(
-            '===================================='
-          );
-
-          console.log(
-            'HASIL getTodayAttendanceList():'
-          );
-
-          console.log(
-            result
-          );
-
-          console.log(
-            '===================================='
-          );
+      console.error(
+        'ATTENDANCE LIST ERROR:',
+        error
+      );
 
 
-          renderTodayAttendance(
-            result
-          );
+      showAttendanceListError(
+        'Gagal memuat data absensi: ' +
+        (
+          error.message ||
+          'Koneksi server gagal.'
+        )
+      );
 
-        }
-      )
-
-      .withFailureHandler(
-        function (error) {
-
-          clearTimeout(
-            attendanceListTimer
-          );
-
-
-          attendanceListTimer =
-            null;
-
-
-          console.error(
-            'getTodayAttendanceList ERROR:',
-            error
-          );
-
-
-          showAttendanceListError(
-
-            error &&
-            error.message
-              ? error.message
-              : 'Gagal mengambil data absensi.'
-
-          );
-
-        }
-      )
-
-      .getTodayAttendanceList();
-
-  }
-
-  catch (error) {
-
-    clearTimeout(
-      attendanceListTimer
-    );
-
-
-    attendanceListTimer =
-      null;
-
-
-    console.error(
-      'CALL GOOGLE SCRIPT ERROR:',
-      error
-    );
-
-
-    showAttendanceListError(
-      error.message ||
-      'Terjadi kesalahan saat mengambil data.'
-    );
-
-  }
+    }
+  );
 
 }
 

@@ -3,478 +3,781 @@
 
 <head>
 
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0"
+>
 
-  <title>
-    Absensi Kartu Pelajar
-  </title>
+<title>
+  Absensi Kartu Pelajar
+</title>
 
 
-  <script
-    src="https://unpkg.com/html5-qrcode"
-  ></script>
+<!-- QR SCANNER -->
 
+<script
+  src="https://unpkg.com/html5-qrcode"
+  type="text/javascript">
+</script>
 
-  <style>
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
 
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      font-family:
-        Arial,
-        Helvetica,
-        sans-serif;
-      background: #f1f5f9;
-      color: #0f172a;
-    }
+body {
 
+  margin: 0;
 
-    .container {
-      max-width: 1100px;
-      margin: auto;
-      padding: 20px;
-    }
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
 
+  background:
+    #f1f5f9;
 
-    .header {
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.06);
-    }
+  color:
+    #0f172a;
 
+}
 
-    .header h1 {
-      margin: 0;
-      font-size: 24px;
-    }
+.container {
 
+  width:
+    min(1100px, 94%);
 
-    .header p {
-      margin: 6px 0 0;
-      color: #64748b;
-    }
+  margin:
+    auto;
 
+  padding:
+    20px 0 40px;
 
-    .datetime {
-      margin-top: 12px;
-      font-weight: bold;
-    }
+}
 
+.header {
 
-    .server-status {
-      margin-top: 10px;
-      font-size: 13px;
-    }
+  background:
+    linear-gradient(
+      135deg,
+      #0f766e,
+      #0d9488
+    );
 
+  color:
+    white;
 
-    .scanner-card {
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.06);
-    }
+  padding:
+    22px;
 
+  border-radius:
+    18px;
 
-    #reader {
-      width: 100%;
-      max-width: 500px;
-      margin: 20px auto;
-    }
+  margin-bottom:
+    18px;
 
+  text-align:
+    center;
 
-    button {
-      border: 0;
-      border-radius: 10px;
-      padding: 12px 18px;
-      font-size: 15px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+}
 
+.header h1 {
 
-    .btn-primary {
-      background: #2563eb;
-      color: white;
-    }
+  margin:
+    0 0 8px;
 
+  font-size:
+    clamp(20px, 4vw, 30px);
 
-    .btn-secondary {
-      background: #e2e8f0;
-      color: #0f172a;
-    }
+}
 
+.header p {
 
-    .status {
-      text-align: center;
-      padding: 12px;
-      border-radius: 10px;
-      background: #f8fafc;
-      margin-bottom: 15px;
-      font-weight: bold;
-    }
+  margin:
+    4px 0;
 
+  opacity:
+    .9;
 
-    .result {
-      background: white;
-      border-radius: 18px;
-      padding: 25px;
-      text-align: center;
-      margin-top: 20px;
-      box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.06);
-    }
+}
 
+.datetime {
 
-    .result-icon {
-      font-size: 50px;
-    }
+  margin-top:
+    12px;
 
+  font-size:
+    14px;
 
-    .result-title {
-      font-size: 22px;
-      font-weight: bold;
-      margin: 10px 0;
-    }
+}
 
 
-    .result-message {
-      color: #64748b;
-      margin-bottom: 15px;
-    }
+/* =================================================
+   SCANNER
+================================================= */
 
+.scanner-card {
 
-    .result.success {
-      border-top: 5px solid #16a34a;
-    }
+  background:
+    white;
 
+  border-radius:
+    18px;
 
-    .result.late {
-      border-top: 5px solid #eab308;
-    }
+  padding:
+    18px;
 
+  box-shadow:
+    0 5px 20px
+    rgba(0,0,0,.06);
 
-    .result.already {
-      border-top: 5px solid #f97316;
-    }
+  margin-bottom:
+    18px;
 
+}
 
-    .result.error {
-      border-top: 5px solid #dc2626;
-    }
+#reader {
 
+  width:
+    100%;
 
-    .student-info {
-      font-size: 18px;
-      line-height: 1.6;
-    }
+  max-width:
+    500px;
 
+  margin:
+    auto;
 
-    .summary {
-      display: grid;
-      grid-template-columns:
-        repeat(4, 1fr);
-      gap: 12px;
-      margin-top: 20px;
-    }
+}
 
+.status {
 
-    .summary-card {
-      background: white;
-      border-radius: 15px;
-      padding: 18px;
-      text-align: center;
-      box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.05);
-    }
+  text-align:
+    center;
 
+  padding:
+    12px;
 
-    .summary-card small {
-      display: block;
-      color: #64748b;
-    }
+  font-weight:
+    bold;
 
+  color:
+    #0f766e;
 
-    .summary-card strong {
-      display: block;
-      font-size: 28px;
-      margin-top: 5px;
-    }
+}
 
+.buttons {
 
-    .attendance-section {
-      margin-top: 20px;
-      background: white;
-      border-radius: 18px;
-      padding: 20px;
-      box-shadow:
-        0 5px 20px
-        rgba(0,0,0,.06);
-    }
+  display:
+    flex;
 
+  gap:
+    10px;
 
-    .attendance-header {
-      display: flex;
-      justify-content:
-        space-between;
-      align-items: center;
-      gap: 15px;
-      flex-wrap: wrap;
-    }
+  justify-content:
+    center;
 
+  flex-wrap:
+    wrap;
 
-    .attendance-header h2 {
-      margin: 0;
-    }
+  margin-top:
+    12px;
 
+}
 
-    .attendance-tools {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+button {
 
+  border:
+    0;
 
-    select {
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-    }
+  padding:
+    11px 18px;
 
+  border-radius:
+    10px;
 
-    .total-box {
-      background: #eff6ff;
-      padding: 10px 15px;
-      border-radius: 10px;
-      font-weight: bold;
-    }
+  cursor:
+    pointer;
 
+  font-weight:
+    bold;
 
-    .display-info {
-      margin: 15px 0;
-      color: #64748b;
-      font-size: 14px;
-    }
+  background:
+    #0f766e;
 
+  color:
+    white;
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+}
 
+button:hover {
 
-    th,
-    td {
-      padding: 12px;
-      border-bottom:
-        1px solid #e2e8f0;
-      text-align: left;
-    }
+  opacity:
+    .9;
 
+}
 
-    th {
-      background: #f8fafc;
-    }
 
+/* =================================================
+   RESULT
+================================================= */
 
-    .rank-column {
-      width: 60px;
-      text-align: center;
-    }
+.result {
 
+  background:
+    white;
 
-    .rank-medal {
-      font-size: 24px;
-    }
+  padding:
+    24px;
 
+  border-radius:
+    18px;
 
-    .rank-number {
-      font-weight: bold;
-      color: #64748b;
-    }
+  text-align:
+    center;
 
+  margin-bottom:
+    18px;
 
-    .student-name {
-      font-weight: bold;
-    }
+}
 
+.result-icon {
 
-    .student-class {
-      color: #64748b;
-    }
+  font-size:
+    50px;
 
+}
 
-    .status-badge {
-      display: inline-block;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: bold;
-    }
+.result h2 {
 
+  margin:
+    10px 0;
 
-    .status-hadir {
-      background: #dcfce7;
-      color: #166534;
-    }
+}
 
+.result.success {
 
-    .status-terlambat {
-      background: #fef9c3;
-      color: #854d0e;
-    }
+  border:
+    3px solid #22c55e;
 
+}
 
-    .status-other {
-      background: #e2e8f0;
-      color: #334155;
-    }
+.result.late {
 
+  border:
+    3px solid #eab308;
 
-    .attendance-card-list {
-      display: none;
-    }
+}
 
+.result.already {
 
-    .attendance-card {
-      display: flex;
-      gap: 12px;
-      padding: 14px;
-      border-bottom:
-        1px solid #e2e8f0;
-    }
+  border:
+    3px solid #f97316;
 
+}
 
-    .attendance-card-rank {
-      min-width: 40px;
-      text-align: center;
-    }
+.result.error {
 
+  border:
+    3px solid #ef4444;
 
-    .attendance-card-content {
-      flex: 1;
-    }
+}
 
 
-    .attendance-card-name {
-      font-weight: bold;
-      font-size: 16px;
-    }
+/* =================================================
+   SUMMARY
+================================================= */
 
+.summary-grid {
 
-    .attendance-card-class {
-      color: #64748b;
-      font-size: 13px;
-      margin-top: 3px;
-    }
+  display:
+    grid;
 
+  grid-template-columns:
+    repeat(4, 1fr);
 
-    .attendance-card-bottom {
-      display: flex;
-      justify-content:
-        space-between;
-      align-items: center;
-      margin-top: 8px;
-      gap: 10px;
-    }
+  gap:
+    12px;
 
+  margin-bottom:
+    18px;
 
-    .attendance-card-time {
-      color: #475569;
-      font-size: 13px;
-    }
+}
 
+.summary-card {
 
-    .loading {
-      text-align: center;
-      padding: 25px;
-      color: #64748b;
-    }
+  background:
+    white;
 
+  padding:
+    18px;
 
-    .empty {
-      text-align: center;
-      padding: 30px;
-      color: #64748b;
-    }
+  border-radius:
+    15px;
 
+  text-align:
+    center;
 
-    @media (
-      max-width: 700px
-    ) {
+  box-shadow:
+    0 3px 15px
+    rgba(0,0,0,.05);
 
-      .container {
-        padding: 10px;
-      }
+}
 
+.summary-number {
 
-      .header h1 {
-        font-size: 20px;
-      }
+  font-size:
+    28px;
 
+  font-weight:
+    bold;
 
-      .summary {
-        grid-template-columns:
-          repeat(2, 1fr);
-      }
+  margin-top:
+    6px;
 
+}
 
-      #attendanceDesktop {
-        display: none !important;
-      }
 
+/* =================================================
+   ATTENDANCE
+================================================= */
 
-      #attendanceMobile {
-        display: block !important;
-      }
+.attendance-section {
 
+  background:
+    white;
 
-      .attendance-tools {
-        width: 100%;
-      }
+  border-radius:
+    18px;
 
+  padding:
+    18px;
 
-      .attendance-tools select,
-      .attendance-tools button {
-        flex: 1;
-      }
+  box-shadow:
+    0 5px 20px
+    rgba(0,0,0,.06);
 
-    }
+}
 
+.attendance-header {
 
-    @media (
-      min-width: 701px
-    ) {
+  display:
+    flex;
 
-      #attendanceDesktop {
-        display: block;
-      }
+  justify-content:
+    space-between;
 
+  align-items:
+    center;
 
-      #attendanceMobile {
-        display: none;
-      }
+  gap:
+    12px;
 
-    }
+  flex-wrap:
+    wrap;
 
-  </style>
+  margin-bottom:
+    14px;
+
+}
+
+.attendance-header h2 {
+
+  margin:
+    0;
+
+}
+
+.attendance-tools {
+
+  display:
+    flex;
+
+  gap:
+    8px;
+
+  align-items:
+    center;
+
+  flex-wrap:
+    wrap;
+
+}
+
+select {
+
+  padding:
+    9px 12px;
+
+  border:
+    1px solid #cbd5e1;
+
+  border-radius:
+    9px;
+
+}
+
+.total-box {
+
+  background:
+    #ecfdf5;
+
+  color:
+    #047857;
+
+  padding:
+    8px 12px;
+
+  border-radius:
+    9px;
+
+  font-weight:
+    bold;
+
+}
+
+
+/* =================================================
+   TABLE
+================================================= */
+
+.attendance-table {
+
+  width:
+    100%;
+
+  border-collapse:
+    collapse;
+
+}
+
+.attendance-table th,
+.attendance-table td {
+
+  padding:
+    11px;
+
+  border-bottom:
+    1px solid #e2e8f0;
+
+  text-align:
+    left;
+
+}
+
+.attendance-table th {
+
+  background:
+    #f8fafc;
+
+}
+
+.rank-column {
+
+  width:
+    60px;
+
+  text-align:
+    center !important;
+
+  font-size:
+    20px;
+
+}
+
+.student-name {
+
+  font-weight:
+    bold;
+
+}
+
+.student-class {
+
+  color:
+    #64748b;
+
+}
+
+.status-badge {
+
+  display:
+    inline-block;
+
+  padding:
+    5px 9px;
+
+  border-radius:
+    20px;
+
+  font-size:
+    12px;
+
+  font-weight:
+    bold;
+
+}
+
+.status-hadir {
+
+  background:
+    #dcfce7;
+
+  color:
+    #166534;
+
+}
+
+.status-terlambat {
+
+  background:
+    #fef3c7;
+
+  color:
+    #92400e;
+
+}
+
+.status-other {
+
+  background:
+    #e2e8f0;
+
+  color:
+    #334155;
+
+}
+
+
+/* =================================================
+   MOBILE CARD
+================================================= */
+
+.attendance-card-list {
+
+  display:
+    none;
+
+}
+
+.attendance-card {
+
+  display:
+    flex;
+
+  gap:
+    12px;
+
+  padding:
+    13px;
+
+  border-bottom:
+    1px solid #e2e8f0;
+
+}
+
+.attendance-card-rank {
+
+  width:
+    38px;
+
+  min-width:
+    38px;
+
+  text-align:
+    center;
+
+  font-size:
+    20px;
+
+}
+
+.attendance-card-content {
+
+  flex:
+    1;
+
+}
+
+.attendance-card-name {
+
+  font-weight:
+    bold;
+
+}
+
+.attendance-card-class {
+
+  font-size:
+    13px;
+
+  color:
+    #64748b;
+
+  margin-top:
+    3px;
+
+}
+
+.attendance-card-bottom {
+
+  display:
+    flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  margin-top:
+    8px;
+
+  gap:
+    8px;
+
+}
+
+.attendance-info {
+
+  text-align:
+    center;
+
+  color:
+    #64748b;
+
+  font-size:
+    13px;
+
+  padding:
+    12px;
+
+}
+
+.loading {
+
+  display:
+    flex;
+
+  justify-content:
+    center;
+
+  padding:
+    25px;
+
+}
+
+
+/* =================================================
+   RESPONSIVE
+================================================= */
+
+@media (
+  max-width: 700px
+) {
+
+  .container {
+
+    width:
+      96%;
+
+    padding-top:
+      10px;
+
+  }
+
+  .summary-grid {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+  }
+
+  .summary-card {
+
+    padding:
+      12px;
+
+  }
+
+  .summary-number {
+
+    font-size:
+      23px;
+
+  }
+
+  .attendance-table {
+
+    display:
+      none;
+
+  }
+
+  .attendance-card-list {
+
+    display:
+      block;
+
+  }
+
+  .attendance-header {
+
+    align-items:
+      stretch;
+
+  }
+
+  .attendance-tools {
+
+    width:
+      100%;
+
+  }
+
+  .attendance-tools select {
+
+    flex:
+      1;
+
+  }
+
+  .total-box {
+
+    width:
+      100%;
+
+    text-align:
+      center;
+
+  }
+
+}
+
+@media (
+  min-width: 701px
+) {
+
+  .attendance-table {
+
+    display:
+      table;
+
+  }
+
+  .attendance-card-list {
+
+    display:
+      none;
+
+  }
+
+}
+
+</style>
 
 </head>
 
@@ -485,402 +788,420 @@
 <div class="container">
 
 
-  <!-- HEADER -->
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
-  <div class="header">
+<div class="header">
 
-    <h1>
-      📚 Sistem Absensi Kartu Pelajar
-    </h1>
+  <h1>
+    🎓 ABSENSI KARTU PELAJAR
+  </h1>
 
-    <p>
-      SMP Baitul Ulum Boarding School
-    </p>
+  <p>
+    SMP BAITUL ULUM BOARDING SCHOOL
+  </p>
 
+  <div class="datetime">
 
-    <div class="datetime">
-
-      📅
-      <span id="currentDate">
-        Memuat tanggal...
-      </span>
-
-      <br>
-
-      🕐
-      <span id="currentTime">
-        Memuat waktu...
-      </span>
-
+    <div id="currentDate">
+      Memuat tanggal...
     </div>
 
-
-    <div
-      id="serverStatus"
-      class="server-status"
-    >
-      🟡 Menghubungkan ke server...
+    <div id="currentTime">
+      Memuat waktu...
     </div>
 
   </div>
 
+</div>
 
-  <!-- SCANNER -->
+
+<!-- =====================================================
+     SCANNER
+===================================================== -->
+
+<div
+  id="scannerCard"
+  class="scanner-card"
+>
 
   <div
-    id="scannerCard"
-    class="scanner-card"
+    id="reader">
+  </div>
+
+  <div
+    id="status"
+    class="status"
   >
+    🟢 Scanner siap.
+  </div>
 
-    <div
-      id="status"
-      class="status"
+  <div class="buttons">
+
+    <button
+      id="startButton"
     >
-      Menyiapkan scanner...
-    </div>
+      📷 Mulai Scanner
+    </button>
+
+  </div>
 
 
-    <div id="reader"></div>
-
-
-    <div style="
+  <div
+    style="
       text-align:center;
       margin-top:10px;
-    ">
+    "
+  >
 
-      <button
-        id="startButton"
-        class="btn-primary"
-      >
-        📷 Mulai Scanner
-      </button>
+    <label>
 
-
-      <label
-        style="
-          margin-left:10px;
-          font-size:14px;
-        "
+      <input
+        type="checkbox"
+        id="autoScanToggle"
       >
 
-        <input
-          type="checkbox"
-          id="autoScanToggle"
-        >
+      Scan otomatis
 
-        Auto Scan
+      <span
+        id="autoScanLabel"
+      >
+        MATI
+      </span>
 
-        <span id="autoScanLabel">
-          MATI
-        </span>
-
-      </label>
-
-    </div>
+    </label>
 
   </div>
 
+</div>
 
-  <!-- RESULT -->
+
+<!-- =====================================================
+     RESULT
+===================================================== -->
+
+<div
+  id="result"
+  class="result"
+  style="display:none;"
+>
 
   <div
-    id="result"
-    class="result"
-    style="display:none;"
+    id="resultIcon"
+    class="result-icon"
   >
+    ⏳
+  </div>
 
-    <div
-      id="resultIcon"
-      class="result-icon"
-    >
-      ⏳
-    </div>
+  <h2
+    id="resultTitle"
+  >
+    MEMPROSES
+  </h2>
 
+  <p
+    id="resultMessage"
+  >
+  </p>
 
-    <div
-      id="resultTitle"
-      class="result-title"
-    >
-      Memproses
-    </div>
+  <div
+    id="studentId"
+  >
+  </div>
 
-
-    <div
-      id="resultMessage"
-      class="result-message"
-    >
-      Mohon tunggu...
-    </div>
-
-
-    <div
-      id="studentId"
-      class="student-info"
-    >
-    </div>
-
-
-    <br>
-
+  <div class="buttons">
 
     <button
       id="scanAgainButton"
-      class="btn-primary"
     >
       📷 Scan Lagi
     </button>
 
   </div>
 
-
-  <!-- SUMMARY -->
-
-  <div class="summary">
+</div>
 
 
-    <div class="summary-card">
+<!-- =====================================================
+     SUMMARY
+===================================================== -->
 
-      <small>
-        Total Hadir
-      </small>
+<div class="summary-grid">
 
-      <strong id="countTotal">
-        0
-      </strong>
+  <div class="summary-card">
 
+    <div>
+      👥 Total
     </div>
 
-
-    <div class="summary-card">
-
-      <small>
-        Hadir
-      </small>
-
-      <strong id="countPresent">
-        0
-      </strong>
-
+    <div
+      id="countTotal"
+      class="summary-number"
+    >
+      0
     </div>
-
-
-    <div class="summary-card">
-
-      <small>
-        Terlambat
-      </small>
-
-      <strong id="countLate">
-        0
-      </strong>
-
-    </div>
-
-
-    <div class="summary-card">
-
-      <small>
-        Sudah Absen
-      </small>
-
-      <strong id="countAlready">
-        0
-      </strong>
-
-    </div>
-
 
   </div>
 
 
-  <!-- ATTENDANCE -->
+  <div class="summary-card">
 
-  <div class="attendance-section">
+    <div>
+      🟢 Hadir
+    </div>
+
+    <div
+      id="countPresent"
+      class="summary-number"
+    >
+      0
+    </div>
+
+  </div>
 
 
-    <div class="attendance-header">
+  <div class="summary-card">
 
-      <div>
+    <div>
+      🟡 Terlambat
+    </div>
 
-        <h2>
-          📋 Urutan Absensi Hari Ini
-        </h2>
+    <div
+      id="countLate"
+      class="summary-number"
+    >
+      0
+    </div>
 
-        <small
-          id="attendanceDate"
-        >
-          -
-        </small>
+  </div>
 
-      </div>
 
+  <div class="summary-card">
+
+    <div>
+      🟠 Sudah Absen
+    </div>
+
+    <div
+      id="countAlready"
+      class="summary-number"
+    >
+      0
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     DAFTAR ABSENSI
+===================================================== -->
+
+<div class="attendance-section">
+
+  <div class="attendance-header">
+
+    <div>
+
+      <h2>
+        📋 Urutan Absensi Hari Ini
+      </h2>
 
       <div
-        class="attendance-tools"
+        id="attendanceDate"
+        style="
+          color:#64748b;
+          font-size:13px;
+          margin-top:4px;
+        "
       >
-
-        <div class="total-box">
-
-          👥 Total:
-          <span
-            id="attendanceTotal"
-          >
-            0
-          </span>
-
-        </div>
-
-
-        <select
-          id="attendanceLimit"
-        >
-
-          <option value="5">
-            5
-          </option>
-
-          <option
-            value="10"
-            selected
-          >
-            10
-          </option>
-
-          <option value="25">
-            25
-          </option>
-
-          <option value="50">
-            50
-          </option>
-
-          <option value="100">
-            100
-          </option>
-
-          <option value="150">
-            150
-          </option>
-
-          <option value="0">
-            Semua
-          </option>
-
-        </select>
-
-
-        <button
-          id="showAllButton"
-          class="btn-secondary"
-        >
-          Tampilkan Semua
-        </button>
-
       </div>
 
     </div>
 
 
-    <div
-      id="attendanceDisplayInfo"
-      class="display-info"
-    >
-      Memuat data...
-    </div>
+    <div class="attendance-tools">
 
+      <select
+        id="attendanceLimit"
+      >
 
-    <div
-      id="attendanceLoading"
-      class="loading"
-    >
-      ⏳ Memuat data absensi...
-    </div>
+        <option value="5">
+          5 siswa
+        </option>
 
-
-    <div
-      id="attendanceEmpty"
-      class="empty"
-      style="display:none;"
-    >
-      Belum ada siswa yang melakukan absensi hari ini.
-    </div>
-
-
-    <!-- DESKTOP -->
-
-    <div
-      id="attendanceDesktop"
-    >
-
-      <table>
-
-        <thead>
-
-          <tr>
-
-            <th>
-              #
-            </th>
-
-            <th>
-              Nama
-            </th>
-
-            <th>
-              Kelas
-            </th>
-
-            <th>
-              Jam
-            </th>
-
-            <th>
-              Status
-            </th>
-
-          </tr>
-
-        </thead>
-
-
-        <tbody
-          id="attendanceTableBody"
+        <option
+          value="10"
+          selected
         >
-        </tbody>
+          10 siswa
+        </option>
 
-      </table>
+        <option value="25">
+          25 siswa
+        </option>
+
+        <option value="50">
+          50 siswa
+        </option>
+
+        <option value="100">
+          100 siswa
+        </option>
+
+        <option value="150">
+          150 siswa
+        </option>
+
+        <option value="all">
+          Semua
+        </option>
+
+      </select>
+
+
+      <button
+        onclick="showAllAttendance()"
+      >
+        Tampilkan Semua
+      </button>
+
+
+      <div class="total-box">
+
+        Total siswa absen:
+
+        <span
+          id="attendanceTotal"
+        >
+          0
+        </span>
+
+      </div>
 
     </div>
 
+  </div>
 
-    <!-- MOBILE -->
+
+  <div
+    id="attendanceDisplayInfo"
+    class="attendance-info"
+  >
+    Memuat data...
+  </div>
+
+
+  <div
+    id="attendanceLoading"
+    class="loading"
+  >
+
+    ⏳ Memuat data absensi...
+
+  </div>
+
+
+  <div
+    id="attendanceEmpty"
+    class="attendance-info"
+    style="display:none;"
+  >
+
+    📭 Belum ada siswa yang melakukan absensi hari ini.
+
+  </div>
+
+
+  <!-- DESKTOP -->
+
+  <div
+    id="attendanceDesktop"
+    style="display:none;"
+  >
+
+    <table class="attendance-table">
+
+      <thead>
+
+        <tr>
+
+          <th>
+            No
+          </th>
+
+          <th>
+            Nama
+          </th>
+
+          <th>
+            Kelas
+          </th>
+
+          <th>
+            Jam
+          </th>
+
+          <th>
+            Status
+          </th>
+
+        </tr>
+
+      </thead>
+
+      <tbody
+        id="attendanceTableBody"
+      >
+      </tbody>
+
+    </table>
+
+  </div>
+
+
+  <!-- MOBILE -->
+
+  <div
+    id="attendanceMobile"
+    style="display:none;"
+  >
 
     <div
-      id="attendanceMobile"
+      id="attendanceCardList"
       class="attendance-card-list"
     >
-
-      <div
-        id="attendanceCardList"
-      >
-      </div>
-
     </div>
 
   </div>
+
+</div>
 
 
 </div>
 
 
+<!-- =====================================================
+     APP JS
+===================================================== -->
+
 <script>
 
-  window.SERVER_READY = false;
+/*
+ * app.js ditempel di sini.
+ *
+ * Jika menggunakan file Apps Script terpisah,
+ * gunakan:
+ *
+ * <?!= include('app'); ?>
+ *
+ * tetapi jangan menggunakan google.script.run
+ * untuk komunikasi API.
+ */
 
 </script>
-
-
-<script src="app.js"></script>
 
 
 </body>

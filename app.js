@@ -69,6 +69,15 @@ let countAlready = 0;
 
 let countError = 0;
 
+/* =====================================================
+   V5.3
+   JUMLAH DATA ABSENSI YANG DITAMPILKAN
+===================================================== */
+
+let attendanceDisplayLimit = 10;
+
+let todayAttendanceData = [];
+
 
 /* =====================================================
    ELEMENT
@@ -292,7 +301,57 @@ if (autoScanToggle) {
 
 }
 
+/* =====================================================
+   FILTER JUMLAH ABSENSI
+   V5.3
+===================================================== */
 
+const attendanceLimit =
+  document.getElementById(
+    'attendanceLimit'
+  );
+
+
+if (attendanceLimit) {
+
+  attendanceLimit.addEventListener(
+    'change',
+    function () {
+
+      attendanceDisplayLimit =
+        Number(
+          attendanceLimit.value
+        ) || 10;
+
+
+      console.log(
+        'JUMLAH DATA DITAMPILKAN:',
+        attendanceDisplayLimit
+      );
+
+
+      /*
+       * Render ulang menggunakan
+       * data yang sudah ada.
+       *
+       * Tidak perlu request ke server
+       * setiap kali dropdown berubah.
+       */
+
+      if (
+        todayAttendanceData.length > 0
+      ) {
+
+        renderTodayAttendance(
+          todayAttendanceData
+        );
+
+      }
+
+    }
+  );
+
+}
 /* =====================================================
    START SCANNER
 ===================================================== */
@@ -1948,6 +2007,11 @@ function updateAttendanceDate() {
 
 /* =====================================================
    RENDER DATA ABSENSI
+   V5.3
+
+   - Default 10
+   - Bisa 5 / 10 / 25 / 50 / 100 / 150
+   - Urutan tetap berdasarkan waktu
 ===================================================== */
 
 function renderTodayAttendance(
@@ -1955,7 +2019,7 @@ function renderTodayAttendance(
 ) {
 
   console.log(
-    'Render data absensi:',
+    'Render absensi V5.3:',
     result
   );
 
@@ -1994,7 +2058,7 @@ function renderTodayAttendance(
 
 
   /* ---------------------------------
-     AMBIL DATA
+     AMBIL ARRAY DATA
   --------------------------------- */
 
   let data = [];
@@ -2045,23 +2109,23 @@ function renderTodayAttendance(
 
   }
 
-  else if (
-    result &&
-    Array.isArray(
-      result.rows
-    )
-  ) {
 
-    data =
-      result.rows;
+  /* ---------------------------------
+     NORMALISASI
+  --------------------------------- */
 
-  }
+  data =
+    normalizeAttendanceData(
+      data
+    );
 
 
-  console.log(
-    'JUMLAH DATA:',
-    data.length
-  );
+  /* ---------------------------------
+     SIMPAN DATA LENGKAP
+  --------------------------------- */
+
+  todayAttendanceData =
+    data;
 
 
   /* ---------------------------------
@@ -2101,18 +2165,17 @@ function renderTodayAttendance(
   }
 
 
-  /* ---------------------------------
-     NORMALISASI
-  --------------------------------- */
+  if (empty) {
 
-  data =
-    normalizeAttendanceData(
-      data
-    );
+    empty.style.display =
+      'none';
+
+  }
 
 
   /* ---------------------------------
-     URUTKAN JAM
+     URUTKAN BERDASARKAN ABSEN
+     PALING AWAL
   --------------------------------- */
 
   data.sort(
@@ -2123,7 +2186,8 @@ function renderTodayAttendance(
 
       return convertTimeToSeconds(
         a.jam
-      ) -
+      )
+      -
       convertTimeToSeconds(
         b.jam
       );
@@ -2133,24 +2197,112 @@ function renderTodayAttendance(
 
 
   /* ---------------------------------
-     RENDER
+     BATASI DATA YANG DITAMPILKAN
   --------------------------------- */
 
-  renderAttendanceTable(
-    data
+  const displayData =
+    data.slice(
+      0,
+      attendanceDisplayLimit
+    );
+
+
+  console.log(
+    'TOTAL DATA SERVER:',
+    data.length
   );
 
 
-  renderAttendanceCards(
-    data
+  console.log(
+    'DATA DITAMPILKAN:',
+    displayData.length
   );
 
 
   /* ---------------------------------
-     TAMPILKAN
+     RENDER DESKTOP
+  --------------------------------- */
+
+  renderAttendanceTable(
+    displayData
+  );
+
+
+  /* ---------------------------------
+     RENDER MOBILE
+  --------------------------------- */
+
+  renderAttendanceCards(
+    displayData
+  );
+
+
+  /* ---------------------------------
+     TAMPILKAN LAYOUT
   --------------------------------- */
 
   showAttendanceLayouts();
+
+}
+
+/* =====================================================
+   KONVERSI JAM KE DETIK
+===================================================== */
+
+function convertTimeToSeconds(
+  time
+) {
+
+  if (!time) {
+
+    return 999999;
+
+  }
+
+
+  const parts =
+    String(
+      time
+    )
+    .split(':');
+
+
+  if (
+    parts.length < 2
+  ) {
+
+    return 999999;
+
+  }
+
+
+  const hour =
+    Number(
+      parts[0]
+    ) || 0;
+
+
+  const minute =
+    Number(
+      parts[1]
+    ) || 0;
+
+
+  const second =
+    Number(
+      parts[2]
+    ) || 0;
+
+
+  return (
+
+    hour * 3600 +
+
+    minute * 60 +
+
+    second
+
+  );
 
 }
 
@@ -2165,48 +2317,8 @@ function normalizeAttendanceData(
 
   return data.map(
     function (
-      item,
-      index
+      item
     ) {
-
-      /*
-       * Jika data dari Code.gs
-       * berupa array
-       */
-
-      if (
-        Array.isArray(item)
-      ) {
-
-        return {
-
-          rank:
-            index + 1,
-
-          nama:
-            String(
-              item[0] || '-'
-            ),
-
-          kelas:
-            String(
-              item[1] || '-'
-            ),
-
-          jam:
-            String(
-              item[2] || '-'
-            ),
-
-          status:
-            String(
-              item[3] || 'Hadir'
-            )
-
-        };
-
-      }
-
 
       const name =
         item.nama ||
@@ -2238,9 +2350,6 @@ function normalizeAttendanceData(
 
 
       return {
-
-        rank:
-          index + 1,
 
         nama:
           String(
@@ -2730,6 +2839,12 @@ function getStatusBadgeHtml(
 
 /* =====================================================
    TAMPILKAN LAYOUT
+   V5.3
+
+   Desktop = TABLE
+   Mobile  = CARD
+
+   CSS yang menentukan tampilan.
 ===================================================== */
 
 function showAttendanceLayouts() {
@@ -2745,10 +2860,17 @@ function showAttendanceLayouts() {
     );
 
 
+  /*
+   * Jangan menggunakan display:none/block
+   * di JavaScript untuk menentukan desktop/HP.
+   *
+   * Biarkan CSS media query yang mengatur.
+   */
+
   if (desktop) {
 
     desktop.style.display =
-      'block';
+      '';
 
   }
 
@@ -2756,7 +2878,7 @@ function showAttendanceLayouts() {
   if (mobile) {
 
     mobile.style.display =
-      'block';
+      '';
 
   }
 

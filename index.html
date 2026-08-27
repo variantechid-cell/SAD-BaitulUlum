@@ -3,867 +3,41 @@
 
 <head>
 
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
 
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1.0"
->
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-<title>
-  Absensi Kartu Pelajar
-</title>
+  <meta
+    name="theme-color"
+    content="#0f766e"
+  >
 
-<!-- QR SCANNER -->
-<script src="https://unpkg.com/html5-qrcode" defer></script>
+  <title>
+    Absensi Kartu Pelajar | SMP & SMA Baitul Ulum
+  </title>
 
-<style>
 
-* {
-  box-sizing: border-box;
-}
+  <!-- =====================================================
+       CSS UTAMA
+  ====================================================== -->
 
-/* =================================================
-   BACKGROUND WEBSITE
-================================================= */
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
-body {
 
-  margin: 0;
+  <!-- =====================================================
+       QR SCANNER
+  ====================================================== -->
 
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
-
-  color:
-    #0f172a;
-
-  /*
-   * FOTO BACKGROUND
-   *
-   * GANTI URL DI BAWAH DENGAN
-   * LINK RAW GITHUB FOTO ANDA
-   */
-
-  background-image:
-    linear-gradient(
-      rgba(255,255,255,0.82),
-      rgba(255,255,255,0.82)
-    ),
-    url("URL_BACKGROUND_ANDA");
-
-  background-size:
-    cover;
-
-  background-position:
-    center;
-
-  background-attachment:
-    fixed;
-
-  background-repeat:
-    no-repeat;
-
-}
-
-
-/* =================================================
-   CONTAINER
-================================================= */
-
-.container {
-
-  width:
-    min(1100px, 94%);
-
-  margin:
-    auto;
-
-  padding:
-    20px 0 40px;
-
-}
-
-
-/* =================================================
-   HEADER
-================================================= */
-
-.header {
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(15,118,110,.95),
-      rgba(13,148,136,.95)
-    );
-
-  color:
-    white;
-
-  padding:
-    22px;
-
-  border-radius:
-    18px;
-
-  margin-bottom:
-    18px;
-
-  text-align:
-    center;
-
-}
-
-
-/* LOGO SEKOLAH */
-
-.school-logo {
-
-  width:
-    70px;
-
-  height:
-    70px;
-
-  object-fit:
-    contain;
-
-  vertical-align:
-    middle;
-
-  margin-right:
-    12px;
-
-  border-radius:
-    50%;
-
-  background:
-    white;
-
-  padding:
-    4px;
-
-}
-
-
-/* JUDUL */
-
-.header h1 {
-
-  margin:
-    0 0 8px;
-
-  font-size:
-    clamp(20px, 4vw, 30px);
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    center;
-
-  gap:
-    8px;
-
-  flex-wrap:
-    wrap;
-
-}
-
-.header p {
-
-  margin:
-    4px 0;
-
-  opacity:
-    .9;
-
-}
-
-.datetime {
-
-  margin-top:
-    12px;
-
-  font-size:
-    14px;
-
-}
-
-
-/* =================================================
-   SCANNER
-================================================= */
-
-.scanner-card {
-
-  background:
-    rgba(255,255,255,.96);
-
-  border-radius:
-    18px;
-
-  padding:
-    18px;
-
-  box-shadow:
-    0 5px 20px
-    rgba(0,0,0,.10);
-
-  margin-bottom:
-    18px;
-
-}
-
-#reader {
-
-  width:
-    100%;
-
-  max-width:
-    500px;
-
-  margin:
-    auto;
-
-}
-
-.status {
-
-  text-align:
-    center;
-
-  padding:
-    12px;
-
-  font-weight:
-    bold;
-
-  color:
-    #0f766e;
-
-}
-
-.buttons {
-
-  display:
-    flex;
-
-  gap:
-    10px;
-
-  justify-content:
-    center;
-
-  flex-wrap:
-    wrap;
-
-  margin-top:
-    12px;
-
-}
-
-button {
-
-  border:
-    0;
-
-  padding:
-    11px 18px;
-
-  border-radius:
-    10px;
-
-  cursor:
-    pointer;
-
-  font-weight:
-    bold;
-
-  background:
-    #0f766e;
-
-  color:
-    white;
-
-}
-
-button:hover {
-
-  opacity:
-    .9;
-
-}
-
-
-/* =================================================
-   RESULT
-================================================= */
-
-.result {
-
-  background:
-    rgba(255,255,255,.96);
-
-  padding:
-    24px;
-
-  border-radius:
-    18px;
-
-  text-align:
-    center;
-
-  margin-bottom:
-    18px;
-
-}
-
-.result-icon {
-
-  font-size:
-    50px;
-
-}
-
-.result h2 {
-
-  margin:
-    10px 0;
-
-}
-
-.result.success {
-
-  border:
-    3px solid #22c55e;
-
-}
-
-.result.late {
-
-  border:
-    3px solid #eab308;
-
-}
-
-.result.already {
-
-  border:
-    3px solid #f97316;
-
-}
-
-.result.error {
-
-  border:
-    3px solid #ef4444;
-
-}
-
-
-/* =================================================
-   SUMMARY
-================================================= */
-
-.summary-grid {
-
-  display:
-    grid;
-
-  grid-template-columns:
-    repeat(4, 1fr);
-
-  gap:
-    12px;
-
-  margin-bottom:
-    18px;
-
-}
-
-.summary-card {
-
-  background:
-    rgba(255,255,255,.96);
-
-  padding:
-    18px;
-
-  border-radius:
-    15px;
-
-  text-align:
-    center;
-
-  box-shadow:
-    0 3px 15px
-    rgba(0,0,0,.08);
-
-}
-
-.summary-number {
-
-  font-size:
-    28px;
-
-  font-weight:
-    bold;
-
-  margin-top:
-    6px;
-
-}
-
-
-/* =================================================
-   ATTENDANCE
-================================================= */
-
-.attendance-section {
-
-  background:
-    rgba(255,255,255,.96);
-
-  border-radius:
-    18px;
-
-  padding:
-    18px;
-
-  box-shadow:
-    0 5px 20px
-    rgba(0,0,0,.10);
-
-}
-
-.attendance-header {
-
-  display:
-    flex;
-
-  justify-content:
-    space-between;
-
-  align-items:
-    center;
-
-  gap:
-    12px;
-
-  flex-wrap:
-    wrap;
-
-  margin-bottom:
-    14px;
-
-}
-
-.attendance-header h2 {
-
-  margin:
-    0;
-
-}
-
-.attendance-tools {
-
-  display:
-    flex;
-
-  gap:
-    8px;
-
-  align-items:
-    center;
-
-  flex-wrap:
-    wrap;
-
-}
-
-select {
-
-  padding:
-    9px 12px;
-
-  border:
-    1px solid #cbd5e1;
-
-  border-radius:
-    9px;
-
-}
-
-.total-box {
-
-  background:
-    #ecfdf5;
-
-  color:
-    #047857;
-
-  padding:
-    8px 12px;
-
-  border-radius:
-    9px;
-
-  font-weight:
-    bold;
-
-}
-
-
-/* =================================================
-   TABLE
-================================================= */
-
-.attendance-table {
-
-  width:
-    100%;
-
-  border-collapse:
-    collapse;
-
-}
-
-.attendance-table th,
-.attendance-table td {
-
-  padding:
-    11px;
-
-  border-bottom:
-    1px solid #e2e8f0;
-
-  text-align:
-    left;
-
-}
-
-.attendance-table th {
-
-  background:
-    #f8fafc;
-
-}
-
-.rank-column {
-
-  width:
-    60px;
-
-  text-align:
-    center !important;
-
-  font-size:
-    20px;
-
-}
-
-.student-name {
-
-  font-weight:
-    bold;
-
-}
-
-.student-class {
-
-  color:
-    #64748b;
-
-}
-
-.status-badge {
-
-  display:
-    inline-block;
-
-  padding:
-    5px 9px;
-
-  border-radius:
-    20px;
-
-  font-size:
-    12px;
-
-  font-weight:
-    bold;
-
-}
-
-.status-hadir {
-
-  background:
-    #dcfce7;
-
-  color:
-    #166534;
-
-}
-
-.status-terlambat {
-
-  background:
-    #fef3c7;
-
-  color:
-    #92400e;
-
-}
-
-.status-other {
-
-  background:
-    #e2e8f0;
-
-  color:
-    #334155;
-
-}
-
-
-/* =================================================
-   MOBILE
-================================================= */
-
-.attendance-card-list {
-
-  display:
-    none;
-
-}
-
-.attendance-card {
-
-  display:
-    flex;
-
-  gap:
-    12px;
-
-  padding:
-    13px;
-
-  border-bottom:
-    1px solid #e2e8f0;
-
-}
-
-.attendance-card-rank {
-
-  width:
-    38px;
-
-  min-width:
-    38px;
-
-  text-align:
-    center;
-
-  font-size:
-    20px;
-
-}
-
-.attendance-card-content {
-
-  flex:
-    1;
-
-}
-
-.attendance-card-name {
-
-  font-weight:
-    bold;
-
-}
-
-.attendance-card-class {
-
-  font-size:
-    13px;
-
-  color:
-    #64748b;
-
-  margin-top:
-    3px;
-
-}
-
-.attendance-card-bottom {
-
-  display:
-    flex;
-
-  justify-content:
-    space-between;
-
-  align-items:
-    center;
-
-  margin-top:
-    8px;
-
-  gap:
-    8px;
-
-}
-
-.attendance-info {
-
-  text-align:
-    center;
-
-  color:
-    #64748b;
-
-  font-size:
-    13px;
-
-  padding:
-    12px;
-
-}
-
-.loading {
-
-  display:
-    flex;
-
-  justify-content:
-    center;
-
-  padding:
-    25px;
-
-}
-
-
-/* =================================================
-   RESPONSIVE
-================================================= */
-
-@media (max-width: 700px) {
-
-  .container {
-
-    width:
-      96%;
-
-    padding-top:
-      10px;
-
-  }
-
-  .summary-grid {
-
-    grid-template-columns:
-      repeat(2, 1fr);
-
-  }
-
-  .summary-card {
-
-    padding:
-      12px;
-
-  }
-
-  .summary-number {
-
-    font-size:
-      23px;
-
-  }
-
-  .attendance-table {
-
-    display:
-      none;
-
-  }
-
-  .attendance-card-list {
-
-    display:
-      block;
-
-  }
-
-  .attendance-header {
-
-    align-items:
-      stretch;
-
-  }
-
-  .attendance-tools {
-
-    width:
-      100%;
-
-  }
-
-  .attendance-tools select {
-
-    flex:
-      1;
-
-  }
-
-  .total-box {
-
-    width:
-      100%;
-
-    text-align:
-      center;
-
-  }
-
-  .school-logo {
-
-    width:
-      55px;
-
-    height:
-      55px;
-
-  }
-
-}
-
-@media (min-width: 701px) {
-
-  .attendance-table {
-
-    display:
-      table;
-
-  }
-
-  .attendance-card-list {
-
-    display:
-      none;
-
-  }
-
-}
-
-</style>
+  <script
+    src="https://unpkg.com/html5-qrcode"
+    defer
+  ></script>
 
 </head>
 
@@ -871,420 +45,491 @@ select {
 <body>
 
 
-<div class="container">
+  <!-- =====================================================
+       CONTAINER UTAMA
+  ====================================================== -->
 
+  <main class="container">
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
 
-<div class="header">
+    <!-- =====================================================
+         HEADER SEKOLAH
+    ====================================================== -->
 
-  <h1>
+    <header class="header">
 
-  <img
-    src="https://raw.githubusercontent.com/variantechid-cell/SAD-BaitulUlum/34bb3d76548d0ba83efc5541b03527041ba5daed/Desain%20tanpa%20judul.png"
-    class="school-logo"
-    alt="Logo SMP Baitul Ulum"
-  >
+      <h1 class="school-title">
 
-  <span>
-    ABSENSI KARTU PELAJAR
-  </span>
+        <img
+          src="https://raw.githubusercontent.com/variantechid-cell/SAD-BaitulUlum/34bb3d76548d0ba83efc5541b03527041ba5daed/Desain%20tanpa%20judul.png"
+          class="school-logo"
+          alt="Logo SMP Baitul Ulum"
+        >
 
-</h1>
+        <span>
+          ABSENSI KARTU PELAJAR
+        </span>
 
-  <p>
-    SMP & SMA BAITUL ULUM BOARDING SCHOOL
-  </p>
+      </h1>
 
-  <div class="datetime">
 
-    <div id="currentDate">
-      Memuat tanggal...
-    </div>
+      <p class="school-name">
+        SMP &amp; SMA BAITUL ULUM BOARDING SCHOOL
+      </p>
 
-    <div id="currentTime">
-      Memuat waktu...
-    </div>
 
-  </div>
+      <!-- TANGGAL DAN WAKTU -->
 
-</div>
+      <div class="datetime">
 
+        <div id="currentDate">
+          Memuat tanggal...
+        </div>
 
-<!-- =====================================================
-     SCANNER
-===================================================== -->
+        <div id="currentTime">
+          Memuat waktu...
+        </div>
 
-<div
-  id="scannerCard"
-  class="scanner-card"
->
-
-  <div
-    id="reader">
-  </div>
-
-  <div
-    id="status"
-    class="status"
-  >
-    🟢 Scanner siap.
-  </div>
-
-  <div class="buttons">
-
-    <button
-      id="startButton"
-    >
-      📷 Mulai Scanner
-    </button>
-
-  </div>
-
-
-  <div
-    style="
-      text-align:center;
-      margin-top:10px;
-    "
-  >
-
-    <label>
-
-      <input
-        type="checkbox"
-        id="autoScanToggle"
-      >
-
-      Scan otomatis
-
-      <span
-        id="autoScanLabel"
-      >
-        MATI
-      </span>
-
-    </label>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
-     RESULT
-===================================================== -->
-
-<div
-  id="result"
-  class="result"
-  style="display:none;"
->
-
-  <div
-    id="resultIcon"
-    class="result-icon"
-  >
-    ⏳
-  </div>
-
-  <h2
-    id="resultTitle"
-  >
-    MEMPROSES
-  </h2>
-
-  <p
-    id="resultMessage"
-  >
-  </p>
-
-  <div
-    id="studentId"
-  >
-  </div>
-
-  <div class="buttons">
-
-    <button
-      id="scanAgainButton"
-    >
-      📷 Scan Lagi
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
-     SUMMARY
-===================================================== -->
-
-<div class="summary-grid">
-
-  <div class="summary-card">
-
-    <div>
-      👥 Total
-    </div>
-
-    <div
-      id="countTotal"
-      class="summary-number"
-    >
-      0
-    </div>
-
-  </div>
-
-
-  <div class="summary-card">
-
-    <div>
-      🟢 Hadir
-    </div>
-
-    <div
-      id="countPresent"
-      class="summary-number"
-    >
-      0
-    </div>
-
-  </div>
-
-
-  <div class="summary-card">
-
-    <div>
-      🟡 Terlambat
-    </div>
-
-    <div
-      id="countLate"
-      class="summary-number"
-    >
-      0
-    </div>
-
-  </div>
-
-
-  <div class="summary-card">
-
-    <div>
-      🟠 Sudah Absen
-    </div>
-
-    <div
-      id="countAlready"
-      class="summary-number"
-    >
-      0
-    </div>
-
-  </div>
-
-</div>
-
-
-<!-- =====================================================
-     DAFTAR ABSENSI
-===================================================== -->
-
-<div class="attendance-section">
-
-  <div class="attendance-header">
-
-    <div>
-
-      <h2>
-        📋 Urutan Absensi Hari Ini
-      </h2>
-
-      <div
-        id="attendanceDate"
-        style="
-          color:#64748b;
-          font-size:13px;
-          margin-top:4px;
-        "
-      >
       </div>
 
-    </div>
+    </header>
 
 
-    <div class="attendance-tools">
+    <!-- =====================================================
+         SCANNER
+    ====================================================== -->
 
-      <select
-        id="attendanceLimit"
+    <section
+      id="scannerCard"
+      class="scanner-card"
+    >
+
+      <!-- AREA KAMERA -->
+
+      <div id="reader"></div>
+
+
+      <!-- STATUS SCANNER -->
+
+      <div
+        id="status"
+        class="status"
       >
+        🟢 Scanner siap.
+      </div>
 
-        <option value="5">
-          5 siswa
-        </option>
 
-        <option
-          value="10"
-          selected
+      <!-- TOMBOL -->
+
+      <div class="buttons">
+
+        <button
+          id="startButton"
+          type="button"
         >
-          10 siswa
-        </option>
+          📷 Mulai Scanner
+        </button>
 
-        <option value="25">
-          25 siswa
-        </option>
-
-        <option value="50">
-          50 siswa
-        </option>
-
-        <option value="100">
-          100 siswa
-        </option>
-
-        <option value="150">
-          150 siswa
-        </option>
-
-        <option value="all">
-          Semua
-        </option>
-
-      </select>
+      </div>
 
 
-      <button
-        onclick="showAllAttendance()"
-      >
-        Tampilkan Semua
-      </button>
+      <!-- AUTO SCAN -->
 
+      <div class="auto-scan-control">
 
-      <div class="total-box">
+        <label
+          for="autoScanToggle"
+        >
 
-        Total siswa absen:
+          <input
+            type="checkbox"
+            id="autoScanToggle"
+          >
+
+          Scan otomatis
+
+        </label>
+
 
         <span
-          id="attendanceTotal"
+          id="autoScanLabel"
+          class="auto-label"
         >
-          0
+          MATI
         </span>
 
       </div>
 
-    </div>
-
-  </div>
+    </section>
 
 
-  <div
-    id="attendanceDisplayInfo"
-    class="attendance-info"
-  >
-    Memuat data...
-  </div>
+    <!-- =====================================================
+         HASIL ABSENSI
+    ====================================================== -->
 
-
-  <div
-    id="attendanceLoading"
-    class="loading"
-  >
-
-    ⏳ Memuat data absensi...
-
-  </div>
-
-
-  <div
-    id="attendanceEmpty"
-    class="attendance-info"
-    style="display:none;"
-  >
-
-    📭 Belum ada siswa yang melakukan absensi hari ini.
-
-  </div>
-
-
-  <!-- DESKTOP -->
-
-  <div
-    id="attendanceDesktop"
-    style="display:none;"
-  >
-
-    <table class="attendance-table">
-
-      <thead>
-
-        <tr>
-
-          <th>
-            No
-          </th>
-
-          <th>
-            Nama
-          </th>
-
-          <th>
-            Kelas
-          </th>
-
-          <th>
-            Jam
-          </th>
-
-          <th>
-            Status
-          </th>
-
-        </tr>
-
-      </thead>
-
-      <tbody
-        id="attendanceTableBody"
-      >
-      </tbody>
-
-    </table>
-
-  </div>
-
-
-  <!-- MOBILE -->
-
-  <div
-    id="attendanceMobile"
-    style="display:none;"
-  >
-
-    <div
-      id="attendanceCardList"
-      class="attendance-card-list"
+    <section
+      id="result"
+      class="result"
     >
-    </div>
 
-  </div>
+      <div
+        id="resultIcon"
+        class="result-icon"
+      >
+        ⏳
+      </div>
 
-</div>
+
+      <h2 id="resultTitle">
+        MEMPROSES
+      </h2>
 
 
-</div>
+      <p
+        id="resultMessage"
+        class="result-message"
+      ></p>
 
 
-<!-- =====================================================
-     APP JS
-===================================================== -->
+      <div
+        id="studentId"
+        class="student-id"
+      ></div>
 
-<script src="app.js" defer></script>
-  
+
+      <!-- SCAN LAGI -->
+
+      <div class="buttons">
+
+        <button
+          id="scanAgainButton"
+          type="button"
+        >
+          📷 Scan Lagi
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         RINGKASAN ABSENSI
+    ====================================================== -->
+
+    <section class="summary-grid">
+
+
+      <!-- TOTAL -->
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          👥
+        </div>
+
+        <div class="summary-label">
+          TOTAL
+        </div>
+
+        <div
+          id="countTotal"
+          class="summary-number"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <!-- HADIR -->
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          🟢
+        </div>
+
+        <div class="summary-label">
+          HADIR
+        </div>
+
+        <div
+          id="countPresent"
+          class="summary-number"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <!-- TERLAMBAT -->
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          🟡
+        </div>
+
+        <div class="summary-label">
+          TERLAMBAT
+        </div>
+
+        <div
+          id="countLate"
+          class="summary-number"
+        >
+          0
+        </div>
+
+      </div>
+
+
+      <!-- SUDAH ABSEN -->
+
+      <div class="summary-card">
+
+        <div class="summary-icon">
+          🟠
+        </div>
+
+        <div class="summary-label">
+          SUDAH ABSEN
+        </div>
+
+        <div
+          id="countAlready"
+          class="summary-number"
+        >
+          0
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         DAFTAR ABSENSI HARI INI
+    ====================================================== -->
+
+    <section class="attendance-section">
+
+
+      <!-- HEADER ABSENSI -->
+
+      <div class="attendance-header">
+
+        <div>
+
+          <h2>
+            📋 Urutan Absensi Hari Ini
+          </h2>
+
+
+          <div
+            id="attendanceDate"
+            class="attendance-date-text"
+          ></div>
+
+        </div>
+
+
+        <!-- TOOLS -->
+
+        <div class="attendance-tools">
+
+
+          <!-- JUMLAH DATA -->
+
+          <select
+            id="attendanceLimit"
+            aria-label="Jumlah siswa yang ditampilkan"
+          >
+
+            <option value="5">
+              5 siswa
+            </option>
+
+            <option
+              value="10"
+              selected
+            >
+              10 siswa
+            </option>
+
+            <option value="25">
+              25 siswa
+            </option>
+
+            <option value="50">
+              50 siswa
+            </option>
+
+            <option value="100">
+              100 siswa
+            </option>
+
+            <option value="150">
+              150 siswa
+            </option>
+
+            <option value="all">
+              Semua
+            </option>
+
+          </select>
+
+
+          <!-- TAMPILKAN SEMUA -->
+
+          <button
+            type="button"
+            onclick="showAllAttendance()"
+          >
+            Tampilkan Semua
+          </button>
+
+
+          <!-- TOTAL ABSENSI -->
+
+          <div class="total-box">
+
+            Total siswa absen:
+
+            <span id="attendanceTotal">
+              0
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           INFORMASI DATA
+      ==================================================== -->
+
+      <div
+        id="attendanceDisplayInfo"
+        class="attendance-info"
+      >
+        Memuat data...
+      </div>
+
+
+      <!-- ===================================================
+           LOADING
+      ==================================================== -->
+
+      <div
+        id="attendanceLoading"
+        class="loading"
+      >
+        ⏳ Memuat data absensi...
+      </div>
+
+
+      <!-- ===================================================
+           DATA KOSONG
+      ==================================================== -->
+
+      <div
+        id="attendanceEmpty"
+        class="attendance-info"
+      >
+        📭 Belum ada siswa yang melakukan absensi hari ini.
+      </div>
+
+
+      <!-- ===================================================
+           DESKTOP TABLE
+      ==================================================== -->
+
+      <div
+        id="attendanceDesktop"
+        class="attendance-desktop"
+      >
+
+        <div class="attendance-table-wrapper">
+
+          <table class="attendance-table">
+
+            <thead>
+
+              <tr>
+
+                <th class="rank-column">
+                  No
+                </th>
+
+                <th>
+                  Nama
+                </th>
+
+                <th>
+                  Kelas
+                </th>
+
+                <th>
+                  Jam
+                </th>
+
+                <th>
+                  Status
+                </th>
+
+              </tr>
+
+            </thead>
+
+
+            <tbody
+              id="attendanceTableBody"
+            ></tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================================
+           MOBILE CARD
+      ==================================================== -->
+
+      <div
+        id="attendanceMobile"
+        class="attendance-mobile"
+      >
+
+        <div
+          id="attendanceCardList"
+          class="attendance-card-list"
+        ></div>
+
+      </div>
+
+    </section>
+
+
+  </main>
+
+
+  <!-- =====================================================
+       JAVASCRIPT APLIKASI
+  ====================================================== -->
+
+  <script
+    src="app.js"
+    defer
+  ></script>
+
+
 </body>
 
 </html>

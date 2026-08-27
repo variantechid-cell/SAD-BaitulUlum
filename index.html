@@ -14,19 +14,18 @@
   Absensi Kartu Pelajar
 </title>
 
-
 <!-- QR SCANNER -->
-
-<script
-  <script src="https://unpkg.com/html5-qrcode" defer></script>
-</script>
-
+<script src="https://unpkg.com/html5-qrcode" defer></script>
 
 <style>
 
 * {
   box-sizing: border-box;
 }
+
+/* =================================================
+   BACKGROUND WEBSITE
+================================================= */
 
 body {
 
@@ -37,13 +36,41 @@ body {
     Helvetica,
     sans-serif;
 
-  background:
-    #f1f5f9;
-
   color:
     #0f172a;
 
+  /*
+   * FOTO BACKGROUND
+   *
+   * GANTI URL DI BAWAH DENGAN
+   * LINK RAW GITHUB FOTO ANDA
+   */
+
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,0.82),
+      rgba(255,255,255,0.82)
+    ),
+    url("URL_BACKGROUND_ANDA");
+
+  background-size:
+    cover;
+
+  background-position:
+    center;
+
+  background-attachment:
+    fixed;
+
+  background-repeat:
+    no-repeat;
+
 }
+
+
+/* =================================================
+   CONTAINER
+================================================= */
 
 .container {
 
@@ -58,13 +85,18 @@ body {
 
 }
 
+
+/* =================================================
+   HEADER
+================================================= */
+
 .header {
 
   background:
     linear-gradient(
       135deg,
-      #0f766e,
-      #0d9488
+      rgba(15,118,110,.95),
+      rgba(13,148,136,.95)
     );
 
   color:
@@ -84,6 +116,40 @@ body {
 
 }
 
+
+/* LOGO SEKOLAH */
+
+.school-logo {
+
+  width:
+    70px;
+
+  height:
+    70px;
+
+  object-fit:
+    contain;
+
+  vertical-align:
+    middle;
+
+  margin-right:
+    12px;
+
+  border-radius:
+    50%;
+
+  background:
+    white;
+
+  padding:
+    4px;
+
+}
+
+
+/* JUDUL */
+
 .header h1 {
 
   margin:
@@ -91,6 +157,21 @@ body {
 
   font-size:
     clamp(20px, 4vw, 30px);
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    8px;
+
+  flex-wrap:
+    wrap;
 
 }
 
@@ -122,7 +203,7 @@ body {
 .scanner-card {
 
   background:
-    white;
+    rgba(255,255,255,.96);
 
   border-radius:
     18px;
@@ -132,7 +213,7 @@ body {
 
   box-shadow:
     0 5px 20px
-    rgba(0,0,0,.06);
+    rgba(0,0,0,.10);
 
   margin-bottom:
     18px;
@@ -227,7 +308,7 @@ button:hover {
 .result {
 
   background:
-    white;
+    rgba(255,255,255,.96);
 
   padding:
     24px;
@@ -309,7 +390,7 @@ button:hover {
 .summary-card {
 
   background:
-    white;
+    rgba(255,255,255,.96);
 
   padding:
     18px;
@@ -322,7 +403,7 @@ button:hover {
 
   box-shadow:
     0 3px 15px
-    rgba(0,0,0,.05);
+    rgba(0,0,0,.08);
 
 }
 
@@ -347,7 +428,7 @@ button:hover {
 .attendance-section {
 
   background:
-    white;
+    rgba(255,255,255,.96);
 
   border-radius:
     18px;
@@ -357,7 +438,7 @@ button:hover {
 
   box-shadow:
     0 5px 20px
-    rgba(0,0,0,.06);
+    rgba(0,0,0,.10);
 
 }
 
@@ -552,7 +633,7 @@ select {
 
 
 /* =================================================
-   MOBILE CARD
+   MOBILE
 ================================================= */
 
 .attendance-card-list {
@@ -674,9 +755,7 @@ select {
    RESPONSIVE
 ================================================= */
 
-@media (
-  max-width: 700px
-) {
+@media (max-width: 700px) {
 
   .container {
 
@@ -754,11 +833,19 @@ select {
 
   }
 
+  .school-logo {
+
+    width:
+      55px;
+
+    height:
+      55px;
+
+  }
+
 }
 
-@media (
-  min-width: 701px
-) {
+@media (min-width: 701px) {
 
   .attendance-table {
 
@@ -794,8 +881,18 @@ select {
 <div class="header">
 
   <h1>
-    🎓 ABSENSI KARTU PELAJAR
-  </h1>
+
+  <img
+    src="https://raw.githubusercontent.com/variantechid-cell/SAD-BaitulUlum/34bb3d76548d0ba83efc5541b03527041ba5daed/Desain%20tanpa%20judul.png"
+    class="school-logo"
+    alt="Logo SMP Baitul Ulum"
+  >
+
+  <span>
+    ABSENSI KARTU PELAJAR
+  </span>
+
+</h1>
 
   <p>
     SMP & SMA BAITUL ULUM BOARDING SCHOOL
@@ -1186,21 +1283,6 @@ select {
      APP JS
 ===================================================== -->
 
-<script>
-
-/*
- * app.js ditempel di sini.
- *
- * Jika menggunakan file Apps Script terpisah,
- * gunakan:
- *
- * <?!= include('app'); ?>
- *
- * tetapi jangan menggunakan google.script.run
- * untuk komunikasi API.
- */
-
-</script>
 <script src="app.js" defer></script>
   
 </body>

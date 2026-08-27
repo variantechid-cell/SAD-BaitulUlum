@@ -1,1198 +1,193 @@
 /* =====================================================
+   ABSENSI KARTU PELAJAR
+   SMP & SMA BAITUL ULUM BOARDING SCHOOL
+   STYLE.CSS FINAL
+===================================================== */
+
+
+/* =====================================================
    RESET
 ===================================================== */
 
 * {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  box-sizing:
-    border-box;
 
-  margin:
-    0;
-
-  padding:
-    0;
-
+html {
+  scroll-behavior: smooth;
 }
 
 
 body {
-
   font-family:
     Arial,
     Helvetica,
     sans-serif;
 
-  color:
-    #0f172a;
+  color: #0f172a;
 
-  min-height:
-    100vh;
+  min-height: 100vh;
 
-  background-image:
-
-    linear-gradient(
-      rgba(255, 255, 255, 0.88),
-      rgba(255, 255, 255, 0.88)
-    ),
-
-    url("https://raw.githubusercontent.com/variantechid-cell/SAD-BaitulUlum/main/bgweb.jpeg");
-
-  background-size:
-    cover;
-
-  background-position:
-    center;
-
-  background-attachment:
-    fixed;
-
-  background-repeat:
-    no-repeat;
-
+  background: #f1f5f9;
 }
 
 
 /* =====================================================
-   HEADER
+   CONTAINER UTAMA
+===================================================== */
+
+.container {
+  width: calc(100% - 30px);
+
+  max-width: 700px;
+
+  margin: 20px auto;
+}
+
+
+/* =====================================================
+   HEADER SEKOLAH
+   BACKGROUND GEDUNG HANYA DI SINI
 ===================================================== */
 
 .header {
 
-  background:
-    #0f172a;
+  position: relative;
 
-  color:
-    white;
+  overflow: hidden;
 
-  padding:
-    18px 20px;
+  color: #ffffff;
 
-  box-shadow:
-    0 2px 10px
-    rgba(
-      0,
-      0,
-      0,
-      0.15
-    );
+  padding: 28px 20px 22px;
 
-}
+  border-radius: 20px;
 
+  margin-bottom: 18px;
 
-.header-content {
+  background-image:
 
-  max-width:
-    700px;
+    linear-gradient(
+      rgba(15, 118, 110, 0.78),
+      rgba(15, 23, 42, 0.82)
+    ),
 
-  margin:
-    auto;
+    url("https://raw.githubusercontent.com/variantechid-cell/SAD-BaitulUlum/f3eca4034fa1897a99e53b0be8a2af63393a90d2/bgweb.jpeg");
 
-  display:
-    flex;
+  background-size: cover;
 
-  align-items:
-    center;
+  background-position: center 48%;
 
-  gap:
-    14px;
-
-}
-
-
-.logo {
-
-  width:
-    50px;
-
-  height:
-    50px;
-
-  border-radius:
-    12px;
-
-  background:
-    rgba(
-      255,
-      255,
-      255,
-      0.12
-    );
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    center;
-
-  font-size:
-    27px;
-
-}
-
-
-.school-info h1 {
-
-  font-size:
-    20px;
-
-  letter-spacing:
-    0.5px;
-
-}
-
-
-.school-info p {
-
-  margin-top:
-    4px;
-
-  font-size:
-    12px;
-
-  opacity:
-    0.75;
-
-  letter-spacing:
-    0.5px;
-
-}
-
-
-/* =====================================================
-   CONTAINER
-===================================================== */
-
-.container {
-
-  width:
-    calc(
-      100% - 30px
-    );
-
-  max-width:
-    700px;
-
-  margin:
-    20px auto;
-
-}
-
-
-/* =====================================================
-   DATE CARD
-===================================================== */
-
-.date-card {
-
-  display:
-    grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
-  gap:
-    10px;
-
-  margin-bottom:
-    12px;
-
-}
-
-
-.date-card > div {
-
-  background:
-    white;
-
-  border-radius:
-    12px;
-
-  padding:
-    12px 15px;
+  background-repeat: no-repeat;
 
   box-shadow:
-    0 3px 12px
-    rgba(
-      15,
-      23,
-      42,
-      0.06
-    );
-
-}
-
-
-.date-label {
-
-  display:
-    block;
-
-  color:
-    #64748b;
-
-  font-size:
-    11px;
-
-  margin-bottom:
-    5px;
-
-}
-
-
-.date-card strong {
-
-  display:
-    block;
-
-  font-size:
-    14px;
-
+    0 6px 22px
+    rgba(15, 23, 42, 0.20);
 }
 
 
 /* =====================================================
-   COUNTER
+   JUDUL SEKOLAH
 ===================================================== */
 
-.counter-grid {
+.school-title {
 
-  display:
-    grid;
+  position: relative;
 
-  grid-template-columns:
-    repeat(
-      4,
-      1fr
-    );
-
-  gap:
-    8px;
-
-  margin-bottom:
-    14px;
-
-}
-
-
-.counter-card {
-
-  background:
-    white;
-
-  border-radius:
-    12px;
-
-  padding:
-    10px 5px;
-
-  text-align:
-    center;
-
-  box-shadow:
-    0 3px 12px
-    rgba(
-      15,
-      23,
-      42,
-      0.06
-    );
-
-}
-
-
-.counter-icon {
-
-  display:
-    block;
-
-  font-size:
-    17px;
-
-}
-
-
-.counter-card strong {
-
-  display:
-    block;
-
-  font-size:
-    21px;
-
-  margin:
-    2px 0;
-
-}
-
-
-.counter-card small {
-
-  color:
-    #64748b;
-
-  font-size:
-    10px;
-
-}
-
-
-/* =====================================================
-   CARD
-===================================================== */
-
-.scanner-card,
-.result,
-.info-card {
-
-  background:
-    white;
-
-  border-radius:
-    18px;
-
-  padding:
-    20px;
-
-  margin-bottom:
-    15px;
-
-  box-shadow:
-    0 4px 18px
-    rgba(
-      15,
-      23,
-      42,
-      0.08
-    );
-
-}
-
-
-/* =====================================================
-   CARD HEADER
-===================================================== */
-
-.card-header {
-
-  text-align:
-    center;
-
-  margin-bottom:
-    15px;
-
-}
-
-
-.card-header h2 {
-
-  font-size:
-    19px;
-
-}
-
-
-.card-header p {
-
-  margin-top:
-    6px;
-
-  color:
-    #64748b;
-
-  font-size:
-    13px;
-
-}
-
-
-/* =====================================================
-   READER
-===================================================== */
-
-.reader {
-
-  width:
-    100%;
-
-  max-width:
-    450px;
-
-  margin:
-    auto;
-
-  overflow:
-    hidden;
-
-  border-radius:
-    14px;
-
-}
-
-
-#reader video {
-
-  width:
-    100% !important;
-
-  border-radius:
-    12px;
-
-}
-
-
-#reader img {
-
-  max-width:
-    100%;
-
-}
-
-
-/* =====================================================
-   STATUS
-===================================================== */
-
-.status {
-
-  margin-top:
-    13px;
-
-  padding:
-    12px;
-
-  border-radius:
-    10px;
-
-  background:
-    #f1f5f9;
-
-  color:
-    #475569;
-
-  text-align:
-    center;
-
-  font-size:
-    13px;
-
-  font-weight:
-    700;
-
-}
-
-
-/* =====================================================
-   BUTTON
-===================================================== */
-
-.button {
-
-  width:
-    100%;
-
-  border:
-    none;
-
-  border-radius:
-    12px;
-
-  padding:
-    14px 18px;
-
-  margin-top:
-    14px;
-
-  font-size:
-    14px;
-
-  font-weight:
-    700;
-
-  cursor:
-    pointer;
-
-}
-
-
-.button.primary {
-
-  background:
-    #2563eb;
-
-  color:
-    white;
-
-}
-
-
-.button:active {
-
-  transform:
-    scale(
-      0.98
-    );
-
-}
-
-
-/* =====================================================
-   AUTO SCAN
-===================================================== */
-
-.auto-scan-control {
-
-  margin-top:
-    15px;
-
-  padding:
-    11px 13px;
-
-  border-radius:
-    10px;
-
-  background:
-    #f8fafc;
-
-  display:
-    flex;
-
-  align-items:
-    center;
-
-  justify-content:
-    center;
-
-  gap:
-    9px;
-
-  font-size:
-    13px;
-
-  font-weight:
-    700;
-
-}
-
-
-.auto-label {
-
-  color:
-    #16a34a;
-
-  font-size:
-    11px;
-
-}
-
-
-/* =====================================================
-   SWITCH
-===================================================== */
-
-.switch {
-
-  position:
-    relative;
-
-  width:
-    44px;
-
-  height:
-    24px;
-
-}
-
-
-.switch input {
-
-  opacity:
-    0;
-
-  width:
-    0;
-
-  height:
-    0;
-
-}
-
-
-.slider {
-
-  position:
-    absolute;
-
-  inset:
-    0;
-
-  background:
-    #cbd5e1;
-
-  border-radius:
-    20px;
-
-  cursor:
-    pointer;
-
-}
-
-
-.slider::before {
-
-  content:
-    "";
-
-  position:
-    absolute;
-
-  width:
-    18px;
-
-  height:
-    18px;
-
-  left:
-    3px;
-
-  top:
-    3px;
-
-  background:
-    white;
-
-  border-radius:
-    50%;
-
-  transition:
-    0.2s;
-
-}
-
-
-.switch input:checked
-+ .slider {
-
-  background:
-    #16a34a;
-
-}
-
-
-.switch input:checked
-+ .slider::before {
-
-  transform:
-    translateX(
-      20px
-    );
-
-}
-
-
-/* =====================================================
-   RESULT
-===================================================== */
-
-.result {
-
-  display:
-    none;
-
-  text-align:
-    center;
-
-}
-
-
-.result-icon {
-
-  font-size:
-    58px;
-
-  margin-bottom:
-    6px;
-
-}
-
-
-.result h2 {
-
-  font-size:
-    21px;
-
-}
-
-
-.result-message {
-
-  margin-top:
-    7px;
-
-  color:
-    #64748b;
-
-  font-size:
-    13px;
-
-}
-
-
-.student-info {
-
-  margin-top:
-    17px;
-
-  padding:
-    18px;
-
-  border-radius:
-    12px;
-
-  background:
-    #f8fafc;
-
-}
-
-
-.info-label {
-
-  color:
-    #64748b;
-
-  font-size:
-    12px;
-
-}
-
-
-.student-id {
-
-  margin-top:
-    8px;
-
-  font-size:
-    20px;
-
-  font-weight:
-    800;
-
-  line-height:
-    1.6;
-
-}
-
-
-/* =====================================================
-   RESULT STATUS
-===================================================== */
-
-.result.success {
-
-  border-top:
-    6px solid
-    #16a34a;
-
-}
-
-
-.result.late {
-
-  border-top:
-    6px solid
-    #eab308;
-
-}
-
-
-.result.already {
-
-  border-top:
-    6px solid
-    #f97316;
-
-}
-
-
-.result.error {
-
-  border-top:
-    6px solid
-    #dc2626;
-
-}
-
-
-/* =====================================================
-   INFO
-===================================================== */
-
-.info-card h3 {
-
-  font-size:
-    16px;
-
-  margin-bottom:
-    10px;
-
-}
-
-
-.info-card ul {
-
-  padding-left:
-    19px;
-
-}
-
-
-.info-card li {
-
-  margin-bottom:
-    7px;
-
-  color:
-    #475569;
-
-  font-size:
-    13px;
-
-  line-height:
-    1.4;
-
-}
-
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-.footer {
-
-  text-align:
-    center;
-
-  padding:
-    15px;
-
-  color:
-    #64748b;
-
-  font-size:
-    11px;
-
-}
-
-
-.footer p + p {
-
-  margin-top:
-    3px;
-
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (
-  max-width: 480px
-) {
-
-  .container {
-
-    width:
-      calc(
-        100% - 16px
-      );
-
-    margin-top:
-      12px;
-
-  }
-
-
-  .scanner-card,
-  .result,
-  .info-card {
-
-    padding:
-      14px;
-
-    border-radius:
-      15px;
-
-  }
-
-
-  .counter-grid {
-
-    gap:
-      5px;
-
-  }
-
-
-  .counter-card {
-
-    padding:
-      8px 3px;
-
-  }
-
-
-  .counter-card strong {
-
-    font-size:
-      18px;
-
-  }
-
-
-  .counter-card small {
-
-    font-size:
-      9px;
-
-  }
-
-
-  .school-info h1 {
-
-    font-size:
-      17px;
-
-  }
-
-
-  .school-info p {
-
-    font-size:
-      10px;
-
-  }
-
-}
-/* =====================================================
-   DASHBOARD SUMMARY
-===================================================== */
-
-.summary-grid {
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(4, 1fr);
-
-  gap: 15px;
-
-  width: 100%;
-
-  margin: 20px 0;
-
-}
-
-
-.summary-card {
-
-  background: #ffffff;
-
-  border-radius: 16px;
-
-  padding: 18px;
-
-  text-align: center;
-
-  box-shadow:
-    0 4px 15px
-    rgba(0,0,0,0.08);
-
-}
-
-
-.summary-icon {
-
-  font-size: 28px;
-
-  margin-bottom: 8px;
-
-}
-
-
-.summary-label {
-
-  font-size: 12px;
-
-  font-weight: 700;
-
-  color: #64748b;
-
-  letter-spacing:
-    0.5px;
-
-}
-
-
-.summary-value {
-
-  font-size: 32px;
-
-  font-weight: 800;
-
-  margin-top: 5px;
-
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (
-  max-width: 700px
-) {
-
-  .summary-grid {
-
-    grid-template-columns:
-      repeat(2, 1fr);
-
-    gap: 10px;
-
-  }
-
-
-  .summary-card {
-
-    padding: 14px;
-
-  }
-
-
-  .summary-value {
-
-    font-size: 26px;
-
-  }
-
-}
-/* =====================================================
-   ABSENSI HARI INI
-   V5.2.8
-   DESKTOP TABLE + MOBILE CARD
-===================================================== */
-
-.attendance-section {
-
-  width: 100%;
-
-  margin-top: 24px;
-
-  background: #ffffff;
-
-  border-radius: 18px;
-
-  padding: 22px;
-
-  box-sizing: border-box;
-
-  box-shadow:
-    0 4px 18px rgba(15, 23, 42, 0.08);
-
-}
-
-
-/* =====================================================
-   HEADER
-===================================================== */
-
-.attendance-header {
+  z-index: 2;
 
   display: flex;
-
-  justify-content: space-between;
 
   align-items: center;
 
-  gap: 15px;
+  justify-content: center;
 
-  margin-bottom: 20px;
+  gap: 13px;
 
-}
+  margin: 0 0 9px;
 
+  font-size:
+    clamp(
+      20px,
+      4vw,
+      30px
+    );
 
-.attendance-title {
+  font-weight: 800;
 
-  display: flex;
+  text-align: center;
 
-  align-items: flex-start;
+  line-height: 1.2;
 
-  gap: 12px;
-
-}
-
-
-.attendance-title-icon {
-
-  font-size: 28px;
-
-  line-height: 1;
-
-}
-
-
-.attendance-title h2 {
-
-  margin: 0;
-
-  font-size: 22px;
-
-  font-weight: 700;
-
-  color: #0f172a;
-
-}
-
-
-.attendance-title p {
-
-  margin: 5px 0 0;
-
-  font-size: 14px;
-
-  color: #64748b;
-
-}
-
-
-.attendance-date {
-
-  background: #eff6ff;
-
-  color: #1d4ed8;
-
-  border-radius: 10px;
-
-  padding: 8px 12px;
-
-  font-size: 13px;
-
-  font-weight: 600;
-
-  white-space: nowrap;
-
+  letter-spacing: 0.3px;
 }
 
 
 /* =====================================================
-   LOADING
+   LOGO SEKOLAH
 ===================================================== */
 
-.attendance-loading {
+.school-logo {
+
+  width: 58px;
+
+  height: 58px;
+
+  min-width: 58px;
+
+  object-fit: contain;
+
+  background: #ffffff;
+
+  border-radius: 50%;
+
+  padding: 5px;
+
+  box-shadow:
+    0 3px 12px
+    rgba(0, 0, 0, 0.25);
+}
+
+
+/* =====================================================
+   NAMA SEKOLAH
+===================================================== */
+
+.school-name {
+
+  position: relative;
+
+  z-index: 2;
+
+  text-align: center;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 0.8px;
+
+  color: #ffffff;
+
+  margin-top: 3px;
+
+  text-shadow:
+    0 2px 5px
+    rgba(0, 0, 0, 0.35);
+}
+
+
+/* =====================================================
+   TANGGAL & WAKTU
+===================================================== */
+
+.datetime {
+
+  position: relative;
+
+  z-index: 2;
 
   display: flex;
 
@@ -1202,98 +197,639 @@ body {
 
   gap: 10px;
 
-  padding: 35px 20px;
-
-  color: #64748b;
-
-  font-size: 14px;
-
+  margin-top: 17px;
 }
 
 
-.loading-spinner {
+.datetime > div {
 
-  width: 20px;
+  background:
+    rgba(255, 255, 255, 0.16);
 
-  height: 20px;
+  border:
+    1px solid
+    rgba(255, 255, 255, 0.25);
 
-  border: 3px solid #e2e8f0;
+  backdrop-filter:
+    blur(5px);
 
-  border-top-color: #2563eb;
+  -webkit-backdrop-filter:
+    blur(5px);
 
-  border-radius: 50%;
+  padding: 7px 12px;
 
-  animation:
-    attendanceSpin 0.8s linear infinite;
+  border-radius: 10px;
 
-}
+  font-size: 12px;
 
+  font-weight: 600;
 
-@keyframes attendanceSpin {
-
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-
+  box-shadow:
+    0 2px 8px
+    rgba(0, 0, 0, 0.12);
 }
 
 
 /* =====================================================
-   EMPTY
+   SCANNER CARD
 ===================================================== */
 
-.attendance-empty {
+.scanner-card {
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  padding: 20px;
+
+  margin-bottom: 15px;
+
+  box-shadow:
+    0 4px 18px
+    rgba(15, 23, 42, 0.08);
+}
+
+
+/* =====================================================
+   READER / KAMERA
+===================================================== */
+
+#reader {
+
+  width: 100%;
+
+  max-width: 450px;
+
+  margin: auto;
+
+  overflow: hidden;
+
+  border-radius: 14px;
+
+  background: #0f172a;
+}
+
+
+#reader video {
+
+  width: 100% !important;
+
+  height: auto !important;
+
+  display: block;
+
+  border-radius: 12px;
+}
+
+
+#reader img {
+
+  max-width: 100%;
+}
+
+
+/* =====================================================
+   STATUS SCANNER
+===================================================== */
+
+.status {
+
+  margin-top: 13px;
+
+  padding: 12px;
+
+  border-radius: 10px;
+
+  background: #f1f5f9;
+
+  color: #475569;
 
   text-align: center;
 
-  padding: 40px 20px;
+  font-size: 13px;
 
-  color: #64748b;
+  font-weight: 700;
 
-}
-
-
-.empty-icon {
-
-  font-size: 42px;
-
-  margin-bottom: 10px;
-
-}
-
-
-.attendance-empty h3 {
-
-  margin: 0;
-
-  color: #334155;
-
-  font-size: 18px;
-
-}
-
-
-.attendance-empty p {
-
-  margin: 7px 0 0;
-
-  font-size: 14px;
-
+  line-height: 1.4;
 }
 
 
 /* =====================================================
-   DESKTOP TABLE
+   TOMBOL
+   Tidak mengubah fungsi maupun tata letak HTML
+===================================================== */
+
+.buttons {
+
+  width: 100%;
+}
+
+
+.buttons button {
+
+  width: 100%;
+
+  border: none;
+
+  border-radius: 12px;
+
+  padding: 14px 18px;
+
+  margin-top: 14px;
+
+  background: #0f766e;
+
+  color: #ffffff;
+
+  font-size: 14px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background 0.15s ease;
+}
+
+
+.buttons button:hover {
+
+  background: #115e59;
+
+  box-shadow:
+    0 5px 12px
+    rgba(15, 118, 110, 0.25);
+}
+
+
+.buttons button:active {
+
+  transform: scale(0.98);
+}
+
+
+/* =====================================================
+   AUTO SCAN
+===================================================== */
+
+.auto-scan-control {
+
+  margin-top: 15px;
+
+  padding: 11px 13px;
+
+  border-radius: 10px;
+
+  background: #f8fafc;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  color: #334155;
+}
+
+
+.auto-scan-control label {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  cursor: pointer;
+}
+
+
+.auto-scan-control input {
+
+  width: 17px;
+
+  height: 17px;
+
+  cursor: pointer;
+}
+
+
+.auto-label {
+
+  color: #16a34a;
+
+  font-size: 11px;
+
+  font-weight: 800;
+}
+
+
+/* =====================================================
+   HASIL ABSENSI
+===================================================== */
+
+.result {
+
+  display: none;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  padding: 20px;
+
+  margin-bottom: 15px;
+
+  text-align: center;
+
+  box-shadow:
+    0 4px 18px
+    rgba(15, 23, 42, 0.08);
+}
+
+
+/* =====================================================
+   ICON HASIL
+===================================================== */
+
+.result-icon {
+
+  font-size: 58px;
+
+  line-height: 1;
+
+  margin-bottom: 8px;
+}
+
+
+.result h2 {
+
+  font-size: 21px;
+
+  font-weight: 800;
+}
+
+
+.result-message {
+
+  margin-top: 7px;
+
+  color: #64748b;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+}
+
+
+.student-id {
+
+  margin-top: 17px;
+
+  padding: 15px;
+
+  border-radius: 12px;
+
+  background: #f8fafc;
+
+  font-size: 20px;
+
+  font-weight: 800;
+
+  line-height: 1.5;
+
+  word-break: break-word;
+}
+
+
+/* =====================================================
+   STATUS HASIL
+===================================================== */
+
+.result.success {
+
+  border-top:
+    6px solid #16a34a;
+}
+
+
+.result.late {
+
+  border-top:
+    6px solid #eab308;
+}
+
+
+.result.already {
+
+  border-top:
+    6px solid #f97316;
+}
+
+
+.result.error {
+
+  border-top:
+    6px solid #dc2626;
+}
+
+
+/* =====================================================
+   RINGKASAN ABSENSI
+===================================================== */
+
+.summary-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 10px;
+
+  width: 100%;
+
+  margin: 20px 0;
+}
+
+
+.summary-card {
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  padding: 15px 8px;
+
+  text-align: center;
+
+  box-shadow:
+    0 4px 15px
+    rgba(15, 23, 42, 0.08);
+
+  transition:
+    transform 0.15s ease;
+}
+
+
+.summary-card:hover {
+
+  transform:
+    translateY(-2px);
+}
+
+
+.summary-icon {
+
+  font-size: 25px;
+
+  line-height: 1;
+
+  margin-bottom: 7px;
+}
+
+
+.summary-label {
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  color: #64748b;
+
+  letter-spacing: 0.4px;
+}
+
+
+.summary-number {
+
+  font-size: 29px;
+
+  font-weight: 800;
+
+  margin-top: 4px;
+
+  color: #0f172a;
+}
+
+
+/* =====================================================
+   SECTION ABSENSI HARI INI
+===================================================== */
+
+.attendance-section {
+
+  width: 100%;
+
+  margin-top: 20px;
+
+  background: #ffffff;
+
+  border-radius: 18px;
+
+  padding: 20px;
+
+  box-shadow:
+    0 4px 18px
+    rgba(15, 23, 42, 0.08);
+}
+
+
+/* =====================================================
+   HEADER ABSENSI
+===================================================== */
+
+.attendance-header {
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  gap: 15px;
+
+  margin-bottom: 15px;
+}
+
+
+.attendance-header h2 {
+
+  font-size: 19px;
+
+  font-weight: 800;
+
+  color: #0f172a;
+
+  line-height: 1.3;
+}
+
+
+.attendance-date-text {
+
+  margin-top: 5px;
+
+  color: #64748b;
+
+  font-size: 12px;
+
+  font-weight: 600;
+}
+
+
+/* =====================================================
+   TOOLS ABSENSI
+===================================================== */
+
+.attendance-tools {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: flex-end;
+
+  flex-wrap: wrap;
+
+  gap: 7px;
+}
+
+
+.attendance-tools select {
+
+  padding: 8px 10px;
+
+  border:
+    1px solid #cbd5e1;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #334155;
+
+  font-size: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+}
+
+
+.attendance-tools button {
+
+  border: none;
+
+  border-radius: 8px;
+
+  padding: 8px 11px;
+
+  background: #0f766e;
+
+  color: #ffffff;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease;
+}
+
+
+.attendance-tools button:hover {
+
+  background: #115e59;
+}
+
+
+/* =====================================================
+   TOTAL BOX
+===================================================== */
+
+.total-box {
+
+  padding: 8px 11px;
+
+  border-radius: 8px;
+
+  background: #f0fdfa;
+
+  color: #0f766e;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+
+.total-box span {
+
+  font-size: 14px;
+
+  font-weight: 800;
+
+  margin-left: 3px;
+}
+
+
+/* =====================================================
+   INFORMASI ABSENSI
+===================================================== */
+
+.attendance-info {
+
+  margin-bottom: 12px;
+
+  padding: 9px 11px;
+
+  border-radius: 9px;
+
+  background: #f8fafc;
+
+  color: #64748b;
+
+  font-size: 12px;
+
+  text-align: center;
+}
+
+
+/* =====================================================
+   LOADING
+===================================================== */
+
+.loading {
+
+  padding: 30px 15px;
+
+  text-align: center;
+
+  color: #64748b;
+
+  font-size: 13px;
+}
+
+
+/* =====================================================
+   TABEL ABSENSI DESKTOP
 ===================================================== */
 
 .attendance-desktop {
 
   width: 100%;
-
 }
 
 
@@ -1303,10 +839,10 @@ body {
 
   overflow-x: auto;
 
-  border: 1px solid #e2e8f0;
+  border:
+    1px solid #e2e8f0;
 
-  border-radius: 14px;
-
+  border-radius: 12px;
 }
 
 
@@ -1316,45 +852,45 @@ body {
 
   border-collapse: collapse;
 
-  min-width: 650px;
+  min-width: 600px;
 
+  background: #ffffff;
 }
 
 
 .attendance-table thead {
 
   background: #f8fafc;
-
 }
 
 
 .attendance-table th {
 
-  padding: 14px 16px;
+  padding: 12px 13px;
 
   text-align: left;
 
-  font-size: 13px;
+  font-size: 12px;
 
   font-weight: 700;
 
   color: #475569;
 
-  border-bottom: 1px solid #e2e8f0;
-
+  border-bottom:
+    1px solid #e2e8f0;
 }
 
 
 .attendance-table td {
 
-  padding: 13px 16px;
+  padding: 11px 13px;
 
-  font-size: 14px;
+  font-size: 13px;
 
   color: #334155;
 
-  border-bottom: 1px solid #f1f5f9;
-
+  border-bottom:
+    1px solid #f1f5f9;
 }
 
 
@@ -1362,30 +898,26 @@ body {
 
   transition:
     background 0.2s ease;
-
 }
 
 
 .attendance-table tbody tr:hover {
 
   background: #f8fafc;
-
 }
 
 
 .attendance-table tbody tr:last-child td {
 
   border-bottom: none;
-
 }
 
 
 .rank-column {
 
-  width: 70px;
+  width: 55px;
 
   text-align: center !important;
-
 }
 
 
@@ -1401,28 +933,26 @@ body {
 
   align-items: center;
 
-  min-width: 32px;
+  min-width: 30px;
 
-  height: 32px;
+  height: 30px;
 
-  font-size: 14px;
+  font-size: 13px;
 
   font-weight: 700;
-
 }
 
 
 .rank-medal {
 
-  font-size: 25px;
+  font-size: 23px;
 
   line-height: 1;
-
 }
 
 
 /* =====================================================
-   STUDENT NAME
+   NAMA SISWA
 ===================================================== */
 
 .student-name {
@@ -1430,7 +960,6 @@ body {
   font-weight: 700;
 
   color: #0f172a;
-
 }
 
 
@@ -1439,12 +968,11 @@ body {
   font-weight: 600;
 
   color: #475569;
-
 }
 
 
 /* =====================================================
-   TIME
+   JAM ABSENSI
 ===================================================== */
 
 .attendance-time {
@@ -1457,7 +985,6 @@ body {
   font-weight: 600;
 
   color: #334155;
-
 }
 
 
@@ -1471,16 +998,15 @@ body {
 
   align-items: center;
 
-  gap: 6px;
+  gap: 5px;
 
-  padding: 6px 10px;
+  padding: 5px 9px;
 
   border-radius: 999px;
 
-  font-size: 12px;
+  font-size: 11px;
 
   font-weight: 700;
-
 }
 
 
@@ -1489,7 +1015,6 @@ body {
   background: #dcfce7;
 
   color: #15803d;
-
 }
 
 
@@ -1498,7 +1023,6 @@ body {
   background: #fef3c7;
 
   color: #b45309;
-
 }
 
 
@@ -1507,18 +1031,16 @@ body {
   background: #e2e8f0;
 
   color: #475569;
-
 }
 
 
 /* =====================================================
-   MOBILE
+   MOBILE ATTENDANCE
 ===================================================== */
 
 .attendance-mobile {
 
   display: none;
-
 }
 
 
@@ -1528,14 +1050,9 @@ body {
 
   flex-direction: column;
 
-  gap: 10px;
-
+  gap: 9px;
 }
 
-
-/* =====================================================
-   MOBILE CARD
-===================================================== */
 
 .attendance-card {
 
@@ -1543,29 +1060,30 @@ body {
 
   align-items: center;
 
-  gap: 12px;
+  gap: 11px;
 
-  padding: 13px;
+  padding: 12px;
 
   background: #ffffff;
 
-  border: 1px solid #e2e8f0;
+  border:
+    1px solid #e2e8f0;
 
-  border-radius: 14px;
+  border-radius: 12px;
 
   box-shadow:
-    0 2px 7px rgba(15, 23, 42, 0.05);
-
+    0 2px 7px
+    rgba(15, 23, 42, 0.05);
 }
 
 
 .attendance-card-rank {
 
-  width: 40px;
+  width: 38px;
 
-  min-width: 40px;
+  min-width: 38px;
 
-  height: 40px;
+  height: 38px;
 
   display: flex;
 
@@ -1576,14 +1094,12 @@ body {
   font-weight: 700;
 
   color: #475569;
-
 }
 
 
 .attendance-card-rank.medal {
 
-  font-size: 27px;
-
+  font-size: 25px;
 }
 
 
@@ -1592,13 +1108,12 @@ body {
   flex: 1;
 
   min-width: 0;
-
 }
 
 
 .attendance-card-name {
 
-  font-size: 15px;
+  font-size: 14px;
 
   font-weight: 700;
 
@@ -1609,7 +1124,6 @@ body {
   overflow: hidden;
 
   text-overflow: ellipsis;
-
 }
 
 
@@ -1617,10 +1131,9 @@ body {
 
   margin-top: 2px;
 
-  font-size: 12px;
+  font-size: 11px;
 
   color: #64748b;
-
 }
 
 
@@ -1632,28 +1145,25 @@ body {
 
   align-items: center;
 
-  gap: 10px;
+  gap: 8px;
 
-  margin-top: 7px;
-
+  margin-top: 6px;
 }
 
 
 .attendance-card-time {
 
-  font-size: 12px;
+  font-size: 11px;
 
   font-weight: 600;
 
   color: #475569;
-
 }
 
 
 .attendance-card-status {
 
   flex-shrink: 0;
-
 }
 
 
@@ -1663,130 +1173,416 @@ body {
 
 .attendance-card:first-child {
 
-  border-color: #bfdbfe;
+  border-color: #99f6e4;
 
   background:
     linear-gradient(
       135deg,
-      #eff6ff,
+      #f0fdfa,
       #ffffff
     );
-
 }
 
 
 /* =====================================================
-   TABLET / HP
+   MOBILE 768px
 ===================================================== */
 
 @media (max-width: 768px) {
 
-  .attendance-section {
+  .container {
 
-    margin-top: 18px;
+    width: calc(100% - 16px);
+
+    margin:
+      10px auto 15px;
+  }
+
+
+  /* HEADER */
+
+  .header {
+
+    padding:
+      23px 14px 18px;
+
+    border-radius:
+      16px;
+
+    background-position:
+      center center;
+  }
+
+
+  .school-title {
+
+    font-size:
+      clamp(
+        18px,
+        5vw,
+        25px
+      );
+
+    gap: 10px;
+  }
+
+
+  .school-logo {
+
+    width: 50px;
+
+    height: 50px;
+
+    min-width: 50px;
+  }
+
+
+  .school-name {
+
+    font-size: 11px;
+
+    letter-spacing: 0.5px;
+
+    line-height: 1.4;
+  }
+
+
+  .datetime {
+
+    margin-top: 13px;
+
+    gap: 6px;
+  }
+
+
+  .datetime > div {
+
+    padding:
+      6px 9px;
+
+    font-size: 10px;
+  }
+
+
+  /* SCANNER */
+
+  .scanner-card {
 
     padding: 15px;
 
     border-radius: 15px;
+  }
 
+
+  /* SUMMARY */
+
+  .summary-grid {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+    gap: 9px;
+
+    margin: 15px 0;
+  }
+
+
+  .summary-card {
+
+    padding: 13px 7px;
+  }
+
+
+  .summary-number {
+
+    font-size: 25px;
+  }
+
+
+  /* ATTENDANCE */
+
+  .attendance-section {
+
+    margin-top: 15px;
+
+    padding: 15px;
+
+    border-radius: 15px;
   }
 
 
   .attendance-header {
 
-    align-items: flex-start;
+    flex-direction: column;
 
-    margin-bottom: 15px;
+    align-items: stretch;
 
+    gap: 10px;
   }
 
 
-  .attendance-title {
+  .attendance-header h2 {
 
-    gap: 9px;
-
+    font-size: 17px;
   }
 
 
-  .attendance-title-icon {
+  .attendance-tools {
 
-    font-size: 23px;
-
+    justify-content: space-between;
   }
 
 
-  .attendance-title h2 {
+  .attendance-tools select {
 
-    font-size: 18px;
+    flex: 1;
 
+    max-width: 150px;
   }
 
 
-  .attendance-title p {
+  .total-box {
 
-    font-size: 12px;
+    flex: 1;
 
-    line-height: 1.4;
-
+    text-align: center;
   }
 
 
-  .attendance-date {
-
-    display: none;
-
-  }
-
+  /* TABLE DESKTOP HIDDEN */
 
   .attendance-desktop {
 
     display: none !important;
-
   }
 
+
+  /* MOBILE CARD SHOW */
 
   .attendance-mobile {
 
     display: block !important;
-
   }
 
 }
 
 
 /* =====================================================
-   HP KECIL
+   HP KECIL 480px
 ===================================================== */
 
 @media (max-width: 480px) {
 
-  .attendance-section {
+  .container {
 
-    padding: 13px;
+    width:
+      calc(100% - 12px);
 
+    margin-top: 7px;
   }
 
 
-  .attendance-title h2 {
+  .header {
+
+    padding:
+      20px 10px 16px;
+
+    border-radius:
+      14px;
+  }
+
+
+  .school-title {
+
+    gap: 8px;
+
+    font-size: 18px;
+
+    line-height: 1.15;
+  }
+
+
+  .school-logo {
+
+    width: 45px;
+
+    height: 45px;
+
+    min-width: 45px;
+
+    padding: 4px;
+  }
+
+
+  .school-name {
+
+    font-size: 9px;
+
+    letter-spacing: 0.3px;
+  }
+
+
+  .datetime {
+
+    gap: 5px;
+
+    flex-wrap: wrap;
+
+    margin-top: 11px;
+  }
+
+
+  .datetime > div {
+
+    padding:
+      5px 8px;
+
+    font-size: 9px;
+  }
+
+
+  /* SCANNER */
+
+  .scanner-card {
+
+    padding: 12px;
+
+    border-radius: 14px;
+  }
+
+
+  .status {
+
+    padding: 10px;
+
+    font-size: 12px;
+  }
+
+
+  .buttons button {
+
+    padding:
+      13px 15px;
+
+    font-size: 13px;
+  }
+
+
+  /* SUMMARY */
+
+  .summary-card {
+
+    padding: 11px 5px;
+
+    border-radius: 13px;
+  }
+
+
+  .summary-icon {
+
+    font-size: 22px;
+  }
+
+
+  .summary-label {
+
+    font-size: 9px;
+  }
+
+
+  .summary-number {
+
+    font-size: 23px;
+  }
+
+
+  /* RESULT */
+
+  .result {
+
+    padding: 14px;
+
+    border-radius: 14px;
+  }
+
+
+  .result-icon {
+
+    font-size: 48px;
+  }
+
+
+  .result h2 {
+
+    font-size: 19px;
+  }
+
+
+  .student-id {
 
     font-size: 17px;
 
+    padding: 13px;
   }
 
 
-  .attendance-title p {
+  /* ATTENDANCE */
+
+  .attendance-section {
+
+    padding: 12px;
+
+    border-radius: 14px;
+  }
+
+
+  .attendance-header h2 {
+
+    font-size: 16px;
+  }
+
+
+  .attendance-tools {
+
+    gap: 5px;
+  }
+
+
+  .attendance-tools select {
+
+    max-width: 120px;
 
     font-size: 11px;
 
+    padding: 7px;
+  }
+
+
+  .attendance-tools button {
+
+    font-size: 10px;
+
+    padding:
+      7px 8px;
+  }
+
+
+  .total-box {
+
+    font-size: 10px;
+
+    padding:
+      7px 8px;
   }
 
 
   .attendance-card {
 
-    padding: 11px;
+    padding: 10px;
 
-    gap: 9px;
+    gap: 8px;
 
+    border-radius: 11px;
   }
 
 
@@ -1797,322 +1593,81 @@ body {
     min-width: 34px;
 
     height: 34px;
-
   }
 
 
   .attendance-card-rank.medal {
 
-    font-size: 24px;
-
+    font-size: 22px;
   }
 
 
   .attendance-card-name {
 
-    font-size: 14px;
-
+    font-size: 13px;
   }
 
 
   .attendance-card-class {
 
-    font-size: 11px;
-
-  }
-
-
-  .attendance-card-bottom {
-
-    margin-top: 5px;
-
+    font-size: 10px;
   }
 
 
   .attendance-card-time {
 
-    font-size: 11px;
-
+    font-size: 10px;
   }
 
 
   .status-badge {
 
-    padding: 5px 8px;
+    padding:
+      4px 7px;
 
-    font-size: 10px;
-
+    font-size: 9px;
   }
-
-}
-
-/* =====================================================
-   V5.3
-   FILTER JUMLAH ABSENSI
-===================================================== */
-
-.attendance-filter {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  margin: 12px 0 16px;
-  font-size: 14px;
-}
-
-.attendance-filter label {
-  font-weight: 600;
-}
-
-.attendance-filter select {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background: #ffffff;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-
-/* =====================================================
-   DESKTOP
-===================================================== */
-
-#attendanceDesktop {
-  display: block;
-}
-
-#attendanceMobile {
-  display: none;
-}
-
-
-/* =====================================================
-   TABEL
-===================================================== */
-
-.attendance-table {
-  width: 100%;
-  border-collapse: collapse;
-  overflow: hidden;
-  border-radius: 10px;
-}
-
-.attendance-table th,
-.attendance-table td {
-  padding: 10px 12px;
-  text-align: left;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.attendance-table th {
-  font-weight: 700;
-}
-
-
-/* =====================================================
-   HP
-===================================================== */
-
-@media (max-width: 768px) {
-
-  #attendanceDesktop {
-    display: none !important;
-  }
-
-  #attendanceMobile {
-    display: block !important;
-  }
-
-
-  .attendance-filter {
-    justify-content: space-between;
-    margin-top: 12px;
-  }
-
-
-  .attendance-filter select {
-    flex: 1;
-    max-width: 150px;
-  }
-
-
-  .attendance-card {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    margin-bottom: 8px;
-    border-radius: 10px;
-    border: 1px solid #e5e7eb;
-    background: #ffffff;
-  }
-
-
-  .attendance-card-rank {
-    min-width: 42px;
-    text-align: center;
-    font-size: 20px;
-  }
-
-
-  .attendance-card-rank.medal {
-    font-size: 25px;
-  }
-
-
-  .attendance-card-content {
-    flex: 1;
-    min-width: 0;
-  }
-
-
-  .attendance-card-name {
-    font-weight: 700;
-    font-size: 14px;
-    word-break: break-word;
-  }
-
-
-  .attendance-card-class {
-    font-size: 12px;
-    margin-top: 3px;
-  }
-
-
-  .attendance-card-bottom {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin-top: 7px;
-  }
-
-
-  .attendance-card-time {
-    font-size: 12px;
-  }
-
-
-  .attendance-card-status {
-    font-size: 12px;
-  }
-
-}
-
-/* =====================================================
-   JUDUL SEKOLAH + LOGO
-===================================================== */
-
-.school-title {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 12px;
-
-  margin: 0 0 8px;
-
-  font-size:
-    clamp(
-      20px,
-      4vw,
-      30px
-    );
 
 }
 
 
 /* =====================================================
-   LOGO SEKOLAH
+   HP SANGAT KECIL
 ===================================================== */
 
-.school-logo {
+@media (max-width: 360px) {
 
-  width: 55px;
+  .school-title {
 
-  height: 55px;
-
-  object-fit: contain;
-
-  background: white;
-
-  border-radius: 50%;
-
-  padding: 5px;
-
-  box-shadow:
-    0 3px 12px
-    rgba(0,0,0,0.15);
-
-}
+    font-size: 16px;
+  }
 
 
-/* =====================================================
-   BACKGROUND WEBSITE
-===================================================== */
+  .school-logo {
 
-body {
+    width: 40px;
 
-  font-family:
-    Arial,
-    Helvetica,
-    sans-serif;
+    height: 40px;
 
-  color:
-    #0f172a;
-
-  min-height:
-    100vh;
-
-  margin:
-    0;
-
-  background-color:
-    #f1f5f9;
-
-  background-image:
-
-    linear-gradient(
-      rgba(255,255,255,0.55),
-      rgba(255,255,255,0.55)
-    ),
-
-    url("https://raw.githubusercontent.com/variantechid-cell/SAD-BaitulUlum/f3eca4034fa1897a99e53b0be8a2af63393a90d2/bgweb.jpeg");
-
-  background-size:
-    cover;
-
-  background-position:
-    center center;
-
-  background-repeat:
-    no-repeat;
-
-  background-attachment:
-    fixed;
-
-}
+    min-width: 40px;
+  }
 
 
+  .school-name {
 
-/* =====================================================
-   MOBILE BACKGROUND
-===================================================== */
+    font-size: 8px;
+  }
 
-@media (max-width: 768px) {
 
-  body {
+  .summary-number {
 
-    background-attachment:
-      scroll;
+    font-size: 21px;
+  }
 
-    background-position:
-      center center;
 
+  .attendance-tools button {
+
+    display: none;
   }
 
 }

@@ -23,14 +23,32 @@ body {
     Helvetica,
     sans-serif;
 
-  background:
-    #f1f5f9;
-
   color:
     #0f172a;
 
   min-height:
     100vh;
+
+  background-image:
+
+    linear-gradient(
+      rgba(255, 255, 255, 0.88),
+      rgba(255, 255, 255, 0.88)
+    ),
+
+    url("https://raw.githubusercontent.com/variantechid-cell/SAD-BaitulUlum/main/bgweb.jpeg");
+
+  background-size:
+    cover;
+
+  background-position:
+    center;
+
+  background-attachment:
+    fixed;
+
+  background-repeat:
+    no-repeat;
 
 }
 
@@ -1978,6 +1996,123 @@ body {
 
   .attendance-card-status {
     font-size: 12px;
+  }
+
+}
+
+/* =====================================================
+   JUDUL SEKOLAH + LOGO
+===================================================== */
+
+.school-title {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  margin: 0 0 8px;
+
+  font-size:
+    clamp(
+      20px,
+      4vw,
+      30px
+    );
+
+}
+
+
+/* =====================================================
+   LOGO SEKOLAH
+===================================================== */
+
+.school-logo {
+
+  width: 55px;
+
+  height: 55px;
+
+  object-fit: contain;
+
+  background: white;
+
+  border-radius: 50%;
+
+  padding: 5px;
+
+  box-shadow:
+    0 3px 12px
+    rgba(0,0,0,0.15);
+
+}
+
+
+/* =====================================================
+   BACKGROUND WEBSITE
+===================================================== */
+
+body {
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+
+  color:
+    #0f172a;
+
+  min-height:
+    100vh;
+
+  margin:
+    0;
+
+  background-color:
+    #f1f5f9;
+
+  background-image:
+
+    linear-gradient(
+      rgba(255,255,255,0.55),
+      rgba(255,255,255,0.55)
+    ),
+
+    url("https://raw.githubusercontent.com/variantechid-cell/SAD-BaitulUlum/f3eca4034fa1897a99e53b0be8a2af63393a90d2/bgweb.jpeg");
+
+  background-size:
+    cover;
+
+  background-position:
+    center center;
+
+  background-repeat:
+    no-repeat;
+
+  background-attachment:
+    fixed;
+
+}
+
+
+
+/* =====================================================
+   MOBILE BACKGROUND
+===================================================== */
+
+@media (max-width: 768px) {
+
+  body {
+
+    background-attachment:
+      scroll;
+
+    background-position:
+      center center;
+
   }
 
 }

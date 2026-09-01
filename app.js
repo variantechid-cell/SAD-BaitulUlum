@@ -1,17 +1,18 @@
 /* ============================================================
    SISTEM ABSENSI KARTU PELAJAR - CLIENT SIDE SCRIPT V6.5
+   (AUTO OPEN CAMERA & AUTO SCAN BARCODE / QR CODE)
 ============================================================ */
 
-// 1. ISIKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+// Ganti dengan URL Web App Apps Script milikmu
 const API_URL = 'https://script.google.com/macros/s/AKfycbx.../exec'; 
 
-let html5QrcodeScanner = null;
+let html5QrCode = null;
 let isProcessing = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
-  initScanner();
   setupEventListeners();
+  startAutoCamera(); // Kamera langsung terbuka otomatis saat halaman dimuat
 });
 
 function initApp() {
@@ -20,11 +21,52 @@ function initApp() {
   loadSummary();
   loadTodayAttendance();
 
-  // Auto Refresh data rekap tiap 30 detik
   setInterval(() => {
     loadSummary();
     loadTodayAttendance();
   }, 30000);
+}
+
+/* ============================================================
+   AUTO OPEN CAMERA & AUTO SCAN (BARCODE 1D & QR CODE 2D)
+============================================================ */
+function startAutoCamera() {
+  html5QrCode = new Html5Qrcode("reader");
+  
+  const config = { 
+    fps: 15, 
+    qrbox: { width: 280, height: 160 }, // Ukuran area bidik disesuaikan untuk barcode & QR
+    aspectRatio: 1.333333
+  };
+
+  // Langsung membuka aliran video kamera belakang (environment) secara otomatis
+  html5QrCode.start(
+    { facingMode: "environment" },
+    config,
+    (decodedText) => {
+      if (isProcessing) return;
+      const cleanId = decodedText.trim();
+      if (cleanId) {
+        processAttendance(cleanId);
+      }
+    },
+    (errorMessage) => {
+      // Frame terus berjalan mencari Barcode / QR
+    }
+  ).catch(err => {
+    console.warn("Mencoba kamera default...", err);
+    // Fallback jika facingMode spesifik tidak terdeteksi
+    Html5Qrcode.getCameras().then(cameras => {
+      if (cameras && cameras.length > 0) {
+        html5QrCode.start(cameras[0].id, config, (decodedText) => {
+          if (isProcessing) return;
+          processAttendance(decodedText.trim());
+        });
+      } else {
+        console.error("Kamera tidak ditemukan.");
+      }
+    }).catch(e => console.error("Izin kamera ditolak:", e));
+  });
 }
 
 /* ============================================================
@@ -136,20 +178,6 @@ function setupEventListeners() {
   });
 }
 
-function initScanner() {
-  html5QrcodeScanner = new Html5QrcodeScanner("reader", { 
-    fps: 10, 
-    qrbox: { width: 250, height: 250 } 
-  }, false);
-
-  html5QrcodeScanner.render((decodedText) => {
-    if (isProcessing) return;
-    processAttendance(decodedText.trim());
-  }, (errorMessage) => {
-    // Ignore scan errors
-  });
-}
-
 function processAttendance(studentId) {
   if (isProcessing) return;
   isProcessing = true;
@@ -180,7 +208,7 @@ function processAttendance(studentId) {
       playBeep('error');
     })
     .finally(() => {
-      // Jeda 2.5 detik sebelum dapat scan berikutnya
+      // Beri jeda 2.5 detik sebelum mengizinkan scan kartu berikutnya
       setTimeout(() => {
         isProcessing = false;
         document.getElementById('studentIdInput').focus();
@@ -238,7 +266,6 @@ function renderResult(data) {
     badgeStatus.className = att.status === 'Terlambat' ? 'badge badge-warning' : 'badge badge-success';
     badgeStatus.innerText = att.status || 'HADIR';
 
-    // WA Notification Status (Fase 3)
     badgeWa.classList.remove('hidden');
     if (wa.sent) {
       badgeWa.className = 'badge badge-wa';

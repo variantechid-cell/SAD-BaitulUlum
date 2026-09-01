@@ -4,18 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Absensi Kartu Pelajar - SMP & SMA Baitul Ulum</title>
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- HTML5-QRCode Library -->
-  <script src="https://unpkg.com/html5-qrcode"></script>
-  <!-- Custom CSS -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- HEADER -->
   <header class="navbar">
     <div class="container nav-container">
       <div class="brand">
@@ -34,7 +29,6 @@
 
   <main class="container main-content">
     
-    <!-- DASHBOARD STATISTIK -->
     <section class="stats-grid">
       <div class="stat-card hadir">
         <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
@@ -66,17 +60,17 @@
       </div>
     </section>
 
-    <!-- AREA SCANNER & REKAP REALTIME -->
     <section class="content-grid">
       
-      <!-- KOLOM KIRI: SCANNER & INPUT MANUAL -->
       <div class="card scanner-card">
-        <div class="card-header">
-          <h3><i class="fa-solid fa-qrcode"></i> Pemindai Kartu Pelajar</h3>
+        <div class="card-header card-header-flex">
+          <h3><i class="fa-solid fa-camera"></i> Pemindai Barcode & QR Kamera</h3>
+          <button id="btnToggleCam" class="btn btn-secondary btn-sm">
+            <i class="fa-solid fa-video"></i> Kamera On/Off
+          </button>
         </div>
         <div class="card-body">
           
-          <!-- SELEKSI JADWAL / MAPEL (FASE 2) -->
           <div class="form-group">
             <label for="selectJadwal"><i class="fa-solid fa-book-open"></i> Sesi Mata Pelajaran</label>
             <select id="selectJadwal" class="form-control">
@@ -85,17 +79,17 @@
             <small class="help-text">Biarkan otomatis atau pilih sesi jam pelajaran secara manual.</small>
           </div>
 
-          <!-- CONTAINER KAMERA -->
+          <!-- CONTAINER STREAM KAMERA AUTOMATIS -->
           <div id="reader-wrapper">
             <div id="reader"></div>
           </div>
 
-          <!-- FORM INPUT MANUAL / SCANNER BARCODE PHYSICAL -->
+          <!-- INPUT KHUSUS BARCODE SCANNER GUN & MANUAL -->
           <form id="attendanceForm" class="manual-form">
             <div class="form-group">
-              <label for="studentIdInput"><i class="fa-solid fa-barcode"></i> Student ID / QR Code</label>
+              <label for="studentIdInput"><i class="fa-solid fa-barcode"></i> Scan Kartu / Input ID Siswa</label>
               <div class="input-group">
-                <input type="text" id="studentIdInput" class="form-control" placeholder="Scan atau ketik ID Siswa..." autocomplete="off" autofocus>
+                <input type="text" id="studentIdInput" class="form-control" placeholder="Arahkan scanner ke barcode kartu..." autocomplete="off" autofocus>
                 <button type="submit" class="btn btn-primary" id="btnSubmit">
                   <i class="fa-solid fa-paper-plane"></i> Absen
                 </button>
@@ -103,7 +97,7 @@
             </div>
           </form>
 
-          <!-- DISPLAY HASIL ABSENSI & WA NOTIFIKASI (FASE 3) -->
+          <!-- HASIL RESUMEN ABSENSI & WA NOTIFIKASI -->
           <div id="resultBox" class="result-box hidden">
             <div id="resultIcon" class="result-icon"></div>
             <div class="result-details">
@@ -121,7 +115,6 @@
         </div>
       </div>
 
-      <!-- KOLOM KANAN: DAFTAR ABSENSI HARI INI -->
       <div class="card list-card">
         <div class="card-header card-header-flex">
           <h3><i class="fa-solid fa-list-check"></i> Absensi Hari Ini</h3>

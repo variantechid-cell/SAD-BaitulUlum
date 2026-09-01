@@ -4,151 +4,115 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sistem Absensi Kartu Pelajar - SMP & SMA Baitul Ulum</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <link rel="stylesheet" href="style.css">
+  <!-- HTML5 QR Code Scanner Library -->
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
-
-  <header class="navbar">
-    <div class="container nav-container">
-      <div class="brand">
-        <i class="fa-solid fa-id-card-clip brand-icon"></i>
-        <div>
-          <h1>SMP & SMA BAITUL ULUM</h1>
-          <p>Presensi Kartu Pelajar & Sistem Informasi Sekolah</p>
-        </div>
-      </div>
-      <div class="server-status">
-        <span class="status-dot green" id="statusDot"></span>
-        <span id="statusText">Terhubung ke Server</span>
-      </div>
-    </div>
-  </header>
-
-  <main class="container main-content">
+  <div class="app-container">
     
-    <section class="stats-grid">
-      <div class="stat-card hadir">
-        <div class="stat-icon"><i class="fa-solid fa-user-check"></i></div>
-        <div class="stat-info">
-          <span class="stat-label">Hadir</span>
-          <h2 id="statHadir">0</h2>
-        </div>
+    <!-- HEADER -->
+    <header class="main-header">
+      <div class="header-title">
+        <h1>SMP & SMA BAITUL ULUM</h1>
+        <p>Sistem Absensi Kartu Pelajar & Presensi Presisi</p>
       </div>
-      <div class="stat-card terlambat">
-        <div class="stat-icon"><i class="fa-solid fa-user-clock"></i></div>
-        <div class="stat-info">
-          <span class="stat-label">Terlambat</span>
-          <h2 id="statTerlambat">0</h2>
-        </div>
+      <div class="header-info">
+        <div id="connectionStatus" class="status-indicator online">ONLINE</div>
+        <div id="liveClock" class="clock">00:00:00 WIB</div>
       </div>
-      <div class="stat-card total">
-        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
-        <div class="stat-info">
-          <span class="stat-label">Sudah Absen</span>
-          <h2 id="statTotal">0</h2>
-        </div>
+    </header>
+
+    <!-- DASHBOARD SUMMARY CARDS -->
+    <section class="summary-grid">
+      <div class="card stat-card total">
+        <span class="stat-label">Total Siswa</span>
+        <h2 id="summaryTotal">0</h2>
       </div>
-      <div class="stat-card belum">
-        <div class="stat-icon"><i class="fa-solid fa-user-xmark"></i></div>
-        <div class="stat-info">
-          <span class="stat-label">Belum Absen</span>
-          <h2 id="statBelum">0</h2>
-        </div>
+      <div class="card stat-card hadir">
+        <span class="stat-label">Hadir</span>
+        <h2 id="summaryHadir">0</h2>
+      </div>
+      <div class="card stat-card terlambat">
+        <span class="stat-label">Terlambat</span>
+        <h2 id="summaryTerlambat">0</h2>
+      </div>
+      <div class="card stat-card belum">
+        <span class="stat-label">Belum Absen</span>
+        <h2 id="summaryBelum">0</h2>
       </div>
     </section>
 
-    <section class="content-grid">
+    <!-- MAIN WORKSPACE -->
+    <main class="workspace-grid">
       
-      <div class="card scanner-card">
-        <div class="card-header card-header-flex">
-          <h3><i class="fa-solid fa-camera"></i> Pemindai Barcode & QR Kamera</h3>
-          <button id="btnToggleCam" class="btn btn-secondary btn-sm">
-            <i class="fa-solid fa-video"></i> Kamera On/Off
-          </button>
+      <!-- SCANNER & CONTROL PANEL -->
+      <section class="card panel-scanner">
+        <h3>Panel Presensi</h3>
+        
+        <!-- FASE 2: PILIHAN JADWAL & MAPEL -->
+        <div class="form-group">
+          <label for="selectJadwal">Pilih Mapel / Jam Ke (Fase 2):</label>
+          <select id="selectJadwal" class="form-control">
+            <option value="">⚡ Otomatis (Sesuai Jam Berjalan)</option>
+          </select>
         </div>
-        <div class="card-body">
-          
-          <div class="form-group">
-            <label for="selectJadwal"><i class="fa-solid fa-book-open"></i> Sesi Mata Pelajaran</label>
-            <select id="selectJadwal" class="form-control">
-              <option value="">-- Auto-Match Jam Berjalan --</option>
-            </select>
-            <small class="help-text">Biarkan otomatis atau pilih sesi jam pelajaran secara manual.</small>
-          </div>
 
-          <!-- CONTAINER STREAM KAMERA AUTOMATIS -->
-          <div id="reader-wrapper">
-            <div id="reader"></div>
-          </div>
-
-          <!-- INPUT KHUSUS BARCODE SCANNER GUN & MANUAL -->
-          <form id="attendanceForm" class="manual-form">
-            <div class="form-group">
-              <label for="studentIdInput"><i class="fa-solid fa-barcode"></i> Scan Kartu / Input ID Siswa</label>
-              <div class="input-group">
-                <input type="text" id="studentIdInput" class="form-control" placeholder="Arahkan scanner ke barcode kartu..." autocomplete="off" autofocus>
-                <button type="submit" class="btn btn-primary" id="btnSubmit">
-                  <i class="fa-solid fa-paper-plane"></i> Absen
-                </button>
-              </div>
-            </div>
-          </form>
-
-          <!-- HASIL RESUMEN ABSENSI & WA NOTIFIKASI -->
-          <div id="resultBox" class="result-box hidden">
-            <div id="resultIcon" class="result-icon"></div>
-            <div class="result-details">
-              <h4 id="resultNama">-</h4>
-              <p id="resultKelas" class="result-subtext">-</p>
-              <div class="result-badges">
-                <span id="badgeStatus" class="badge">-</span>
-                <span id="badgeJadwal" class="badge badge-info">-</span>
-                <span id="badgeWa" class="badge badge-wa"><i class="fa-brands fa-whatsapp"></i> -</span>
-              </div>
-              <p id="resultMessage" class="result-message"></p>
-            </div>
-          </div>
-
+        <!-- QR SCANNER CONTAINER -->
+        <div id="reader-wrapper">
+          <div id="reader"></div>
         </div>
+
+        <!-- MANUAL SCAN / RFID INPUT -->
+        <div class="form-group manual-input-group">
+          <input type="text" id="inputStudentId" class="form-control" placeholder="Scan Kartu / Ketik ID Siswa..." autofocus autocomplete="off">
+          <button id="btnScanManual" class="btn btn-primary">Absen</button>
+        </div>
+      </section>
+
+      <!-- FEEDBACK DISPLAY CARD (FASE 2 & FASE 3) -->
+      <section class="card panel-result">
+        <h3>Status Presensi Terakhir</h3>
+        
+        <div id="resultCard" class="result-placeholder">
+          <div class="placeholder-text">Silakan scan Kartu Pelajar pada kamera atau alat pembaca RFID.</div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- LIVE ATTENDANCE TABLE -->
+    <section class="card table-container">
+      <div class="table-header">
+        <h3>Daftar Kehadiran Hari Ini</h3>
+        <button id="btnRefresh" class="btn btn-secondary">🔄 Refresh Data</button>
       </div>
-
-      <div class="card list-card">
-        <div class="card-header card-header-flex">
-          <h3><i class="fa-solid fa-list-check"></i> Absensi Hari Ini</h3>
-          <button id="btnRefresh" class="btn btn-secondary btn-sm">
-            <i class="fa-solid fa-rotate-right"></i> Refresh
-          </button>
-        </div>
-        <div class="card-body padding-none">
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>No</th>
-                  <th>Waktu</th>
-                  <th>ID Siswa</th>
-                  <th>Nama</th>
-                  <th>Kelas</th>
-                  <th>Mapel</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="attendanceTableBody">
-                <tr>
-                  <td colspan="7" class="text-center">Memuat data absensi...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+      
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Waktu</th>
+              <th>ID Siswa</th>
+              <th>Nama Siswa</th>
+              <th>Kelas</th>
+              <th>Mata Pelajaran (Fase 2)</th>
+              <th>Guru</th>
+              <th>Status</th>
+              <th>Notif WA (Fase 3)</th>
+            </tr>
+          </thead>
+          <tbody id="tableAbsensiBody">
+            <tr>
+              <td colspan="9" class="text-center">Memuat data absensi...</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-
     </section>
 
-  </main>
+  </div>
 
   <script src="app.js"></script>
 </body>

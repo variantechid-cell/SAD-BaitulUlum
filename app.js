@@ -1,501 +1,2635 @@
 /* ============================================================
-   SISTEM ABSENSI KARTU PELAJAR - SMP & SMA BAITUL ULUM
-   CODE.GS V6.3 (SINKRON 100% DENGAN SHEET EXCEL & APP.JS)
+   SISTEM ABSENSI KARTU PELAJAR
+   SMP BAITUL ULUM BOARDING SCHOOL
+
+   APP.JS V6.2
+
+   SERVER:
+   fetch(API_URL)
+
+   FITUR:
+   - QR Scanner
+   - HP / Laptop
+   - Hadir
+   - Terlambat
+   - Sudah Absen
+   - Data Tidak Ditemukan
+   - Rekap Hari Ini
+   - Daftar Urutan Absensi
+   - 5 / 10 / 25 / 50 / 100 / 150
+   - Tampilkan Semua
+   - Total Siswa Absen
 ============================================================ */
+
+
+/* ============================================================
+   API
+============================================================ */
+
+const API_URL =
+  'https://script.google.com/macros/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec';
+
+
+/* ============================================================
+   KONFIGURASI
+============================================================ */
+
+const AUTO_SCAN_DELAY =
+  2500;
+
+const SUMMARY_REFRESH_DELAY =
+  1200;
+
+const DEFAULT_DISPLAY_LIMIT =
+  10;
+
+
+/* ============================================================
+   SCANNER
+============================================================ */
+
+let html5QrCode =
+  null;
+
+let scannerRunning =
+  false;
+
+let processingScan =
+  false;
+
+
+/* ============================================================
+   DATA ABSENSI
+============================================================ */
+
+let todayAttendanceData =
+  [];
+
+let attendanceDisplayLimit =
+  DEFAULT_DISPLAY_LIMIT;
+
+
+/* ============================================================
+   COUNTER
+============================================================ */
+
+let countPresent =
+  0;
+
+let countLate =
+  0;
+
+let countAlready =
+  0;
+
+let countError =
+  0;
+
+
+/* ============================================================
+   ELEMENT
+============================================================ */
+
+const statusElement =
+  document.getElementById(
+    'status'
+  );
+
+const resultElement =
+  document.getElementById(
+    'result'
+  );
+
+const scannerCard =
+  document.getElementById(
+    'scannerCard'
+  );
+
+const studentIdElement =
+  document.getElementById(
+    'studentId'
+  );
+
+const resultTitleElement =
+  document.getElementById(
+    'resultTitle'
+  );
+
+const resultIconElement =
+  document.getElementById(
+    'resultIcon'
+  );
+
+const resultMessageElement =
+  document.getElementById(
+    'resultMessage'
+  );
+
+const startButton =
+  document.getElementById(
+    'startButton'
+  );
+
+const scanAgainButton =
+  document.getElementById(
+    'scanAgainButton'
+  );
+
+const autoScanToggle =
+  document.getElementById(
+    'autoScanToggle'
+  );
+
+const autoScanLabel =
+  document.getElementById(
+    'autoScanLabel'
+  );
+
+
+/* ============================================================
+   LOAD
+============================================================ */
+
+window.addEventListener(
+  'load',
+  function() {
+
+    console.log(
+      '================================'
+    );
+
+    console.log(
+      'ABSENSI V6.2'
+    );
+
+    console.log(
+      '================================'
+    );
+
+
+    updateDateTime();
+
+
+    setInterval(
+      updateDateTime,
+      1000
+    );
+
+
+    setStatus(
+      '🟢 Scanner siap.'
+    );
+
+
+    prepareSpeech();
+
+
+    loadTodaySummary();
+
+
+    loadTodayAttendanceList();
+
+
+    testServer();
+
+  }
+);
+
+
+/* ============================================================
+   TEST SERVER
+============================================================ */
+
+function testServer() {
+
+  fetch(
+    API_URL +
+    '?action=test&_=' +
+    Date.now()
+  )
+
+  .then(
+    function(response) {
+
+      if (!response.ok) {
+
+        throw new Error(
+          'HTTP ' +
+          response.status
+        );
+
+      }
+
+      return response.json();
+
+    }
+  )
+
+  .then(
+    function(result) {
+
+      console.log(
+        'SERVER TEST:',
+        result
+      );
+
+
+      if (
+        result &&
+        result.success === true
+      ) {
+
+        setStatus(
+          '🟢 Server terhubung.'
+        );
+
+      }
+
+    }
+  )
+
+  .catch(
+    function(error) {
+
+      console.error(
+        'SERVER TEST ERROR:',
+        error
+      );
+
+      setStatus(
+        '🔴 Koneksi Apps Script gagal.'
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   START SCANNER
+============================================================ */
+
+if (startButton) {
+
+  startButton.addEventListener(
+    'click',
+    function() {
+
+      prepareSpeech();
+
+      speak(
+        'Scanner siap'
+      );
+
+      startScanner();
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   SCAN LAGI
+============================================================ */
+
+if (scanAgainButton) {
+
+  scanAgainButton.addEventListener(
+    'click',
+    function() {
+
+      restartScanner();
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   AUTO SCAN
+============================================================ */
+
+if (autoScanToggle) {
+
+  autoScanToggle.addEventListener(
+    'change',
+    function() {
+
+      if (
+        autoScanToggle.checked
+      ) {
+
+        if (autoScanLabel) {
+
+          autoScanLabel.textContent =
+            'AKTIF';
+
+        }
+
+      }
+
+      else {
+
+        if (autoScanLabel) {
+
+          autoScanLabel.textContent =
+            'MATI';
+
+        }
+
+      }
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   FILTER JUMLAH
+============================================================ */
+
+const attendanceLimit =
+  document.getElementById(
+    'attendanceLimit'
+  );
+
+
+if (attendanceLimit) {
+
+  attendanceLimit.addEventListener(
+    'change',
+    function() {
+
+      const value =
+        attendanceLimit.value;
+
+
+      if (
+        value === 'all'
+      ) {
+
+        attendanceDisplayLimit =
+          0;
+
+      }
+
+      else {
+
+        attendanceDisplayLimit =
+          Number(value) || 10;
+
+      }
+
+
+      renderAttendanceByLimit();
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   SCANNER
+============================================================ */
+
+function startScanner() {
+
+  processingScan =
+    false;
+
+
+  if (resultElement) {
+
+    resultElement.style.display =
+      'none';
+
+  }
+
+
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'block';
+
+  }
+
+
+  setStatus(
+    '📷 Memeriksa kamera...'
+  );
+
+
+  if (
+    typeof Html5Qrcode ===
+    'undefined'
+  ) {
+
+    setStatus(
+      '🔴 Library scanner tidak tersedia.'
+    );
+
+    return;
+
+  }
+
+
+  if (
+    html5QrCode &&
+    scannerRunning
+  ) {
+
+    stopScanner()
+      .finally(
+        getCameraAndStart
+      );
+
+  }
+
+  else {
+
+    getCameraAndStart();
+
+  }
+
+}
+
+
+/* ============================================================
+   KAMERA
+============================================================ */
+
+function getCameraAndStart() {
+
+  setStatus(
+    '📷 Meminta izin kamera...'
+  );
+
+
+  Html5Qrcode
+    .getCameras()
+
+    .then(
+      function(cameras) {
+
+        if (
+          !cameras ||
+          cameras.length === 0
+        ) {
+
+          throw new Error(
+            'Kamera tidak ditemukan.'
+          );
+
+        }
+
+
+        let camera =
+          cameras[0];
+
+
+        for (
+          let i = 0;
+          i < cameras.length;
+          i++
+        ) {
+
+          const label =
+            String(
+              cameras[i].label || ''
+            )
+            .toLowerCase();
+
+
+          if (
+            label.includes('back') ||
+            label.includes('rear') ||
+            label.includes('environment') ||
+            label.includes('belakang')
+          ) {
+
+            camera =
+              cameras[i];
+
+            break;
+
+          }
+
+        }
+
+
+        startCamera(
+          camera.id
+        );
+
+      }
+    )
+
+    .catch(
+      showCameraError
+    );
+
+}
+
+
+/* ============================================================
+   START CAMERA
+============================================================ */
+
+function startCamera(
+  cameraId
+) {
+
+  const reader =
+    document.getElementById(
+      'reader'
+    );
+
+
+  if (!reader) {
+
+    setStatus(
+      '🔴 Area kamera tidak ditemukan.'
+    );
+
+    return;
+
+  }
+
+
+  reader.innerHTML =
+    '';
+
+
+  html5QrCode =
+    new Html5Qrcode(
+      'reader'
+    );
+
+
+  const config = {
+
+    fps: 10,
+
+    qrbox:
+      function(width, height) {
+
+        const size =
+          Math.floor(
+            Math.min(
+              width,
+              height
+            ) * 0.70
+          );
+
+
+        return {
+
+          width: size,
+
+          height: size
+
+        };
+
+      },
+
+    aspectRatio: 1.0
+
+  };
+
+
+  html5QrCode
+
+    .start(
+      cameraId,
+      config,
+      onScanSuccess,
+      onScanError
+    )
+
+    .then(
+      function() {
+
+        scannerRunning =
+          true;
+
+
+        setStatus(
+          '🟢 SIAP SCAN KARTU'
+        );
+
+
+        if (startButton) {
+
+          startButton.style.display =
+            'none';
+
+        }
+
+      }
+    )
+
+    .catch(
+      showCameraError
+    );
+
+}
+
+
+/* ============================================================
+   QR BERHASIL
+============================================================ */
+
+function onScanSuccess(
+  decodedText
+) {
+
+  if (
+    processingScan
+  ) {
+
+    return;
+
+  }
+
+
+  processingScan =
+    true;
+
+
+  const studentId =
+    String(
+      decodedText || ''
+    ).trim();
+
+
+  console.log(
+    'QR:',
+    studentId
+  );
+
+
+  stopScanner()
+    .finally(
+      function() {
+
+        showProcessing();
+
+        processAttendance(
+          studentId
+        );
+
+      }
+    );
+
+}
+
+
+/* ============================================================
+   QR ERROR NORMAL
+============================================================ */
+
+function onScanError() {}
+
+
+/* ============================================================
+   PROCESSING
+============================================================ */
+
+function showProcessing() {
+
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'none';
+
+  }
+
+
+  if (resultElement) {
+
+    resultElement.style.display =
+      'block';
+
+    resultElement.className =
+      'result';
+
+  }
+
+
+  if (resultIconElement) {
+
+    resultIconElement.textContent =
+      '⏳';
+
+  }
+
+
+  if (resultTitleElement) {
+
+    resultTitleElement.textContent =
+      'MEMPROSES ABSENSI';
+
+  }
+
+
+  if (resultMessageElement) {
+
+    resultMessageElement.textContent =
+      'Menghubungkan ke server...';
+
+  }
+
+
+  if (studentIdElement) {
+
+    studentIdElement.textContent =
+      'Mohon tunggu...';
+
+  }
+
+}
+
+
+/* ============================================================
+   ABSENSI API
+============================================================ */
+
+function processAttendance(
+  studentId
+) {
+
+  const url =
+    API_URL +
+    '?action=attendance' +
+    '&studentId=' +
+    encodeURIComponent(
+      studentId
+    ) +
+    '&_=' +
+    Date.now();
+
+
+  fetch(url)
+
+    .then(
+      function(response) {
+
+        if (!response.ok) {
+
+          throw new Error(
+            'HTTP ' +
+            response.status
+          );
+
+        }
+
+
+        return response.json();
+
+      }
+    )
+
+    .then(
+      handleAttendanceResult
+    )
+
+    .catch(
+      function(error) {
+
+        console.error(
+          'ATTENDANCE API ERROR:',
+          error
+        );
+
+
+        countError++;
+
+        updateCounters();
+
+
+        showAttendanceError(
+          'KONEKSI GAGAL',
+          'Tidak dapat terhubung ke server Apps Script.'
+        );
+
+
+        speak(
+          'Koneksi gagal'
+        );
+
+
+        scheduleNextScan();
+
+      }
+    );
+
+}
+
+
+/* ============================================================
+   HASIL ABSENSI
+============================================================ */
+
+function handleAttendanceResult(
+  result
+) {
+
+  console.log(
+    'ATTENDANCE RESULT:',
+    result
+  );
+
+
+  if (!result) {
+
+    showAttendanceError(
+      'ERROR SERVER',
+      'Server tidak memberikan data.'
+    );
+
+    scheduleNextScan();
+
+    return;
+
+  }
+
+
+  switch (
+    result.status
+  ) {
+
+    case 'SUCCESS':
+
+      handleSuccess(
+        result
+      );
+
+      break;
+
+
+    case 'ALREADY':
+
+      handleAlready(
+        result
+      );
+
+      break;
+
+
+    case 'NOT_FOUND':
+
+      countError++;
+
+      updateCounters();
+
+      showAttendanceError(
+        'DATA TIDAK DITEMUKAN',
+        result.message ||
+        'Kartu tidak terdaftar.'
+      );
+
+      speak(
+        'Kartu tidak terdaftar'
+      );
+
+      scheduleNextScan();
+
+      break;
+
+
+    case 'INACTIVE':
+
+      countError++;
+
+      updateCounters();
+
+      showAttendanceError(
+        'SISWA TIDAK AKTIF',
+        result.message ||
+        'Siswa tidak aktif.'
+      );
+
+      speak(
+        'Siswa tidak aktif'
+      );
+
+      scheduleNextScan();
+
+      break;
+
+
+    default:
+
+      countError++;
+
+      updateCounters();
+
+      showAttendanceError(
+        'ABSENSI GAGAL',
+        result.message ||
+        'Terjadi kesalahan server.'
+      );
+
+      scheduleNextScan();
+
+  }
+
+}
+
+
+/* ============================================================
+   BERHASIL
+============================================================ */
+
+function handleSuccess(
+  result
+) {
+
+  const student =
+    result.student || {};
+
+  const attendance =
+    result.attendance || {};
+
+
+  const status =
+    String(
+      attendance.status || ''
+    );
+
+
+  if (
+    status
+      .toLowerCase()
+      .includes('terlambat')
+  ) {
+
+    countLate++;
+
+  }
+
+  else {
+
+    countPresent++;
+
+  }
+
+
+  updateCounters();
+
+
+  if (resultElement) {
+
+    resultElement.style.display =
+      'block';
+
+    resultElement.className =
+      status
+        .toLowerCase()
+        .includes('terlambat')
+        ? 'result late'
+        : 'result success';
+
+  }
+
+
+  if (resultIconElement) {
+
+    resultIconElement.textContent =
+      status
+        .toLowerCase()
+        .includes('terlambat')
+        ? '🟡'
+        : '🟢';
+
+  }
+
+
+  if (resultTitleElement) {
+
+    resultTitleElement.textContent =
+      status
+        .toLowerCase()
+        .includes('terlambat')
+        ? 'TERLAMBAT'
+        : 'ABSENSI BERHASIL';
+
+  }
+
+
+  if (resultMessageElement) {
+
+    resultMessageElement.textContent =
+      'Absensi berhasil dicatat.';
+
+  }
+
+
+  if (studentIdElement) {
+
+    studentIdElement.innerHTML =
+
+      '<strong>' +
+      escapeHtml(student.nama) +
+      '</strong>' +
+
+      '<br>' +
+
+      '<span>' +
+      escapeHtml(student.kelas) +
+      '</span>' +
+
+      '<br><br>' +
+
+      '<strong>' +
+      escapeHtml(status) +
+      '</strong>' +
+
+      '<br>' +
+
+      '<small>' +
+      escapeHtml(
+        attendance.tanggal
+      ) +
+      ' • ' +
+      escapeHtml(
+        attendance.jam
+      ) +
+      ' WIB</small>';
+
+  }
+
+
+  speak(
+    status
+      .toLowerCase()
+      .includes('terlambat')
+      ? 'Terlambat'
+      : 'Absensi berhasil'
+  );
+
+
+  setTimeout(
+    function() {
+
+      loadTodaySummary();
+
+      loadTodayAttendanceList();
+
+    },
+    SUMMARY_REFRESH_DELAY
+  );
+
+
+  scheduleNextScan();
+
+}
+
+
+/* ============================================================
+   SUDAH ABSEN
+============================================================ */
+
+function handleAlready(
+  result
+) {
+
+  const student =
+    result.student || {};
+
+  const previous =
+    result.previousAttendance || {};
+
+
+  countAlready++;
+
+  updateCounters();
+
+
+  if (resultElement) {
+
+    resultElement.style.display =
+      'block';
+
+    resultElement.className =
+      'result already';
+
+  }
+
+
+  if (resultIconElement) {
+
+    resultIconElement.textContent =
+      '🟠';
+
+  }
+
+
+  if (resultTitleElement) {
+
+    resultTitleElement.textContent =
+      'SUDAH ABSEN';
+
+  }
+
+
+  if (resultMessageElement) {
+
+    resultMessageElement.textContent =
+      'Siswa sudah melakukan absensi hari ini.';
+
+  }
+
+
+  if (studentIdElement) {
+
+    studentIdElement.innerHTML =
+
+      '<strong>' +
+      escapeHtml(student.nama) +
+      '</strong>' +
+
+      '<br>' +
+
+      '<span>' +
+      escapeHtml(student.kelas) +
+      '</span>' +
+
+      '<br><br>' +
+
+      'Status: <strong>' +
+
+      escapeHtml(
+        previous.status
+      ) +
+
+      '</strong>' +
+
+      '<br>' +
+
+      '<small>Absen pukul ' +
+
+      escapeHtml(
+        previous.jam
+      ) +
+
+      '</small>';
+
+  }
+
+
+  speak(
+    'Siswa sudah absen'
+  );
+
+
+  loadTodaySummary();
+
+  loadTodayAttendanceList();
+
+
+  scheduleNextScan();
+
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+function showAttendanceError(
+  title,
+  message
+) {
+
+  if (resultElement) {
+
+    resultElement.style.display =
+      'block';
+
+    resultElement.className =
+      'result error';
+
+  }
+
+
+  if (resultIconElement) {
+
+    resultIconElement.textContent =
+      '🔴';
+
+  }
+
+
+  if (resultTitleElement) {
+
+    resultTitleElement.textContent =
+      title;
+
+  }
+
+
+  if (resultMessageElement) {
+
+    resultMessageElement.textContent =
+      '';
+
+  }
+
+
+  if (studentIdElement) {
+
+    studentIdElement.textContent =
+      message;
+
+  }
+
+}
+
+
+/* ============================================================
+   RESTART
+============================================================ */
+
+function restartScanner() {
+
+  processingScan =
+    false;
+
+
+  if (resultElement) {
+
+    resultElement.style.display =
+      'none';
+
+  }
+
+
+  if (scannerCard) {
+
+    scannerCard.style.display =
+      'block';
+
+  }
+
+
+  startScanner();
+
+}
+
+
+/* ============================================================
+   STOP
+============================================================ */
+
+function stopScanner() {
+
+  return new Promise(
+    function(resolve) {
+
+      if (
+        !html5QrCode ||
+        !scannerRunning
+      ) {
+
+        scannerRunning =
+          false;
+
+        resolve();
+
+        return;
+
+      }
+
+
+      html5QrCode
+
+        .stop()
+
+        .then(
+          function() {
+
+            scannerRunning =
+              false;
+
+            resolve();
+
+          }
+        )
+
+        .catch(
+          function(error) {
+
+            console.warn(
+              'STOP CAMERA:',
+              error
+            );
+
+            scannerRunning =
+              false;
+
+            resolve();
+
+          }
+        );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   AUTO SCAN
+============================================================ */
+
+function scheduleNextScan() {
+
+  if (
+    !autoScanToggle ||
+    !autoScanToggle.checked
+  ) {
+
+    return;
+
+  }
+
+
+  setTimeout(
+    restartScanner,
+    AUTO_SCAN_DELAY
+  );
+
+}
+
+
+/* ============================================================
+   COUNTER
+============================================================ */
+
+function updateCounters() {
+
+  const total =
+    countPresent +
+    countLate;
+
+
+  setText(
+    'countTotal',
+    total
+  );
+
+  setText(
+    'countPresent',
+    countPresent
+  );
+
+  setText(
+    'countLate',
+    countLate
+  );
+
+  setText(
+    'countAlready',
+    countAlready
+  );
+
+  setText(
+    'countError',
+    countError
+  );
+
+}
+
+
+/* ============================================================
+   SUMMARY
+============================================================ */
+
+function loadTodaySummary() {
+
+  fetch(
+    API_URL +
+    '?action=summary&_=' +
+    Date.now()
+  )
+
+  .then(
+    function(response) {
+
+      if (!response.ok) {
+
+        throw new Error(
+          'HTTP ' +
+          response.status
+        );
+
+      }
+
+
+      return response.json();
+
+    }
+  )
+
+  .then(
+    function(result) {
+
+      console.log(
+        'SUMMARY:',
+        result
+      );
+
+
+      if (
+        !result ||
+        result.success !== true
+      ) {
+
+        throw new Error(
+          result &&
+          result.message
+            ? result.message
+            : 'Summary tidak valid.'
+        );
+
+      }
+
+
+      countPresent =
+        Number(
+          result.hadir || 0
+        );
+
+
+      countLate =
+        Number(
+          result.terlambat || 0
+        );
+
+
+      /*
+       * Jangan menjumlahkan "sudahAbsen"
+       * sebagai counter baru.
+       *
+       * Total siswa =
+       * Hadir + Terlambat
+       */
+
+      updateCounters();
+
+    }
+  )
+
+  .catch(
+    function(error) {
+
+      console.error(
+        'SUMMARY ERROR:',
+        error
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   LOAD DAFTAR ABSENSI
+============================================================ */
+
+function loadTodayAttendanceList() {
+
+  console.log(
+    'Memuat daftar absensi...'
+  );
+
+
+  showAttendanceLoading();
+
+
+  fetch(
+    API_URL +
+    '?action=todayAttendance&_=' +
+    Date.now()
+  )
+
+  .then(
+    function(response) {
+
+      if (!response.ok) {
+
+        throw new Error(
+          'HTTP ' +
+          response.status
+        );
+
+      }
+
+
+      return response.json();
+
+    }
+  )
+
+  .then(
+    function(result) {
+
+      console.log(
+        'DAFTAR ABSENSI:',
+        result
+      );
+
+
+      if (
+        !result ||
+        result.success !== true
+      ) {
+
+        throw new Error(
+          result &&
+          result.message
+            ? result.message
+            : 'Data absensi tidak valid.'
+        );
+
+      }
+
+
+      renderTodayAttendance(
+        result.data || []
+      );
+
+    }
+  )
+
+  .catch(
+    function(error) {
+
+      console.error(
+        'ATTENDANCE LIST ERROR:',
+        error
+      );
+
+
+      showAttendanceListError(
+        error.message ||
+        'Gagal mengambil data absensi.'
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   RENDER DAFTAR
+============================================================ */
+
+function renderTodayAttendance(
+  data
+) {
+
+  if (!Array.isArray(data)) {
+
+    data = [];
+
+  }
+
+
+  todayAttendanceData =
+    normalizeAttendanceData(
+      data
+    );
+
+
+  updateAttendanceTotal(
+    todayAttendanceData.length
+  );
+
+
+  const empty =
+    document.getElementById(
+      'attendanceEmpty'
+    );
+
+
+  if (
+    todayAttendanceData.length === 0
+  ) {
+
+    if (empty) {
+
+      empty.style.display =
+        'block';
+
+    }
+
+
+    hideAttendanceLayouts();
+
+
+    updateAttendanceDisplayInfo(
+      0,
+      0
+    );
+
+
+    hideAttendanceLoading();
+
+
+    return;
+
+  }
+
+
+  if (empty) {
+
+    empty.style.display =
+      'none';
+
+  }
+
+
+  hideAttendanceLoading();
+
+
+  renderAttendanceByLimit();
+
+}
+
+
+/* ============================================================
+   FILTER RENDER
+============================================================ */
+
+function renderAttendanceByLimit() {
+
+  const total =
+    todayAttendanceData.length;
+
+
+  let displayData;
+
+
+  if (
+    attendanceDisplayLimit === 0
+  ) {
+
+    displayData =
+      todayAttendanceData.slice();
+
+  }
+
+  else {
+
+    displayData =
+      todayAttendanceData.slice(
+        0,
+        attendanceDisplayLimit
+      );
+
+  }
+
+
+  renderAttendanceTable(
+    displayData
+  );
+
+
+  renderAttendanceCards(
+    displayData
+  );
+
+
+  updateAttendanceDisplayInfo(
+    displayData.length,
+    total
+  );
+
+
+  showAttendanceLayouts();
+
+}
+
+
+/* ============================================================
+   NORMALISASI
+============================================================ */
+
+function normalizeAttendanceData(
+  data
+) {
+
+  return data.map(
+    function(item) {
+
+      return {
+
+        nama:
+          String(
+            item.nama ||
+            item.NAMA ||
+            item.name ||
+            '-'
+          ),
+
+        kelas:
+          String(
+            item.kelas ||
+            item.KELAS ||
+            item.class ||
+            '-'
+          ),
+
+        jam:
+          String(
+            item.jam ||
+            item.JAM ||
+            item.time ||
+            '-'
+          ),
+
+        status:
+          String(
+            item.status ||
+            item.STATUS ||
+            '-'
+          )
+
+      };
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+function renderAttendanceTable(
+  data
+) {
+
+  const tbody =
+    document.getElementById(
+      'attendanceTableBody'
+    );
+
+
+  if (!tbody) {
+
+    return;
+
+  }
+
+
+  tbody.innerHTML =
+    '';
+
+
+  data.forEach(
+    function(student, index) {
+
+      const row =
+        document.createElement(
+          'tr'
+        );
+
+
+      row.innerHTML =
+
+        '<td class="rank-column">' +
+
+        getRankHtml(
+          index + 1
+        ) +
+
+        '</td>' +
+
+        '<td>' +
+
+        '<span class="student-name">' +
+
+        escapeHtml(
+          student.nama
+        ) +
+
+        '</span>' +
+
+        '</td>' +
+
+        '<td>' +
+
+        '<span class="student-class">' +
+
+        escapeHtml(
+          student.kelas
+        ) +
+
+        '</span>' +
+
+        '</td>' +
+
+        '<td>' +
+
+        '🕐 ' +
+
+        escapeHtml(
+          student.jam
+        ) +
+
+        '</td>' +
+
+        '<td>' +
+
+        getStatusBadgeHtml(
+          student.status
+        ) +
+
+        '</td>';
+
+
+      tbody.appendChild(
+        row
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   MOBILE CARD
+============================================================ */
+
+function renderAttendanceCards(
+  data
+) {
+
+  const container =
+    document.getElementById(
+      'attendanceCardList'
+    );
+
+
+  if (!container) {
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    '';
+
+
+  data.forEach(
+    function(student, index) {
+
+      const card =
+        document.createElement(
+          'div'
+        );
+
+
+      card.className =
+        'attendance-card';
+
+
+      card.innerHTML =
+
+        '<div class="attendance-card-rank">' +
+
+        getRankHtml(
+          index + 1
+        ) +
+
+        '</div>' +
+
+        '<div class="attendance-card-content">' +
+
+        '<div class="attendance-card-name">' +
+
+        escapeHtml(
+          student.nama
+        ) +
+
+        '</div>' +
+
+        '<div class="attendance-card-class">' +
+
+        'Kelas ' +
+
+        escapeHtml(
+          removeKelasPrefix(
+            student.kelas
+          )
+        ) +
+
+        '</div>' +
+
+        '<div class="attendance-card-bottom">' +
+
+        '<span>🕐 ' +
+
+        escapeHtml(
+          student.jam
+        ) +
+
+        '</span>' +
+
+        getStatusBadgeHtml(
+          student.status
+        ) +
+
+        '</div>' +
+
+        '</div>';
+
+
+      container.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+/* ============================================================
+   RANK
+============================================================ */
+
+function getRankHtml(
+  rank
+) {
+
+  if (rank === 1)
+    return '🥇';
+
+  if (rank === 2)
+    return '🥈';
+
+  if (rank === 3)
+    return '🥉';
+
+  return String(rank);
+
+}
+
+
+/* ============================================================
+   STATUS BADGE
+============================================================ */
+
+function getStatusBadgeHtml(
+  status
+) {
+
+  const text =
+    String(
+      status || '-'
+    );
+
+
+  const lower =
+    text.toLowerCase();
+
+
+  if (
+    lower.includes(
+      'terlambat'
+    )
+  ) {
+
+    return (
+
+      '<span class="status-badge status-terlambat">' +
+
+      '🟡 ' +
+
+      escapeHtml(
+        text
+      ) +
+
+      '</span>'
+
+    );
+
+  }
+
+
+  if (
+    lower.includes(
+      'hadir'
+    )
+  ) {
+
+    return (
+
+      '<span class="status-badge status-hadir">' +
+
+      '🟢 ' +
+
+      escapeHtml(
+        text
+      ) +
+
+      '</span>'
+
+    );
+
+  }
+
+
+  return (
+
+    '<span class="status-badge status-other">' +
+
+    escapeHtml(
+      text
+    ) +
+
+    '</span>'
+
+  );
+
+}
+
+
+/* ============================================================
+   TOTAL
+============================================================ */
+
+function updateAttendanceTotal(
+  total
+) {
+
+  setText(
+    'attendanceTotal',
+    Number(total || 0)
+  );
+
+}
+
+
+/* ============================================================
+   INFO
+============================================================ */
+
+function updateAttendanceDisplayInfo(
+  displayed,
+  total
+) {
+
+  const element =
+    document.getElementById(
+      'attendanceDisplayInfo'
+    );
+
+
+  if (!element) {
+
+    return;
+
+  }
+
+
+  if (total === 0) {
+
+    element.textContent =
+      'Belum ada siswa yang melakukan absensi hari ini.';
+
+    return;
+
+  }
+
+
+  if (
+    displayed >= total
+  ) {
+
+    element.textContent =
+      'Menampilkan seluruh ' +
+      total +
+      ' siswa yang sudah absen hari ini.';
+
+    return;
+
+  }
+
+
+  element.textContent =
+    'Menampilkan ' +
+    displayed +
+    ' dari ' +
+    total +
+    ' siswa yang sudah absen hari ini.';
+
+}
+
+
+/* ============================================================
+   SHOW / HIDE
+============================================================ */
+
+function showAttendanceLayouts() {
+
+  const desktop =
+    document.getElementById(
+      'attendanceDesktop'
+    );
+
+  const mobile =
+    document.getElementById(
+      'attendanceMobile'
+    );
+
+
+  if (desktop) {
+
+    desktop.style.display =
+      '';
+
+  }
+
+
+  if (mobile) {
+
+    mobile.style.display =
+      '';
+
+  }
+
+}
+
+
+function hideAttendanceLayouts() {
+
+  const desktop =
+    document.getElementById(
+      'attendanceDesktop'
+    );
+
+  const mobile =
+    document.getElementById(
+      'attendanceMobile'
+    );
+
+
+  if (desktop) {
+
+    desktop.style.display =
+      'none';
+
+  }
+
+
+  if (mobile) {
+
+    mobile.style.display =
+      'none';
+
+  }
+
+}
+
+
+/* ============================================================
+   LOADING
+============================================================ */
+
+function showAttendanceLoading() {
+
+  const loading =
+    document.getElementById(
+      'attendanceLoading'
+    );
+
+
+  if (loading) {
+
+    loading.style.display =
+      'flex';
+
+  }
+
+}
+
+
+function hideAttendanceLoading() {
+
+  const loading =
+    document.getElementById(
+      'attendanceLoading'
+    );
+
+
+  if (loading) {
+
+    loading.style.display =
+      'none';
+
+  }
+
+}
+
+
+/* ============================================================
+   ERROR LIST
+============================================================ */
+
+function showAttendanceListError(
+  message
+) {
+
+  const loading =
+    document.getElementById(
+      'attendanceLoading'
+    );
+
+
+  if (!loading) {
+
+    return;
+
+  }
+
+
+  loading.style.display =
+    'flex';
+
+
+  loading.innerHTML =
+
+    '<div style="text-align:center;padding:20px;color:#dc2626;">' +
+
+    '🔴 ' +
+
+    escapeHtml(
+      message
+    ) +
+
+    '<br><br>' +
+
+    '<button onclick="loadTodayAttendanceList()">' +
+
+    '🔄 Coba Lagi' +
+
+    '</button>' +
+
+    '</div>';
+
+}
+
+
+/* ============================================================
+   REFRESH
+============================================================ */
+
+function refreshAttendanceList() {
+
+  loadTodayAttendanceList();
+
+}
+
+
+/* ============================================================
+   TAMPILKAN SEMUA
+============================================================ */
+
+function showAllAttendance() {
+
+  attendanceDisplayLimit =
+    0;
+
+
+  const selector =
+    document.getElementById(
+      'attendanceLimit'
+    );
+
+
+  if (selector) {
+
+    selector.value =
+      'all';
+
+  }
+
+
+  renderAttendanceByLimit();
+
+}
+
+
+/* ============================================================
+   HELPER TEXT
+============================================================ */
+
+function setText(
+  id,
+  value
+) {
+
+  const element =
+    document.getElementById(
+      id
+    );
+
+
+  if (element) {
+
+    element.textContent =
+      value;
+
+  }
+
+}
+
+
+/* ============================================================
+   TANGGAL & JAM
+============================================================ */
+
+function updateDateTime() {
+
+  const now =
+    new Date();
+
+
+  setText(
+    'currentDate',
+    now.toLocaleDateString(
+      'id-ID',
+      {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }
+    )
+  );
+
+
+  setText(
+    'currentTime',
+    now.toLocaleTimeString(
+      'id-ID',
+      {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      }
+    )
+  );
+
+
+  setText(
+    'attendanceDate',
+    now.toLocaleDateString(
+      'id-ID',
+      {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }
+    )
+  );
+
+}
+
+
+/* ============================================================
+   AUDIO
+============================================================ */
+
+function prepareSpeech() {
+
+  if (
+    'speechSynthesis'
+    in window
+  ) {
+
+    window.speechSynthesis.cancel();
+
+  }
+
+}
+
+
+function speak(
+  text
+) {
+
+  if (
+    !(
+      'speechSynthesis'
+      in window
+    )
+  ) {
+
+    return;
+
+  }
+
+
+  try {
+
+    window.speechSynthesis.cancel();
+
+
+    const utterance =
+      new SpeechSynthesisUtterance(
+        text
+      );
+
+
+    utterance.lang =
+      'id-ID';
+
+    utterance.rate =
+      0.9;
+
+    utterance.pitch =
+      1;
+
+    utterance.volume =
+      1;
+
+
+    window.speechSynthesis.speak(
+      utterance
+    );
+
+  }
+
+  catch(error) {
+
+    console.error(
+      'SPEECH ERROR:',
+      error
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+function setStatus(
+  message
+) {
+
+  if (statusElement) {
+
+    statusElement.textContent =
+      message;
+
+  }
+
+
+  console.log(
+    'STATUS:',
+    message
+  );
+
+}
+
+
+/* ============================================================
+   CAMERA ERROR
+============================================================ */
+
+function showCameraError(
+  error
+) {
+
+  console.error(
+    'CAMERA ERROR:',
+    error
+  );
+
+
+  let message =
+    'Kamera gagal diakses.';
+
+
+  if (error) {
+
+    if (error.message) {
+
+      message +=
+        ' ' +
+        error.message;
+
+    }
+
+  }
+
+
+  setStatus(
+    '🔴 ' +
+    message
+  );
+
+
+  if (startButton) {
+
+    startButton.style.display =
+      'block';
+
+  }
+
+}
+
+
+/* ============================================================
+   REMOVE PREFIX KELAS
+============================================================ */
+
+function removeKelasPrefix(
+  value
+) {
+
+  return String(
+    value || ''
+  )
+  .replace(
+    /^kelas\s+/i,
+    ''
+  )
+  .trim();
+
+}
+
+
+/* ============================================================
+   ESCAPE HTML
+============================================================ */
+
+function escapeHtml(
+  value
+) {
+
+  return String(
+    value ?? ''
+  )
+  .replace(
+    /&/g,
+    '&amp;'
+  )
+  .replace(
+    /</g,
+    '&lt;'
+  )
+  .replace(
+    />/g,
+    '&gt;'
+  )
+  .replace(
+    /"/g,
+    '&quot;'
+  )
+  .replace(
+    /'/g,
+    '&#039;'
+  );
+
+}
 
 const CONFIG = {
-  SPREADSHEET_ID: '', // Kosongkan jika script terikat langsung dengan Spreadsheet
+
+  SPREADSHEET_ID: '',
+
   SHEET_SISWA: 'SISWA',
+
   SHEET_ABSENSI: 'ABSENSI',
+
   SHEET_LOG: 'LOG',
+
   TIMEZONE: 'Asia/Jakarta',
-  JAM_MASUK: '07:00',
-  BATAS_TERLAMBAT: '07:20'
-};
 
-// Ganti bagian API_URL di dalam app.js Anda dengan URL yang baru disalin
-const API_URL = "https://script.google.com/macros/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec";
+  JAM_MASUK:
+    '07:00',
 
-/* ============================================================
-   DO GET - PINTU MASUK API UTAMA
-============================================================ */
-function doGet(e) {
-  let action = 'test';
-  try {
-    if (e && e.parameter && e.parameter.action) {
-      action = String(e.parameter.action).trim();
-    }
+  BATAS_TERLAMBAT:
+    '07:30'
 
-    console.log('API Action: ' + action);
-
-    if (action === 'test' || action === 'serverTime') {
-      const serverTime = getCurrentDateTime();
-      writeLog('TEST', 'ONLINE', '', '', '', 'ONLINE', 'Pengecekan koneksi Apps Script berhasil');
-      return jsonResponse({
-        success: true,
-        status: 'ONLINE',
-        message: 'Apps Script V6.3 aktif & sinkron 100%.',
-        serverTime: serverTime
-      });
-    }
-
-    if (action === 'attendance') {
-      return handleAttendance(e.parameter.studentId);
-    }
-
-    if (action === 'summary') {
-      return handleSummary();
-    }
-
-    if (action === 'todayAttendance' || action === 'todayAttendanceList' || action === 'attendanceList') {
-      return handleTodayAttendance();
-    }
-
-    writeLog('API', 'INVALID_ACTION', '', '', '', 'INVALID', 'Action tidak dikenal: ' + action);
-    return jsonResponse({
-      success: false,
-      status: 'INVALID_ACTION',
-      message: 'Action tidak dikenal: ' + action
-    });
-
-  } catch (error) {
-    console.error('DO GET ERROR: ' + error.message);
-    writeLog('ERROR', 'SERVER_ERROR', '', '', '', 'ERROR', error.message || String(error));
-    return jsonResponse({
-      success: false,
-      status: 'SERVER_ERROR',
-      message: error.message || String(error)
-    });
-  }
-}
-
-function jsonResponse(data) {
-  return ContentService
-    .createTextOutput(JSON.stringify(data))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function getSpreadsheet() {
-  if (CONFIG.SPREADSHEET_ID && String(CONFIG.SPREADSHEET_ID).trim() !== '') {
-    return SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  }
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  if (!ss) {
-    throw new Error('Spreadsheet tidak ditemukan. Periksa konfigurasi ID.');
-  }
-  return ss;
-}
-
-function getSheet(name) {
-  const ss = getSpreadsheet();
-  const sheet = ss.getSheetByName(name);
-  if (!sheet) {
-    throw new Error('Sheet "' + name + '" tidak ditemukan.');
-  }
-  return sheet;
-}
-
-function getCurrentDateTime() {
-  const now = new Date();
-  return {
-    tanggal: Utilities.formatDate(now, CONFIG.TIMEZONE, 'yyyy-MM-dd'),
-    jam: Utilities.formatDate(now, CONFIG.TIMEZONE, 'HH:mm:ss'),
-    timestamp: now.getTime()
-  };
-}
-
-/* ============================================================
-   LOGIKA ABSENSI (100% SINKRON DENGAN 19 KOLOM SHEET ABSENSI)
-============================================================ */
-function handleAttendance(studentId) {
-  studentId = String(studentId || '').trim();
-
-  if (!studentId) {
-    writeLog('ATTENDANCE', 'EMPTY_ID', '', '', '', 'FAIL', 'Student ID kosong');
-    return jsonResponse({
-      success: false,
-      status: 'NOT_FOUND',
-      message: 'Student ID kosong.'
-    });
-  }
-
-  try {
-    // 1. CARI DATA SISWA
-    const student = findStudent(studentId);
-
-    if (!student) {
-      writeLog('SCAN', 'NOT_FOUND', studentId, '', '', 'FAIL', 'Data siswa tidak ditemukan');
-      return jsonResponse({
-        success: false,
-        status: 'NOT_FOUND',
-        message: 'Data siswa tidak ditemukan.'
-      });
-    }
-
-    // 2. CEK STATUS SISWA
-    if (!isStudentActive(student)) {
-      writeLog('ATTENDANCE', 'INACTIVE', student.studentId, student.nama, student.kelas, 'FAIL', 'Siswa tidak aktif');
-      return jsonResponse({
-        success: false,
-        status: 'INACTIVE',
-        message: 'Siswa tidak aktif.',
-        student: student
-      });
-    }
-
-    // 3. CEK DOUBLE ABSEN HARI INI
-    const previous = findTodayAttendance(studentId);
-    if (previous) {
-      writeLog('ATTENDANCE', 'ALREADY', student.studentId, student.nama, student.kelas, 'DUPLICATE', 'Siswa sudah absen hari ini');
-      return jsonResponse({
-        success: true,
-        status: 'ALREADY',
-        message: 'Siswa sudah melakukan absensi hari ini.',
-        student: student,
-        previousAttendance: previous
-      });
-    }
-
-    // 4. PENENTUAN STATUS HADIR / TERLAMBAT
-    const now = new Date();
-    const tanggal = Utilities.formatDate(now, CONFIG.TIMEZONE, 'yyyy-MM-dd');
-    const jam = Utilities.formatDate(now, CONFIG.TIMEZONE, 'HH:mm:ss');
-    const status = determineAttendanceStatus(now);
-    const absensiId = 'ABS' + Utilities.formatDate(now, CONFIG.TIMEZONE, 'yyMMddHHmmss');
-
-    // 5. PENULISAN 19 KOLOM KE SHEET ABSENSI
-    const sheetAbsensi = getSheet(CONFIG.SHEET_ABSENSI);
-    const rowAbsensi = [
-      absensiId,          // [0] ABSENSI_ID
-      now,                // [1] TIMESTAMP
-      tanggal,            // [2] TANGGAL
-      jam,                // [3] JAM
-      student.studentId,  // [4] STUDENT_ID
-      student.nama,       // [5] NAMA
-      student.kelasId,    // [6] KELAS_ID
-      student.kelas,      // [7] KELAS
-      '-',                // [8] JADWAL_ID
-      '-',                // [9] JAM_KE
-      '-',                // [10] MAPEL_ID
-      '-',                // [11] MAPEL
-      '-',                // [12] GURU_ID
-      '-',                // [13] GURU
-      status,             // [14] STATUS (Hadir / Terlambat)
-      'Masuk',            // [15] JENIS
-      'QR',               // [16] METODE
-      '-',                // [17] CATATAN
-      'Sistem'            // [18] PETUGAS
-    ];
-
-    sheetAbsensi.appendRow(rowAbsensi);
-    SpreadsheetApp.flush();
-
-    writeLog('ATTENDANCE', 'SUCCESS', student.studentId, student.nama, student.kelas, status, 'Absensi berhasil dicatat');
-
-    return jsonResponse({
-      success: true,
-      status: 'SUCCESS',
-      message: 'Absensi berhasil dicatat.',
-      student: student,
-      attendance: {
-        tanggal: formatDateValue(now),
-        jam: jam,
-        status: status
-      }
-    });
-
-  } catch (error) {
-    console.error('ATTENDANCE ERROR: ' + error.message);
-    writeLog('ATTENDANCE', 'SERVER_ERROR', studentId, '', '', 'ERROR', error.message || String(error));
-    return jsonResponse({
-      success: false,
-      status: 'SERVER_ERROR',
-      message: error.message || String(error)
-    });
-  }
-}
-
-/* ============================================================
-   PENCARIAN DATA SISWA
-============================================================ */
-function findStudent(studentId) {
-  const sheet = getSheet(CONFIG.SHEET_SISWA);
-  const values = sheet.getDataRange().getValues();
-  if (values.length < 2) return null;
-
-  const headers = values[0].map(h => String(h).trim().toUpperCase());
-  
-  const idIndex = findColumn(headers, ['STUDENT_ID', 'STUDENT ID', 'ID', 'NIS', 'NISN']);
-  const nameIndex = findColumn(headers, ['NAMA', 'NAMA SISWA', 'NAMA_SISWA']);
-  const classIdIndex = findColumn(headers, ['KELAS_ID', 'KELAS ID']);
-  const classIndex = findColumn(headers, ['KELAS', 'CLASS']);
-  const statusIndex = findColumn(headers, ['STATUS', 'STATUS SISWA', 'AKTIF']);
-
-  if (idIndex === -1) throw new Error('Kolom STUDENT_ID pada sheet SISWA tidak ditemukan.');
-
-  for (let i = 1; i < values.length; i++) {
-    const row = values[i];
-    const id = String(row[idIndex] || '').trim();
-
-    if (id === studentId) {
-      return {
-        studentId: id,
-        nama: nameIndex >= 0 ? String(row[nameIndex] || '-').trim() : '-',
-        kelasId: classIdIndex >= 0 ? String(row[classIdIndex] || '-').trim() : (classIndex >= 0 ? String(row[classIndex] || '-').trim() : '-'),
-        kelas: classIndex >= 0 ? String(row[classIndex] || '-').trim() : '-',
-        status: statusIndex >= 0 ? String(row[statusIndex] || 'Aktif').trim() : 'Aktif'
-      };
-    }
-  }
-  return null;
-}
-
-function findColumn(headers, names) {
-  for (let i = 0; i < names.length; i++) {
-    const idx = headers.indexOf(names[i]);
-    if (idx !== -1) return idx;
-  }
-  return -1;
-}
-
-function isStudentActive(student) {
-  const st = String(student.status || '').trim().toLowerCase();
-  if (!st) return true;
-  return !['nonaktif', 'non aktif', 'tidak aktif', 'inactive', 'false', '0'].includes(st);
-}
-
-function determineAttendanceStatus(date) {
-  const time = Utilities.formatDate(date, CONFIG.TIMEZONE, 'HH:mm');
-  return time > CONFIG.BATAS_TERLAMBAT ? 'Terlambat' : 'Hadir';
-}
-
-/* ============================================================
-   CEK ABSEN HARI INI (MENYESUAIKAN KOLOM ABSENSI 19 KOLOM)
-============================================================ */
-function findTodayAttendance(studentId) {
-  const sheet = getSheet(CONFIG.SHEET_ABSENSI);
-  const values = sheet.getDataRange().getValues();
-  if (values.length < 2) return null;
-
-  const today = Utilities.formatDate(new Date(), CONFIG.TIMEZONE, 'yyyy-MM-dd');
-
-  for (let i = values.length - 1; i >= 1; i--) {
-    const row = values[i];
-    const rowStudentId = String(row[4] || '').trim(); // Index 4: STUDENT_ID
-
-    if (rowStudentId !== studentId) continue;
-
-    const rowDate = getSheetDate(row[2]); // Index 2: TANGGAL
-    if (rowDate === today) {
-      return {
-        tanggal: formatDateValue(row[2]),
-        jam: formatTimeValue(row[3]), // Index 3: JAM
-        status: String(row[14] || '').trim() // Index 14: STATUS
-      };
-    }
-  }
-  return null;
-}
-
-/* ============================================================
-   SUMMARY RINGKASAN REKAP
-============================================================ */
-function handleSummary() {
-  try {
-    const sheetAbsensi = getSheet(CONFIG.SHEET_ABSENSI);
-    const values = sheetAbsensi.getDataRange().getValues();
-    const today = Utilities.formatDate(new Date(), CONFIG.TIMEZONE, 'yyyy-MM-dd');
-
-    let hadir = 0;
-    let terlambat = 0;
-
-    if (values.length >= 2) {
-      for (let i = 1; i < values.length; i++) {
-        const row = values[i];
-        const rowDate = getSheetDate(row[2]); // Index 2: TANGGAL
-
-        if (rowDate !== today) continue;
-
-        const status = String(row[14] || '').trim().toLowerCase(); // Index 14: STATUS
-        if (status.includes('terlambat')) {
-          terlambat++;
-        } else if (status.includes('hadir')) {
-          hadir++;
-        }
-      }
-    }
-
-    const totalSiswa = getTotalSiswa();
-    const sudahAbsen = hadir + terlambat;
-    const belumAbsen = Math.max(totalSiswa - sudahAbsen, 0);
-
-    return jsonResponse({
-      success: true,
-      status: 'OK',
-      tanggal: today,
-      hadir: hadir,
-      terlambat: terlambat,
-      total: sudahAbsen,
-      sudahAbsen: sudahAbsen,
-      totalSiswa: totalSiswa,
-      belumAbsen: belumAbsen,
-      error: 0
-    });
-  } catch (error) {
-    writeLog('SUMMARY', 'SERVER_ERROR', '', '', '', 'ERROR', error.message || String(error));
-    return jsonResponse({
-      success: false,
-      status: 'SERVER_ERROR',
-      message: error.message || String(error),
-      hadir: 0, terlambat: 0, total: 0, sudahAbsen: 0, totalSiswa: 0, belumAbsen: 0, error: 1
-    });
-  }
-}
-
-function getTotalSiswa() {
-  const sheet = getSheet(CONFIG.SHEET_SISWA);
-  const values = sheet.getDataRange().getValues();
-  if (values.length < 2) return 0;
-
-  const headers = values[0].map(h => String(h).trim().toUpperCase());
-  const idIndex = findColumn(headers, ['STUDENT_ID', 'STUDENT ID', 'ID', 'NIS', 'NISN']);
-  const statusIndex = findColumn(headers, ['STATUS', 'STATUS SISWA', 'AKTIF']);
-
-  let total = 0;
-  for (let i = 1; i < values.length; i++) {
-    const row = values[i];
-    const id = idIndex >= 0 ? String(row[idIndex] || '').trim() : '';
-    if (!id) continue;
-
-    if (statusIndex >= 0) {
-      const st = String(row[statusIndex] || '').trim().toLowerCase();
-      if (['nonaktif', 'non aktif', 'tidak aktif', 'inactive', 'false', '0'].includes(st)) continue;
-    }
-    total++;
-  }
-  return total;
-}
-
-/* ============================================================
-   DAFTAR ABSENSI HARI INI (MENYESUAIKAN 19 KOLOM)
-============================================================ */
-function handleTodayAttendance() {
-  try {
-    const sheet = getSheet(CONFIG.SHEET_ABSENSI);
-    const values = sheet.getDataRange().getValues();
-    const today = Utilities.formatDate(new Date(), CONFIG.TIMEZONE, 'yyyy-MM-dd');
-    const list = [];
-
-    if (values.length >= 2) {
-      for (let i = 1; i < values.length; i++) {
-        const row = values[i];
-        const rowDate = getSheetDate(row[2]); // Index 2: TANGGAL
-
-        if (rowDate !== today) continue;
-
-        list.push({
-          studentId: String(row[4] || '').trim(), // Index 4: STUDENT_ID
-          nama: String(row[5] || '-').trim(),      // Index 5: NAMA
-          kelas: String(row[7] || '-').trim(),     // Index 7: KELAS
-          jam: formatTimeValue(row[3]),            // Index 3: JAM
-          status: String(row[14] || '-').trim()    // Index 14: STATUS
-        });
-      }
-    }
-
-    list.sort((a, b) => convertTime(a.jam) - convertTime(b.jam));
-    list.forEach((item, index) => { item.rank = index + 1; });
-
-    writeLog('LIST', 'SUCCESS', '', '', '', 'OK', 'Memuat daftar absensi hari ini: ' + list.length + ' data');
-
-    return jsonResponse({
-      success: true,
-      status: 'OK',
-      tanggal: today,
-      total: list.length,
-      data: list
-    });
-
-  } catch (error) {
-    writeLog('LIST', 'SERVER_ERROR', '', '', '', 'ERROR', error.message || String(error));
-    return jsonResponse({
-      success: false,
-      status: 'SERVER_ERROR',
-      message: error.message || String(error),
-      tanggal: Utilities.formatDate(new Date(), CONFIG.TIMEZONE, 'yyyy-MM-dd'),
-      total: 0,
-      data: []
-    });
-  }
-}
-
-/* ============================================================
-   HELPER FORMAT TANGGAL & JAM
-============================================================ */
-function getSheetDate(value) {
-  if (value instanceof Date) {
-    return Utilities.formatDate(value, CONFIG.TIMEZONE, 'yyyy-MM-dd');
-  }
-  const text = String(value || '').trim();
-  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
-  const match = text.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (match) {
-    return match[3] + '-' + String(match[2]).padStart(2, '0') + '-' + String(match[1]).padStart(2, '0');
-  }
-  return '';
-}
-
-function formatDateValue(value) {
-  if (value instanceof Date) {
-    return Utilities.formatDate(value, CONFIG.TIMEZONE, 'dd/MM/yyyy');
-  }
-  return String(value || '-');
-}
-
-function formatTimeValue(value) {
-  if (value instanceof Date) {
-    return Utilities.formatDate(value, CONFIG.TIMEZONE, 'HH:mm:ss');
-  }
-  const text = String(value || '').trim();
-  if (/^\d{1,2}:\d{2}$/.test(text)) return text + ':00';
-  if (/^\d{1,2}:\d{2}:\d{2}$/.test(text)) return text;
-  return text || '-';
-}
-
-function convertTime(value) {
-  const parts = String(value || '').split(':');
-  if (parts.length < 2) return 999999;
-  return Number(parts[0]) * 3600 + Number(parts[1]) * 60 + Number(parts[2] || 0);
-}
-
-/* ============================================================
-   LOG SYSTEM (9 KOLOM SHEET LOG)
-============================================================ */
-function writeLog(aksi, hasil, studentId, nama, kelas, status, keterangan) {
-  try {
-    const ss = getSpreadsheet();
-    let sheet = ss.getSheetByName(CONFIG.SHEET_LOG);
-
-    if (!sheet) {
-      sheet = ss.insertSheet(CONFIG.SHEET_LOG);
-      sheet.appendRow(['TIMESTAMP', 'TANGGAL', 'AKSI', 'HASIL', 'STUDENT_ID', 'NAMA', 'KELAS', 'STATUS', 'KETERANGAN']);
-    }
-
-    const now = new Date();
-    const tanggal = Utilities.formatDate(now, CONFIG.TIMEZONE, 'yyyy-MM-dd');
-
-    sheet.appendRow([
-      now,
-      tanggal,
-      String(aksi || ''),
-      String(hasil || ''),
-      String(studentId || ''),
-      String(nama || ''),
-      String(kelas || ''),
-      String(status || ''),
-      String(keterangan || '')
-    ]);
-  } catch (error) {
-    console.error('WRITE LOG ERROR: ' + error.message);
-  }
-}
+};a

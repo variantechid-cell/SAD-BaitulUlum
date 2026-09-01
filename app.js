@@ -1,6 +1,8 @@
 /* ============================================================
-   SISTEM ABSENSI KARTU PELAJAR
-   SMP BAITUL ULUM BOARDING SCHOOL
+  /* ============================================================
+   SISTEM ABSENSI KARTU PELAJAR - SMP & SMA BAITUL ULUM
+   CODE.GS V6.3 (SINKRON 100% DENGAN SHEET EXCEL & APP.JS)
+============================================================
 
    APP.JS V6.2
 

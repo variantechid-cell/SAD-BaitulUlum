@@ -33,7 +33,6 @@ body {
   padding: 0 1rem;
 }
 
-/* NAVBAR */
 .navbar {
   background-color: #0f172a;
   color: #ffffff;
@@ -94,7 +93,6 @@ body {
   background-color: var(--danger);
 }
 
-/* DASHBOARD STATISTIK */
 .main-content {
   margin-top: 2rem;
   margin-bottom: 2rem;
@@ -143,10 +141,9 @@ body {
   font-weight: 700;
 }
 
-/* CONTENT GRID */
 .content-grid {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 440px 1fr;
   gap: 1.5rem;
 }
 
@@ -192,7 +189,6 @@ body {
   padding: 0;
 }
 
-/* FORM ELEMENTS */
 .form-group {
   margin-bottom: 1rem;
 }
@@ -266,19 +262,27 @@ body {
   font-size: 0.8rem;
 }
 
-/* CAMERA & SCANNER */
+/* STYLING KAMERA & CANVAS SCANNER */
 #reader-wrapper {
   margin-bottom: 1rem;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid var(--border-color);
+  border: 2px dashed var(--primary);
+  background: #000;
+  min-height: 250px;
+  position: relative;
 }
 
 #reader {
   width: 100%;
 }
 
-/* RESULT BOX & BADGES */
+#reader video {
+  width: 100% !important;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
 .result-box {
   margin-top: 1rem;
   padding: 1rem;
@@ -351,7 +355,6 @@ body {
   display: none !important;
 }
 
-/* TABLE STYLING */
 .table-responsive {
   max-height: 520px;
   overflow-y: auto;

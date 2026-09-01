@@ -1,18 +1,17 @@
 /* ============================================================
-   SISTEM ABSENSI KARTU PELAJAR - CLIENT SIDE SCRIPT V6.5
-   (AUTO OPEN CAMERA & AUTO SCAN BARCODE / QR CODE)
+   SISTEM ABSENSI KARTU PELAJAR - CLIENT SIDE V6.5
 ============================================================ */
 
-// Ganti dengan URL Web App Apps Script milikmu
 const API_URL = 'https://script.google.com/macros/s/AKfycbx.../exec'; 
 
 let html5QrCode = null;
+let isCameraActive = false;
 let isProcessing = false;
 
 document.addEventListener('DOMContentLoaded', () => {
   initApp();
+  initAutoCameraScanner();
   setupEventListeners();
-  startAutoCamera(); // Kamera langsung terbuka otomatis saat halaman dimuat
 });
 
 function initApp() {
@@ -27,51 +26,6 @@ function initApp() {
   }, 30000);
 }
 
-/* ============================================================
-   AUTO OPEN CAMERA & AUTO SCAN (BARCODE 1D & QR CODE 2D)
-============================================================ */
-function startAutoCamera() {
-  html5QrCode = new Html5Qrcode("reader");
-  
-  const config = { 
-    fps: 15, 
-    qrbox: { width: 280, height: 160 }, // Ukuran area bidik disesuaikan untuk barcode & QR
-    aspectRatio: 1.333333
-  };
-
-  // Langsung membuka aliran video kamera belakang (environment) secara otomatis
-  html5QrCode.start(
-    { facingMode: "environment" },
-    config,
-    (decodedText) => {
-      if (isProcessing) return;
-      const cleanId = decodedText.trim();
-      if (cleanId) {
-        processAttendance(cleanId);
-      }
-    },
-    (errorMessage) => {
-      // Frame terus berjalan mencari Barcode / QR
-    }
-  ).catch(err => {
-    console.warn("Mencoba kamera default...", err);
-    // Fallback jika facingMode spesifik tidak terdeteksi
-    Html5Qrcode.getCameras().then(cameras => {
-      if (cameras && cameras.length > 0) {
-        html5QrCode.start(cameras[0].id, config, (decodedText) => {
-          if (isProcessing) return;
-          processAttendance(decodedText.trim());
-        });
-      } else {
-        console.error("Kamera tidak ditemukan.");
-      }
-    }).catch(e => console.error("Izin kamera ditolak:", e));
-  });
-}
-
-/* ============================================================
-   KONEKSI API & SINKRONISASI
-============================================================ */
 function checkServerConnection() {
   fetch(`${API_URL}?action=test&_=${Date.now()}`)
     .then(res => res.json())
@@ -156,12 +110,73 @@ function loadTodayAttendance() {
 }
 
 /* ============================================================
-   PEMROSESAN SCANNER & ABSENSI
+   PEMINDAI KAMERA & AUTO SCAN BARCODE / QR
+============================================================ */
+function initAutoCameraScanner() {
+  html5QrCode = new Html5Qrcode("reader");
+
+  const config = { 
+    fps: 15, 
+    qrbox: { width: 260, height: 180 },
+    aspectRatio: 1.0,
+    formatsToSupport: [
+      Html5QrcodeSupportedFormats.QR_CODE,
+      Html5QrcodeSupportedFormats.CODE_128,
+      Html5QrcodeSupportedFormats.CODE_39,
+      Html5QrcodeSupportedFormats.EAN_13,
+      Html5QrcodeSupportedFormats.UPC_A
+    ]
+  };
+
+  Html5Qrcode.getCameras().then(devices => {
+    if (devices && devices.length > 0) {
+      const cameraId = devices[0].id;
+      html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        onScanSuccess
+      ).then(() => {
+        isCameraActive = true;
+      }).catch(err => {
+        console.warn('Gagal membuka kamera belakang, mencoba kamera default:', err);
+        html5QrCode.start(cameraId, config, onScanSuccess);
+        isCameraActive = true;
+      });
+    }
+  }).catch(err => {
+    console.error('Kamera tidak ditemukan atau ditolak:', err);
+  });
+}
+
+function onScanSuccess(decodedText) {
+  if (isProcessing) return;
+  const cleanId = String(decodedText || '').trim();
+  if (cleanId) {
+    processAttendance(cleanId);
+  }
+}
+
+function toggleCamera() {
+  if (!html5QrCode) return;
+  if (isCameraActive) {
+    html5QrCode.stop().then(() => {
+      isCameraActive = false;
+      document.getElementById('reader-wrapper').style.display = 'none';
+    });
+  } else {
+    document.getElementById('reader-wrapper').style.display = 'block';
+    initAutoCameraScanner();
+  }
+}
+
+/* ============================================================
+   EVENT LISTENERS & SCANNER GUN FOCUS MANAGEMENT
 ============================================================ */
 function setupEventListeners() {
   const form = document.getElementById('attendanceForm');
   const input = document.getElementById('studentIdInput');
   const btnRefresh = document.getElementById('btnRefresh');
+  const btnToggleCam = document.getElementById('btnToggleCam');
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
@@ -176,8 +191,19 @@ function setupEventListeners() {
     loadSummary();
     loadTodayAttendance();
   });
+
+  btnToggleCam.addEventListener('click', toggleCamera);
+
+  document.addEventListener('click', (e) => {
+    if (!['INPUT', 'SELECT', 'BUTTON', 'A'].includes(e.target.tagName)) {
+      input.focus();
+    }
+  });
 }
 
+/* ============================================================
+   PROSES ABSENSI & FEEDBACK
+============================================================ */
 function processAttendance(studentId) {
   if (isProcessing) return;
   isProcessing = true;
@@ -208,17 +234,14 @@ function processAttendance(studentId) {
       playBeep('error');
     })
     .finally(() => {
-      // Beri jeda 2.5 detik sebelum mengizinkan scan kartu berikutnya
       setTimeout(() => {
         isProcessing = false;
-        document.getElementById('studentIdInput').focus();
+        const input = document.getElementById('studentIdInput');
+        if (input) input.focus();
       }, 2500);
     });
 }
 
-/* ============================================================
-   TAMPILAN HASIL ABSENSI & WA BADGE
-============================================================ */
 function renderResult(data) {
   const box = document.getElementById('resultBox');
   const icon = document.getElementById('resultIcon');
@@ -277,9 +300,6 @@ function renderResult(data) {
   }
 }
 
-/* ============================================================
-   AUDIO FEEDBACK (WEB AUDIO API)
-============================================================ */
 function playBeep(type) {
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();

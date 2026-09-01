@@ -13,6 +13,9 @@ const CONFIG = {
   BATAS_TERLAMBAT: '07:20'
 };
 
+// Ganti bagian API_URL di dalam app.js Anda dengan URL yang baru disalin
+const API_URL = "https://script.google.com/macros/s/AKfycbybMMhzrTv3Uqv3vMAdJTA5Co4FiTh_jZ4ocD5iNdHb2mZBX2S_BJJBrgFCgJIcqb21/exec";
+
 /* ============================================================
    DO GET - PINTU MASUK API UTAMA
 ============================================================ */

@@ -19,20 +19,10 @@
     Absensi Kartu Pelajar | SMP & SMA Baitul Ulum
   </title>
 
-
-  <!-- =====================================================
-       CSS UTAMA
-  ====================================================== -->
-
   <link
     rel="stylesheet"
     href="style.css"
   >
-
-
-  <!-- =====================================================
-       QR SCANNER
-  ====================================================== -->
 
   <script
     src="https://unpkg.com/html5-qrcode"
@@ -44,19 +34,16 @@
 
 <body>
 
+<main class="container">
+
 
   <!-- =====================================================
-       CONTAINER UTAMA
+       HEADER
   ====================================================== -->
 
-  <main class="container">
+  <header class="header">
 
-
-    <!-- =====================================================
-         HEADER SEKOLAH
-    ====================================================== -->
-
-    <header class="header">
+    <div class="header-top">
 
       <h1 class="school-title">
 
@@ -67,471 +54,615 @@
         >
 
         <span>
-          ABSENSI KARTU PELAJAR
+           ABSENSI KARTU PELAJAR
         </span>
 
       </h1>
 
-
-      <p class="school-name">
-        SMP &amp; SMA BAITUL ULUM BOARDING SCHOOL
-      </p>
+    </div>
 
 
-      <!-- TANGGAL DAN WAKTU -->
+    <p class="school-name">
+      SMP &amp; SMA BAITUL ULUM BOARDING SCHOOL
+    </p>
+    
 
-      <div class="datetime">
+    <div class="datetime">
 
-        <div id="currentDate">
-          Memuat tanggal...
-        </div>
-
-        <div id="currentTime">
-          Memuat waktu...
-        </div>
-
+      <div id="currentDate">
+        Memuat tanggal...
       </div>
 
-    </header>
+      <div id="currentTime">
+        Memuat waktu...
+      </div>
+
+    </div>
+<button
+        id="loginButton"
+        class="login-button"
+        type="button"
+      >
+        🔐 Login Guru/Admin
+      </button>
+  </header>
 
 
-    <!-- =====================================================
-         SCANNER
-    ====================================================== -->
+  <!-- =====================================================
+       SCANNER
+  ====================================================== -->
 
-    <section
-      id="scannerCard"
-      class="scanner-card"
+  <section
+    id="scannerCard"
+    class="scanner-card"
+  >
+
+    <div id="reader"></div>
+
+
+    <div
+      id="status"
+      class="status"
     >
-
-      <!-- AREA KAMERA -->
-
-      <div id="reader"></div>
+      🟢 Scanner siap.
+    </div>
 
 
-      <!-- STATUS SCANNER -->
+    <div class="buttons">
+
+      <button
+        id="startButton"
+        type="button"
+      >
+        📷 Mulai Scanner
+      </button>
+
+    </div>
+
+
+    <div class="auto-scan-control">
+
+      <label for="autoScanToggle">
+
+        <input
+          type="checkbox"
+          id="autoScanToggle"
+        >
+
+        Scan otomatis
+
+      </label>
+
+
+      <span
+        id="autoScanLabel"
+        class="auto-label"
+      >
+        MATI
+      </span>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       RESULT
+  ====================================================== -->
+
+  <section
+    id="result"
+    class="result"
+  >
+
+    <div
+      id="resultIcon"
+      class="result-icon"
+    >
+      ⏳
+    </div>
+
+
+    <h2 id="resultTitle">
+      MEMPROSES
+    </h2>
+
+
+    <p
+      id="resultMessage"
+      class="result-message"
+    ></p>
+
+
+    <div
+      id="studentId"
+      class="student-id"
+    ></div>
+
+
+    <div class="buttons">
+
+      <button
+        id="scanAgainButton"
+        type="button"
+      >
+        📷 Scan Lagi
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       SUMMARY
+  ====================================================== -->
+
+  <section class="summary-grid">
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        👥
+      </div>
+
+      <div class="summary-label">
+        TOTAL
+      </div>
 
       <div
-        id="status"
-        class="status"
+        id="countTotal"
+        class="summary-number"
       >
-        🟢 Scanner siap.
+        0
       </div>
 
+    </div>
 
-      <!-- TOMBOL -->
 
-      <div class="buttons">
+    <div class="summary-card">
 
-        <button
-          id="startButton"
-          type="button"
-        >
-          📷 Mulai Scanner
-        </button>
-
+      <div class="summary-icon">
+        🟢
       </div>
 
+      <div class="summary-label">
+        HADIR
+      </div>
 
-      <!-- AUTO SCAN -->
+      <div
+        id="countPresent"
+        class="summary-number"
+      >
+        0
+      </div>
 
-      <div class="auto-scan-control">
-
-        <label
-          for="autoScanToggle"
-        >
-
-          <input
-            type="checkbox"
-            id="autoScanToggle"
-          >
-
-          Scan otomatis
-
-        </label>
+    </div>
 
 
-        <span
-          id="autoScanLabel"
-          class="auto-label"
-        >
-          MATI
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        🟡
+      </div>
+
+      <div class="summary-label">
+        TERLAMBAT
+      </div>
+
+      <div
+        id="countLate"
+        class="summary-number"
+      >
+        0
+      </div>
+
+    </div>
+
+
+    <div class="summary-card">
+
+      <div class="summary-icon">
+        🟠
+      </div>
+
+      <div class="summary-label">
+        SUDAH ABSEN
+      </div>
+
+      <div
+        id="countAlready"
+        class="summary-number"
+      >
+        0
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =====================================================
+       DASHBOARD GURU
+  ====================================================== -->
+
+  <section
+    id="dashboard"
+    class="dashboard"
+    style="display:none;"
+  >
+
+    <div class="dashboard-header">
+
+      <div>
+
+        <span class="dashboard-kicker">
+          DASHBOARD GURU
         </span>
 
+        <h2 id="dashboardTitle">
+          Selamat datang
+        </h2>
+
+        <p id="dashboardUser">
+          -
+        </p>
+
+      </div>
+      <button
+        id="logoutButton"
+        class="logout-button"
+        type="button"
+      >
+        Keluar
+      </button>
+    </div>
+     
+
+
+    <!-- JADWAL -->
+
+    <div class="dashboard-section">
+
+      <div class="section-title">
+
+        <div>
+          <h3>
+            📚 Jadwal Mengajar Hari Ini
+          </h3>
+
+          <p>
+            Pilih mata pelajaran untuk melihat kehadiran siswa.
+          </p>
+        </div>
+
       </div>
 
-    </section>
+
+      <div
+        id="teacherSchedules"
+        class="schedule-list"
+      >
+
+        <div class="dashboard-loading">
+          ⏳ Memuat jadwal...
+        </div>
+
+      </div>
+
+    </div>
 
 
-    <!-- =====================================================
-         HASIL ABSENSI
-    ====================================================== -->
+    <!-- DETAIL ABSENSI -->
 
-    <section
-      id="result"
-      class="result"
+    <div
+      id="teacherAttendancePanel"
+      class="dashboard-section"
+      style="display:none;"
     >
 
-      <div
-        id="resultIcon"
-        class="result-icon"
-      >
-        ⏳
-      </div>
-
-
-      <h2 id="resultTitle">
-        MEMPROSES
-      </h2>
-
-
-      <p
-        id="resultMessage"
-        class="result-message"
-      ></p>
-
-
-      <div
-        id="studentId"
-        class="student-id"
-      ></div>
-
-
-      <!-- SCAN LAGI -->
-
-      <div class="buttons">
-
-        <button
-          id="scanAgainButton"
-          type="button"
-        >
-          📷 Scan Lagi
-        </button>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         RINGKASAN ABSENSI
-    ====================================================== -->
-
-    <section class="summary-grid">
-
-
-      <!-- TOTAL -->
-
-      <div class="summary-card">
-
-        <div class="summary-icon">
-          👥
-        </div>
-
-        <div class="summary-label">
-          TOTAL
-        </div>
-
-        <div
-          id="countTotal"
-          class="summary-number"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <!-- HADIR -->
-
-      <div class="summary-card">
-
-        <div class="summary-icon">
-          🟢
-        </div>
-
-        <div class="summary-label">
-          HADIR
-        </div>
-
-        <div
-          id="countPresent"
-          class="summary-number"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <!-- TERLAMBAT -->
-
-      <div class="summary-card">
-
-        <div class="summary-icon">
-          🟡
-        </div>
-
-        <div class="summary-label">
-          TERLAMBAT
-        </div>
-
-        <div
-          id="countLate"
-          class="summary-number"
-        >
-          0
-        </div>
-
-      </div>
-
-
-      <!-- SUDAH ABSEN -->
-
-      <div class="summary-card">
-
-        <div class="summary-icon">
-          🟠
-        </div>
-
-        <div class="summary-label">
-          SUDAH ABSEN
-        </div>
-
-        <div
-          id="countAlready"
-          class="summary-number"
-        >
-          0
-        </div>
-
-      </div>
-
-    </section>
-
-
-    <!-- =====================================================
-         DAFTAR ABSENSI HARI INI
-    ====================================================== -->
-
-    <section class="attendance-section">
-
-
-      <!-- HEADER ABSENSI -->
-
-      <div class="attendance-header">
+      <div class="attendance-dashboard-header">
 
         <div>
 
-          <h2>
-            📋 Urutan Absensi Hari Ini
-          </h2>
+          <span id="teacherScheduleInfo">
+            -
+          </span>
 
+          <h3 id="teacherClassTitle">
+            -
+          </h3>
 
-          <div
-            id="attendanceDate"
-            class="attendance-date-text"
-          ></div>
-
-        </div>
-
-
-        <!-- TOOLS -->
-
-        <div class="attendance-tools">
-
-
-          <!-- JUMLAH DATA -->
-
-          <select
-            id="attendanceLimit"
-            aria-label="Jumlah siswa yang ditampilkan"
-          >
-
-            <option value="5">
-              5 siswa
-            </option>
-
-            <option
-              value="10"
-              selected
-            >
-              10 siswa
-            </option>
-
-            <option value="25">
-              25 siswa
-            </option>
-
-            <option value="50">
-              50 siswa
-            </option>
-
-            <option value="100">
-              100 siswa
-            </option>
-
-            <option value="150">
-              150 siswa
-            </option>
-
-            <option value="all">
-              Semua
-            </option>
-
-          </select>
-
-
-          <!-- TAMPILKAN SEMUA -->
-
-          <button
-            type="button"
-            onclick="showAllAttendance()"
-          >
-            Tampilkan Semua
-          </button>
-
-
-          <!-- TOTAL ABSENSI -->
-
-          <div class="total-box">
-
-            Total siswa absen:
-
-            <span id="attendanceTotal">
-              0
-            </span>
-
-          </div>
+          <p id="teacherMapelTitle">
+            -
+          </p>
 
         </div>
 
       </div>
 
 
-      <!-- ===================================================
-           INFORMASI DATA
-      ==================================================== -->
+      <!-- STATISTIK -->
 
       <div
-        id="attendanceDisplayInfo"
-        class="attendance-info"
-      >
-        Memuat data...
-      </div>
+        id="teacherStats"
+        class="teacher-stats"
+      ></div>
 
 
-      <!-- ===================================================
-           LOADING
-      ==================================================== -->
+      <!-- DAFTAR SISWA -->
 
       <div
-        id="attendanceLoading"
-        class="loading"
-      >
-        ⏳ Memuat data absensi...
-      </div>
+        id="teacherStudentList"
+        class="teacher-student-list"
+      ></div>
+
+    </div>
+
+  </section>
 
 
-      <!-- ===================================================
-           DATA KOSONG
-      ==================================================== -->
+  <!-- =====================================================
+       ATTENDANCE TODAY
+  ====================================================== -->
 
-      <div
-        id="attendanceEmpty"
-        class="attendance-info"
-      >
-        📭 Belum ada siswa yang melakukan absensi hari ini.
-      </div>
+  <section class="attendance-section">
 
+    <div class="attendance-header">
 
-      <!-- ===================================================
-           DESKTOP TABLE
-      ==================================================== -->
+      <div>
 
-      <div
-        id="attendanceDesktop"
-        class="attendance-desktop"
-      >
-
-        <div class="attendance-table-wrapper">
-
-          <table class="attendance-table">
-
-            <thead>
-
-              <tr>
-
-                <th class="rank-column">
-                  No
-                </th>
-
-                <th>
-                  Nama
-                </th>
-
-                <th>
-                  Kelas
-                </th>
-
-                <th>
-                  Jam
-                </th>
-
-                <th>
-                  Status
-                </th>
-
-              </tr>
-
-            </thead>
-
-
-            <tbody
-              id="attendanceTableBody"
-            ></tbody>
-
-          </table>
-
-        </div>
-
-      </div>
-
-
-      <!-- ===================================================
-           MOBILE CARD
-      ==================================================== -->
-
-      <div
-        id="attendanceMobile"
-        class="attendance-mobile"
-      >
+        <h3>
+          📋 Urutan Absensi Hari Ini
+        </h3>
 
         <div
-          id="attendanceCardList"
-          class="attendance-card-list"
+          id="attendanceDate"
+          class="attendance-date-text"
         ></div>
 
       </div>
 
-    </section>
+
+      <div class="attendance-tools">
+
+        <select
+          id="attendanceLimit"
+          aria-label="Jumlah siswa yang ditampilkan"
+        >
+
+          <option value="5">
+            5 siswa
+          </option>
+
+          <option
+            value="10"
+            selected
+          >
+            10 siswa
+          </option>
+
+          <option value="25">
+            25 siswa
+          </option>
+
+          <option value="50">
+            50 siswa
+          </option>
+
+          <option value="100">
+            100 siswa
+          </option>
+
+          <option value="150">
+            150 siswa
+          </option>
+
+          <option value="all">
+            Semua
+          </option>
+
+        </select>
 
 
-  </main>
+        <button
+          type="button"
+          onclick="showAllAttendance()"
+        >
+          Tampilkan Semua
+        </button>
 
 
-  <!-- =====================================================
-       JAVASCRIPT APLIKASI
-  ====================================================== -->
+        <div class="total-box">
 
-  <script
-    src="app.js"
-    defer
-  ></script>
+          Total siswa absen:
 
+          <span id="attendanceTotal">
+            0
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="attendanceDisplayInfo"
+      class="attendance-info"
+    >
+      Memuat data...
+    </div>
+
+
+    <div
+      id="attendanceLoading"
+      class="loading"
+    >
+      ⏳ Memuat data absensi...
+    </div>
+
+
+    <div
+      id="attendanceEmpty"
+      class="attendance-info"
+    >
+      📭 Belum ada siswa yang melakukan absensi hari ini.
+    </div>
+
+
+    <div
+      id="attendanceDesktop"
+      class="attendance-desktop"
+    >
+
+      <div class="attendance-table-wrapper">
+
+        <table class="attendance-table">
+
+          <thead>
+
+            <tr>
+
+              <th class="rank-column">
+                No
+              </th>
+
+              <th>
+                Nama
+              </th>
+
+              <th>
+                Kelas
+              </th>
+
+              <th>
+                Jam
+              </th>
+
+              <th>
+                Status
+              </th>
+
+            </tr>
+
+          </thead>
+
+          <tbody
+            id="attendanceTableBody"
+          ></tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+
+    <div
+      id="attendanceMobile"
+      class="attendance-mobile"
+    >
+
+      <div
+        id="attendanceCardList"
+        class="attendance-card-list"
+      ></div>
+
+    </div>
+
+  </section>
+
+
+</main>
+
+
+<!-- =====================================================
+     LOGIN MODAL
+====================================================== -->
+
+<div
+  id="loginModal"
+  class="login-modal"
+  style="display:none;"
+>
+
+  <div class="login-box">
+
+    <button
+      id="closeLoginButton"
+      class="login-close"
+      type="button"
+    >
+      ×
+    </button>
+
+
+    <div class="login-icon">
+      🔐
+    </div>
+
+
+    <h2>
+      Login Sistem
+    </h2>
+
+    <p>
+      Guru &amp; Administrator
+    </p>
+
+
+    <form id="loginForm">
+
+      <label>
+        Username
+      </label>
+
+      <input
+        type="text"
+        id="loginUsername"
+        autocomplete="username"
+        required
+      >
+
+
+      <label>
+        Password
+      </label>
+
+      <input
+        type="password"
+        id="loginPassword"
+        autocomplete="current-password"
+        required
+      >
+
+
+      <div
+        id="loginMessage"
+        class="login-message"
+      ></div>
+
+
+      <button
+        type="submit"
+        class="login-submit"
+      >
+        Masuk
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<script
+  src="app.js"
+  defer
+></script>
 
 </body>
-<div class=footer align="center">
-    <h6>Sistem Absensi Digital V6.2 | vaRianTech</h6>
-  </div>
 </html>

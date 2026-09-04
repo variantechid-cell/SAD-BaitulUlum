@@ -106,7 +106,7 @@ body {
 
   gap: 45px;
 
-  margin: 0 0 6px;
+  margin: 3 0 6px;
 
   font-size:
     clamp(
@@ -163,7 +163,7 @@ body {
 
   text-align: center;
 
-  font-size: 18px;
+  font-size: 14px;
 
   font-weight: 400;
 

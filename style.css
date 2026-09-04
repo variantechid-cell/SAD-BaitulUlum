@@ -94,7 +94,7 @@ body {
 
 .school-title {
 
-  position: relative;
+  position: flex;
 
   z-index: 2;
 

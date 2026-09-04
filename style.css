@@ -94,7 +94,7 @@ body {
 
 .school-title {
 
-  position: flex;
+  position: relative;
 
   z-index: 2;
 
@@ -106,7 +106,7 @@ body {
 
   gap: 45px;
 
-  margin: 0 0 9px;
+  margin: 0 0 3px;
 
   font-size:
     clamp(

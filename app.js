@@ -5282,7 +5282,7 @@ function injectAdminWhatsAppButton() {
       <div class="wa-launcher-title">💬 WhatsApp Center</div>
       <div class="wa-launcher-subtitle">Kelola notifikasi WhatsApp orang tua/wali siswa tanpa memenuhi Dashboard Administrator.</div>
     </div>
-    <button type="button" id="openAdminWhatsAppButton" class="wa-open-button">Buka WhatsApp Center →</button>
+    <button type="button" id="openAdminWhatsAppButton" class="wa-open-button">WhatsApp Center →</button>
   
   `;
 

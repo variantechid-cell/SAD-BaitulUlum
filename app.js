@@ -5242,7 +5242,7 @@ function injectAdminWhatsAppPanel() {
         <div class="wa-history-filters">
           <label class="wa-field"><span>Status Kirim</span><select id="waHistoryStatus"><option value="">Semua Status</option><option value="TERKIRIM">Terkirim</option><option value="GAGAL">Gagal</option><option value="PENDING">Pending</option></select></label>
           <label class="wa-field"><span>Jenis WA</span><select id="waHistoryType"><option value="">Semua Jenis</option><option value="ABSENSI">Absensi</option><option value="MANUAL">Manual</option><option value="RESEND">Kirim Ulang</option><option value="TEST">Test</option></select></label>
-          <label class="wa-field wa-history-search"><span>Pencarian</span><input type="search" id="waHistorySearch" placeholder="Nama siswa, ID, kelas..." autocomplete="off"></label>
+          <label class="wa-field wa-history-search"><span>Pencarian</span><input type="search" id="waHistorySearch" placeholder="Nama/ID/kelas..." autocomplete="off"></label>
           <button type="button" id="waHistoryLoadButton" class="wa-secondary-button">🔍 Tampilkan</button>
         </div>
         <div id="waHistoryMessage" class="wa-inline-message" aria-live="polite"></div>
@@ -5282,7 +5282,7 @@ function injectAdminWhatsAppButton() {
       <div class="wa-launcher-title">💬 WhatsApp Center</div>
       <div class="wa-launcher-subtitle">Kelola notifikasi WhatsApp orang tua/wali siswa tanpa memenuhi Dashboard Administrator.</div>
     </div>
-    <button type="button" id="openAdminWhatsAppButton" class="wa-open-button">WhatsApp Center →</button>
+    <button type="button" id="openAdminWhatsAppButton" class="wa-open-button">Buka WhatsApp Center →</button>
   
   `;
 
@@ -6138,7 +6138,7 @@ function injectDashboardStyles() {
     .wa-switch-row strong {display:block;font-size:13px;color:#0f172a;}.wa-switch-row small {display:block;color:#64748b;font-size:11px;margin-top:2px;}
     .wa-rule-title {margin-top:15px;font-size:13px;font-weight:800;color:#334155;}
     .wa-rule-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:9px;}
-    .wa-rule-item {display:flex;align-items:center;gap:8px;padding:8px 9px;border:1px solid #e2e8f0;border-radius:9px;background:#fafafa;font-size:12px;font-weight:700;color:#475569;cursor:pointer;}
+    .wa-rule-item {display:flex;align-items:center;gap:8px;padding:8px 9px;border:1px solid #e2e8f0;border-radius:9px;background:#fafafa;font-size:10px;font-weight:700;color:#475569;cursor:pointer;}
     .wa-rule-item input {accent-color:#2563eb;}
     .wa-history-box {margin-top:14px;}
     .wa-history-count {padding:7px 10px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:12px;font-weight:700;}

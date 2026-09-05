@@ -2,7 +2,7 @@
    ABSENSI KARTU PELAJAR
    SMP & SMA BAITUL ULUM BOARDING SCHOOL
 
-   APP.JS FINAL - V13
+   APP.JS V20.1 - WHATSAPP CENTER STANDALONE
 
    PERUBAHAN UTAMA:
    - LOGIN menggunakan USERNAME + PASSWORD biasa
@@ -1122,6 +1122,7 @@ function handleSessionExpired() {
 
   clearSession();
 
+  closeAdminWhatsAppCenter();
   hideDashboard();
 
 
@@ -1242,6 +1243,11 @@ function showDashboard() {
   injectAdminRecapPanel();
   setAdminRecapVisibility(role === 'ADMIN');
 
+  injectAdminWhatsAppPanel();
+  injectAdminWhatsAppButton();
+  setAdminWhatsAppVisibility(false);
+  setAdminWhatsAppButtonVisibility(role === 'ADMIN');
+
   injectTeacherRecapPanel();
   setTeacherRecapVisibility(role === 'GURU');
   resetTeacherRecapView();
@@ -1282,6 +1288,9 @@ function hideDashboard() {
 
   setTodayAttendanceVisibility(true);
   setPublicScannerAreaVisibility(true);
+  setAdminWhatsAppVisibility(false);
+  setAdminWhatsAppButtonVisibility(false);
+  waCenterStandaloneVisible = false;
   resetTeacherRecapView();
   hideTeacherRecapDownload();
   hideAdminRecapDownload();
@@ -2897,6 +2906,18 @@ function showAllAttendance() {
 window.showAllAttendance =
   showAllAttendance;
 
+window.loadWACenterDashboard =
+  loadWACenterDashboard;
+
+window.sendManualWAMessageFromDashboard =
+  sendManualWAMessageFromDashboard;
+
+window.loadWAHistory =
+  loadWAHistory;
+
+window.resendWAFromDashboard =
+  resendWAFromDashboard;
+
 
 /* ============================================================
    25. TANGGAL & JAM
@@ -4092,7 +4113,7 @@ function injectTeacherRecapPanel() {
         id="teacherRebuildRecapButton"
         class="teacher-recap-button"
       >
-        Rekap...
+        📊 Tampilkan Rekap
       </button>
     </div>
 
@@ -4456,7 +4477,7 @@ async function loadTeacherMonthlyRecap() {
 
   if (button) {
     button.disabled = true;
-    button.textContent = '⏳ Memuat...';
+    button.textContent = '⏳ Memuat rekap...';
   }
 
   if (resultContainer) {
@@ -4511,7 +4532,7 @@ async function loadTeacherMonthlyRecap() {
 
     if (button) {
       button.disabled = false;
-      button.textContent = '📊 Hasil Rekap';
+      button.textContent = '📊 Tampilkan Rekap';
     }
   }
 }
@@ -5124,6 +5145,812 @@ async function rebuildMonthlyRecapFromDashboard() {
   }
 }
 
+
+/* ============================================================
+   43. WHATSAPP CENTER ADMIN V19
+   ------------------------------------------------------------
+   UI langsung di Dashboard Admin.
+   Komunikasi tetap menggunakan fetch(API_URL) -> doGet().
+============================================================ */
+
+let waCenterHistoryData = [];
+let waCenterRecipientsData = [];
+let waCenterHistoryLoading = false;
+let waCenterDashboardLoading = false;
+let waCenterStandaloneVisible = false;
+
+
+function injectAdminWhatsAppPanel() {
+
+  if ($('adminWhatsAppCenter')) return;
+
+  const page = document.createElement('section');
+  page.id = 'adminWhatsAppCenter';
+  page.className = 'wa-center-page';
+  page.style.display = 'none';
+
+  page.innerHTML = `
+    <div class="wa-page-shell">
+      <div class="wa-page-topbar">
+        <div>
+          <div class="wa-page-kicker">ADMINISTRATOR</div>
+          <div class="wa-page-title">💬 WhatsApp Center</div>
+          <div class="wa-page-subtitle">Pusat kendali notifikasi WhatsApp orang tua/wali siswa.</div>
+        </div>
+        <div class="wa-page-top-actions">
+          <span id="waConnectionBadge" class="wa-connection-badge">⏳ Memeriksa koneksi...</span>
+          <button type="button" id="waCenterRefreshButton" class="wa-secondary-button">🔄 Refresh</button>
+          <button type="button" id="waCenterBackButton" class="wa-back-button">← Kembali ke Dashboard</button>
+        </div>
+      </div>
+
+      <div class="wa-date-row">
+        <label class="wa-field wa-date-field">
+          <span>Tanggal Statistik</span>
+          <input type="date" id="waDashboardDate">
+        </label>
+        <div id="waDashboardMessage" class="wa-inline-message" aria-live="polite"></div>
+      </div>
+
+      <div class="wa-stat-grid">
+        <div class="wa-stat-card wa-stat-total"><span>📨 Total</span><strong id="waStatTotal">0</strong><small>Log WhatsApp</small></div>
+        <div class="wa-stat-card wa-stat-sent"><span>✅ Terkirim</span><strong id="waStatSent">0</strong><small>Berhasil dikirim</small></div>
+        <div class="wa-stat-card wa-stat-failed"><span>❌ Gagal</span><strong id="waStatFailed">0</strong><small>Perlu diperiksa</small></div>
+        <div class="wa-stat-card wa-stat-pending"><span>⏳ Pending</span><strong id="waStatPending">0</strong><small>Menunggu proses</small></div>
+        <div class="wa-stat-card wa-stat-auto"><span>⚙️ Otomatis</span><strong id="waStatAuto">0</strong><small>Notifikasi sistem</small></div>
+        <div class="wa-stat-card wa-stat-manual"><span>💬 Manual</span><strong id="waStatManual">0</strong><small>Dikirim Admin</small></div>
+      </div>
+
+      <div class="wa-center-grid">
+        <section class="wa-box wa-manual-box">
+          <div class="wa-box-title">💬 Kirim Pesan WA Manual</div>
+          <div class="wa-box-subtitle">Pesan dikirim ke nomor WhatsApp orang tua/wali siswa.</div>
+
+          <label class="wa-field"><span>Cari Siswa</span><input type="search" id="waRecipientSearch" placeholder="Ketik nama, Student ID, atau kelas..." autocomplete="off"></label>
+          <label class="wa-field"><span>Pilih Siswa</span><select id="waRecipientSelect"><option value="">⏳ Memuat daftar siswa...</option></select></label>
+          <div id="waRecipientInfo" class="wa-recipient-info">Pilih siswa untuk melihat informasi penerima.</div>
+          <label class="wa-field"><span>Isi Pesan</span><textarea id="waManualMessage" rows="7" maxlength="4000" placeholder="Tulis pesan untuk orang tua/wali siswa..."></textarea><div class="wa-char-counter"><span id="waMessageCharCount">0</span>/4000 karakter</div></label>
+          <div id="waManualMessageBox" class="wa-message-box" aria-live="polite"></div>
+          <button type="button" id="waManualSendButton" class="wa-primary-button">💬 Kirim Pesan WhatsApp</button>
+        </section>
+
+        <section class="wa-box wa-settings-box">
+          <div class="wa-box-title">⚙️ Pengaturan WhatsApp</div>
+          <div class="wa-box-subtitle">Atur kapan sistem mengirim notifikasi otomatis.</div>
+          <div class="wa-setting-main"><label class="wa-switch-row"><input type="checkbox" id="waSettingEnabled"><span class="wa-switch-ui"></span><span><strong>Aktifkan WhatsApp</strong><small>Master switch notifikasi WhatsApp</small></span></label></div>
+          <div class="wa-setting-list">
+            <label class="wa-switch-row compact"><input type="checkbox" id="waSettingFirstDailyOnly"><span class="wa-switch-ui"></span><span><strong>Hanya 1 WA per siswa per hari</strong><small>Mencegah notifikasi otomatis berulang</small></span></label>
+            <label class="wa-switch-row compact"><input type="checkbox" id="waSettingManualStatus"><span class="wa-switch-ui"></span><span><strong>WA saat status manual berubah</strong><small>Guru/Admin mengubah status absensi</small></span></label>
+          </div>
+          <div class="wa-rule-title">Notifikasi berdasarkan status</div>
+          <div class="wa-rule-grid">
+            <label class="wa-rule-item"><input type="checkbox" id="waRuleHadir"><span>Hadir</span></label>
+            <label class="wa-rule-item"><input type="checkbox" id="waRuleTerlambat"><span>Terlambat</span></label>
+            <label class="wa-rule-item"><input type="checkbox" id="waRuleIzin"><span>Izin</span></label>
+            <label class="wa-rule-item"><input type="checkbox" id="waRuleSakit"><span>Sakit</span></label>
+            <label class="wa-rule-item"><input type="checkbox" id="waRuleAlpa"><span>Alpa</span></label>
+            <label class="wa-rule-item"><input type="checkbox" id="waRuleKegiatan"><span>Kegiatan</span></label>
+            <label class="wa-rule-item"><input type="checkbox" id="waRuleIzinPulang"><span>Izin Pulang</span></label>
+          </div>
+          <div id="waSettingsMessage" class="wa-message-box" aria-live="polite"></div>
+          <button type="button" id="waSaveSettingsButton" class="wa-primary-button">💾 Simpan Pengaturan WA</button>
+        </section>
+      </div>
+
+      <section class="wa-box wa-history-box">
+        <div class="wa-history-header"><div><div class="wa-box-title">📋 Riwayat WhatsApp</div><div class="wa-box-subtitle">Data bersumber dari sheet LOG_WA.</div></div><span id="waHistoryCount" class="wa-history-count">0 data</span></div>
+        <div class="wa-history-filters">
+          <label class="wa-field"><span>Status Kirim</span><select id="waHistoryStatus"><option value="">Semua Status</option><option value="TERKIRIM">Terkirim</option><option value="GAGAL">Gagal</option><option value="PENDING">Pending</option></select></label>
+          <label class="wa-field"><span>Jenis WA</span><select id="waHistoryType"><option value="">Semua Jenis</option><option value="ABSENSI">Absensi</option><option value="MANUAL">Manual</option><option value="RESEND">Kirim Ulang</option><option value="TEST">Test</option></select></label>
+          <label class="wa-field wa-history-search"><span>Pencarian</span><input type="search" id="waHistorySearch" placeholder="Nama siswa, ID, kelas..." autocomplete="off"></label>
+          <button type="button" id="waHistoryLoadButton" class="wa-secondary-button">🔍 Tampilkan</button>
+        </div>
+        <div id="waHistoryMessage" class="wa-inline-message" aria-live="polite"></div>
+        <div id="waHistoryTableWrap" class="wa-history-table-wrap"><div class="app-loading">Memuat riwayat WhatsApp...</div></div>
+      </section>
+    </div>
+
+    <footer class="wa-page-footer">
+      <div class="wa-page-footer-name">ABSENSI KARTU PELAJAR</div>
+      <div class="wa-page-footer-meta">
+        WhatsApp Center &nbsp;•&nbsp; Versi 20.1 &nbsp;•&nbsp; SMP &amp; SMA Baitul Ulum Boarding School &nbsp;•&nbsp; © 2026
+      </div>
+    </footer>
+  `;
+
+  document.body.appendChild(page);
+
+  const now = new Date();
+  const dateInput = $('waDashboardDate');
+  if (dateInput) dateInput.value = formatLocalDateForInput(now);
+
+  bindAdminWhatsAppEvents();
+}
+
+
+function injectAdminWhatsAppButton() {
+
+  const dashboard = $('dashboard');
+  if (!dashboard || $('adminWhatsAppLauncher')) return;
+
+  const launcher = document.createElement('section');
+  launcher.id = 'adminWhatsAppLauncher';
+  launcher.className = 'wa-launcher';
+  launcher.innerHTML = `
+    <div class="wa-launcher-text">
+      <div class="wa-launcher-title">💬 WhatsApp Center</div>
+      <div class="wa-launcher-subtitle">Kelola notifikasi WhatsApp orang tua/wali siswa tanpa memenuhi Dashboard Administrator.</div>
+    </div>
+    <button type="button" id="openAdminWhatsAppButton" class="wa-open-button">Buka WhatsApp Center →</button>
+  `;
+
+  const adminRecap = $('adminMonthlyRecapPanel');
+  if (adminRecap && adminRecap.parentNode) {
+    adminRecap.parentNode.insertBefore(launcher, adminRecap);
+  } else {
+    dashboard.insertBefore(launcher, dashboard.firstChild);
+  }
+
+  const button = $('openAdminWhatsAppButton');
+  if (button) button.addEventListener('click', openAdminWhatsAppCenter);
+}
+
+
+function setAdminWhatsAppButtonVisibility(visible) {
+  const launcher = $('adminWhatsAppLauncher');
+  if (launcher) launcher.style.display = visible ? 'flex' : 'none';
+}
+
+
+function openAdminWhatsAppCenter() {
+
+  if (!currentToken || String(currentUser?.role || '').toUpperCase() !== 'ADMIN') {
+    openLoginModal();
+    return;
+  }
+
+  injectAdminWhatsAppPanel();
+  waCenterStandaloneVisible = true;
+
+  const dashboard = $('dashboard');
+  if (dashboard) dashboard.style.display = 'none';
+
+  const globalFooter = $('appFooter');
+  if (globalFooter) globalFooter.style.display = 'none';
+
+  setPublicScannerAreaVisibility(false);
+  setAdminWhatsAppVisibility(true);
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+
+function closeAdminWhatsAppCenter() {
+
+  waCenterStandaloneVisible = false;
+  setAdminWhatsAppVisibility(false);
+
+  const page = $('adminWhatsAppCenter');
+  if (page) page.scrollTop = 0;
+}
+
+
+function formatLocalDateForInput(date) {
+  const d = date instanceof Date ? date : new Date(date);
+  if (Number.isNaN(d.getTime())) return '';
+  return [
+    d.getFullYear(),
+    String(d.getMonth() + 1).padStart(2, '0'),
+    String(d.getDate()).padStart(2, '0')
+  ].join('-');
+}
+
+
+function setAdminWhatsAppVisibility(visible) {
+  const panel = $('adminWhatsAppCenter');
+  if (!panel) return;
+  panel.style.display = visible ? 'block' : 'none';
+
+  if (visible && currentToken && String(currentUser?.role || '').toUpperCase() === 'ADMIN') {
+    loadWACenterDashboard(true);
+  }
+}
+
+
+function closeAdminWhatsAppCenterAndReturn() {
+  closeAdminWhatsAppCenter();
+
+  if (currentToken && String(currentUser?.role || '').toUpperCase() === 'ADMIN') {
+    const dashboard = $('dashboard');
+    if (dashboard) dashboard.style.display = 'block';
+
+    const globalFooter = $('appFooter');
+    if (globalFooter) globalFooter.style.display = '';
+
+    setPublicScannerAreaVisibility(false);
+    setAdminWhatsAppButtonVisibility(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+
+function bindAdminWhatsAppEvents() {
+
+  const refreshButton = $('waCenterRefreshButton');
+  if (refreshButton) {
+    refreshButton.addEventListener('click', function() {
+      loadWACenterDashboard(true);
+    });
+  }
+
+  const backButton = $('waCenterBackButton');
+  if (backButton) {
+    backButton.addEventListener('click', closeAdminWhatsAppCenterAndReturn);
+  }
+
+  const dateInput = $('waDashboardDate');
+  if (dateInput) {
+    dateInput.addEventListener('change', function() {
+      loadWACenterDashboard(true);
+    });
+  }
+
+  const recipientSearch = $('waRecipientSearch');
+  if (recipientSearch) {
+    recipientSearch.addEventListener('input', debounceWA(function() {
+      renderWARecipients(recipientSearch.value);
+    }, 180));
+  }
+
+  const recipientSelect = $('waRecipientSelect');
+  if (recipientSelect) {
+    recipientSelect.addEventListener('change', updateWARecipientInfo);
+  }
+
+  const message = $('waManualMessage');
+  if (message) {
+    message.addEventListener('input', updateWAMessageCounter);
+  }
+
+  const sendButton = $('waManualSendButton');
+  if (sendButton) sendButton.addEventListener('click', sendManualWAMessageFromDashboard);
+
+  const saveButton = $('waSaveSettingsButton');
+  if (saveButton) saveButton.addEventListener('click', saveWACenterSettings);
+
+  const historyButton = $('waHistoryLoadButton');
+  if (historyButton) historyButton.addEventListener('click', loadWAHistory);
+
+  ['waHistoryStatus', 'waHistoryType'].forEach(function(id) {
+    const el = $(id);
+    if (el) el.addEventListener('change', loadWAHistory);
+  });
+
+  const historySearch = $('waHistorySearch');
+  if (historySearch) {
+    historySearch.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') loadWAHistory();
+    });
+  }
+}
+
+
+function debounceWA(fn, delay) {
+  let timer = null;
+  return function() {
+    const args = arguments;
+    const context = this;
+    clearTimeout(timer);
+    timer = setTimeout(function() {
+      fn.apply(context, args);
+    }, delay);
+  };
+}
+
+
+async function loadWACenterDashboard(showLoading = true) {
+
+  if (waCenterDashboardLoading) return;
+  if (!currentToken || String(currentUser?.role || '').toUpperCase() !== 'ADMIN') return;
+  if (!$('adminWhatsAppCenter')) return;
+
+  waCenterDashboardLoading = true;
+  const button = $('waCenterRefreshButton');
+  if (button && showLoading) {
+    button.disabled = true;
+    button.textContent = '⏳ Memuat...';
+  }
+
+  try {
+    const dateInput = $('waDashboardDate');
+    const tanggal = dateInput?.value || formatLocalDateForInput(new Date());
+
+    const result = await apiGet({
+      action: 'waDashboard',
+      token: currentToken,
+      tanggal: tanggal
+    });
+
+    if (result?.status === 'SESSION_EXPIRED') {
+      handleSessionExpired();
+      return;
+    }
+
+    if (!result || !result.success) {
+      throw new Error(result?.message || 'Data WhatsApp Center tidak dapat dimuat.');
+    }
+
+    renderWAConnection(result.tokenConfigured, result.settings);
+    renderWAStats(result.stats || {});
+    renderWASettings(result.settings || {});
+
+    await Promise.all([
+      loadWARecipients(),
+      loadWAHistory()
+    ]);
+
+    setWAMessage('waDashboardMessage', 'WhatsApp Center berhasil diperbarui.', 'success');
+
+  } catch (error) {
+    console.error('WA CENTER LOAD ERROR:', error);
+    setWAMessage('waDashboardMessage', error.message || 'Gagal memuat WhatsApp Center.', 'error');
+  } finally {
+    waCenterDashboardLoading = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent = '🔄 Refresh';
+    }
+  }
+}
+
+
+function renderWAConnection(tokenConfigured, settings) {
+  const badge = $('waConnectionBadge');
+  if (!badge) return;
+
+  const enabled = !!settings?.enabled;
+
+  if (!tokenConfigured) {
+    badge.textContent = '🔴 Token Fonnte belum ada';
+    badge.className = 'wa-connection-badge danger';
+    return;
+  }
+
+  if (!enabled) {
+    badge.textContent = '🟡 WA terhubung • NONAKTIF';
+    badge.className = 'wa-connection-badge warning';
+    return;
+  }
+
+  badge.textContent = '🟢 WA terhubung • AKTIF';
+  badge.className = 'wa-connection-badge success';
+}
+
+
+function renderWAStats(stats) {
+  setText('waStatTotal', Number(stats.total || 0));
+  setText('waStatSent', Number(stats.terkirim || 0));
+  setText('waStatFailed', Number(stats.gagal || 0));
+  setText('waStatPending', Number(stats.pending || 0));
+  setText('waStatAuto', Number(stats.otomatis || 0));
+  setText('waStatManual', Number(stats.manual || 0));
+}
+
+
+function renderWASettings(settings) {
+  const data = settings || {};
+  const status = data.status || {};
+
+  setChecked('waSettingEnabled', data.enabled);
+  setChecked('waSettingFirstDailyOnly', data.firstDailyOnly);
+  setChecked('waSettingManualStatus', data.manualStatus);
+
+  setChecked('waRuleHadir', status.HADIR);
+  setChecked('waRuleTerlambat', status.TERLAMBAT);
+  setChecked('waRuleIzin', status.IZIN);
+  setChecked('waRuleSakit', status.SAKIT);
+  setChecked('waRuleAlpa', status.ALPA);
+  setChecked('waRuleKegiatan', status.KEGIATAN);
+  setChecked('waRuleIzinPulang', status['IZIN PULANG']);
+}
+
+
+function setChecked(id, value) {
+  const el = $(id);
+  if (el) el.checked = !!value;
+}
+
+
+async function loadWARecipients() {
+
+  if (!currentToken || String(currentUser?.role || '').toUpperCase() !== 'ADMIN') return;
+
+  try {
+    const result = await apiGet({
+      action: 'waRecipients',
+      token: currentToken
+    });
+
+    if (result?.status === 'SESSION_EXPIRED') {
+      handleSessionExpired();
+      return;
+    }
+
+    if (!result || !result.success) {
+      throw new Error(result?.message || 'Daftar penerima tidak dapat dimuat.');
+    }
+
+    waCenterRecipientsData = Array.isArray(result.data) ? result.data : [];
+    renderWARecipients($('waRecipientSearch')?.value || '');
+
+  } catch (error) {
+    console.error('WA RECIPIENT ERROR:', error);
+    const select = $('waRecipientSelect');
+    if (select) select.innerHTML = '<option value="">❌ Gagal memuat daftar siswa</option>';
+    setWAMessage('waManualMessageBox', error.message || 'Gagal memuat penerima.', 'error');
+  }
+}
+
+
+function renderWARecipients(searchText) {
+  const select = $('waRecipientSelect');
+  if (!select) return;
+
+  const q = String(searchText || '').trim().toLowerCase();
+  const list = waCenterRecipientsData.filter(function(item) {
+    if (!q) return true;
+    return [item.studentId, item.nama, item.kelas].some(function(value) {
+      return String(value || '').toLowerCase().includes(q);
+    });
+  });
+
+  select.innerHTML = '<option value="">-- Pilih siswa --</option>' + list.map(function(item) {
+    const ortu = item.namaOrtu ? ' • ' + item.namaOrtu : '';
+    return '<option value="' + escapeHTML(item.studentId) + '">' +
+      escapeHTML(item.nama) + ' • ' + escapeHTML(item.kelas || '-') +
+      ' • WA: ' + escapeHTML(item.noWaOrtu || '-') + ortu + '</option>';
+  }).join('');
+
+  if (!list.length) {
+    select.innerHTML = '<option value="">Tidak ada siswa yang cocok</option>';
+  }
+
+  updateWARecipientInfo();
+}
+
+
+function updateWARecipientInfo() {
+  const select = $('waRecipientSelect');
+  const info = $('waRecipientInfo');
+  if (!select || !info) return;
+
+  const id = select.value;
+  const item = waCenterRecipientsData.find(function(x) {
+    return String(x.studentId) === String(id);
+  });
+
+  if (!item) {
+    info.innerHTML = 'Pilih siswa untuk melihat informasi penerima.';
+    return;
+  }
+
+  info.innerHTML =
+    '<strong>' + escapeHTML(item.nama) + '</strong>' +
+    '<span>' + escapeHTML(item.kelas || '-') + '</span>' +
+    '<span>👤 ' + escapeHTML(item.namaOrtu || 'Orang Tua/Wali') + '</span>' +
+    '<span>📱 ' + escapeHTML(item.noWaOrtu || '-') + '</span>';
+}
+
+
+function updateWAMessageCounter() {
+  const input = $('waManualMessage');
+  const counter = $('waMessageCharCount');
+  if (counter) counter.textContent = String(input?.value?.length || 0);
+}
+
+
+function getWASettingsFromUI() {
+  return {
+    enabled: !!$('waSettingEnabled')?.checked,
+    firstDailyOnly: !!$('waSettingFirstDailyOnly')?.checked,
+    manualStatus: !!$('waSettingManualStatus')?.checked,
+    status: {
+      HADIR: !!$('waRuleHadir')?.checked,
+      TERLAMBAT: !!$('waRuleTerlambat')?.checked,
+      IZIN: !!$('waRuleIzin')?.checked,
+      SAKIT: !!$('waRuleSakit')?.checked,
+      ALPA: !!$('waRuleAlpa')?.checked,
+      KEGIATAN: !!$('waRuleKegiatan')?.checked,
+      'IZIN PULANG': !!$('waRuleIzinPulang')?.checked
+    }
+  };
+}
+
+
+async function saveWACenterSettings() {
+
+  if (!currentToken) return;
+
+  const button = $('waSaveSettingsButton');
+  const settings = getWASettingsFromUI();
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = '⏳ Menyimpan...';
+  }
+
+  try {
+    const result = await apiGet({
+      action: 'saveWASettings',
+      token: currentToken,
+      settings: JSON.stringify(settings)
+    }, { timeoutMs: 20000 });
+
+    if (result?.status === 'SESSION_EXPIRED') {
+      handleSessionExpired();
+      return;
+    }
+
+    if (!result || !result.success) {
+      throw new Error(result?.message || 'Pengaturan WA gagal disimpan.');
+    }
+
+    renderWASettings(result.data || settings);
+    renderWAConnection(true, result.data || settings);
+    setWAMessage('waSettingsMessage', '✅ Pengaturan WhatsApp berhasil disimpan.', 'success');
+
+  } catch (error) {
+    console.error('WA SETTINGS ERROR:', error);
+    setWAMessage('waSettingsMessage', error.message || 'Gagal menyimpan pengaturan.', 'error');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = '💾 Simpan Pengaturan WA';
+    }
+  }
+}
+
+
+async function sendManualWAMessageFromDashboard() {
+
+  if (!currentToken) return;
+
+  const studentId = $('waRecipientSelect')?.value || '';
+  const messageInput = $('waManualMessage');
+  const message = String(messageInput?.value || '').trim();
+  const button = $('waManualSendButton');
+
+  if (!studentId) {
+    setWAMessage('waManualMessageBox', '⚠️ Pilih siswa terlebih dahulu.', 'error');
+    return;
+  }
+
+  if (!message) {
+    setWAMessage('waManualMessageBox', '⚠️ Isi pesan belum diisi.', 'error');
+    messageInput?.focus();
+    return;
+  }
+
+  if (message.length > 4000) {
+    setWAMessage('waManualMessageBox', '⚠️ Pesan maksimal 4000 karakter.', 'error');
+    return;
+  }
+
+  if (!confirm('Kirim pesan WhatsApp ke orang tua/wali siswa ini?')) return;
+
+  if (button) {
+    button.disabled = true;
+    button.textContent = '⏳ Mengirim WhatsApp...';
+  }
+
+  try {
+    const result = await apiGet({
+      action: 'sendManualWA',
+      token: currentToken,
+      studentId: studentId,
+      message: message
+    }, { timeoutMs: 30000 });
+
+    if (result?.status === 'SESSION_EXPIRED') {
+      handleSessionExpired();
+      return;
+    }
+
+    if (!result || !result.success) {
+      throw new Error(result?.message || 'Pesan WhatsApp gagal dikirim.');
+    }
+
+    setWAMessage(
+      'waManualMessageBox',
+      '✅ Pesan berhasil dikirim ke orang tua/wali ' + (result.data?.nama || 'siswa') + '.',
+      'success'
+    );
+
+    if (messageInput) messageInput.value = '';
+    updateWAMessageCounter();
+
+    await loadWACenterDashboard(true);
+
+  } catch (error) {
+    console.error('WA MANUAL ERROR:', error);
+    setWAMessage('waManualMessageBox', error.message || 'Pengiriman WhatsApp gagal.', 'error');
+  } finally {
+    if (button) {
+      button.disabled = false;
+      button.textContent = '💬 Kirim Pesan WhatsApp';
+    }
+  }
+}
+
+
+async function loadWAHistory() {
+
+  if (waCenterHistoryLoading) return;
+  if (!currentToken || String(currentUser?.role || '').toUpperCase() !== 'ADMIN') return;
+  if (!$('waHistoryTableWrap')) return;
+
+  waCenterHistoryLoading = true;
+
+  const wrap = $('waHistoryTableWrap');
+  const button = $('waHistoryLoadButton');
+  if (button) {
+    button.disabled = true;
+    button.textContent = '⏳ Memuat...';
+  }
+
+  try {
+    const tanggal = $('waDashboardDate')?.value || formatLocalDateForInput(new Date());
+    const statusKirim = $('waHistoryStatus')?.value || '';
+    const jenisWA = $('waHistoryType')?.value || '';
+    const search = $('waHistorySearch')?.value || '';
+
+    const result = await apiGet({
+      action: 'waHistory',
+      token: currentToken,
+      tanggal: tanggal,
+      statusKirim: statusKirim,
+      jenisWA: jenisWA,
+      search: search,
+      limit: 200
+    });
+
+    if (result?.status === 'SESSION_EXPIRED') {
+      handleSessionExpired();
+      return;
+    }
+
+    if (!result || !result.success) {
+      throw new Error(result?.message || 'Riwayat WA tidak dapat dimuat.');
+    }
+
+    waCenterHistoryData = Array.isArray(result.data) ? result.data : [];
+    renderWAHistory();
+    setWAMessage('waHistoryMessage', 'Riwayat diperbarui.', 'success');
+
+  } catch (error) {
+    console.error('WA HISTORY ERROR:', error);
+    wrap.innerHTML = '<div class="app-error">❌ ' + escapeHTML(error.message || 'Gagal memuat riwayat.') + '</div>';
+    setWAMessage('waHistoryMessage', error.message || 'Gagal memuat riwayat.', 'error');
+  } finally {
+    waCenterHistoryLoading = false;
+    if (button) {
+      button.disabled = false;
+      button.textContent = '🔍 Tampilkan';
+    }
+  }
+}
+
+
+function renderWAHistory() {
+
+  const wrap = $('waHistoryTableWrap');
+  if (!wrap) return;
+
+  setText('waHistoryCount', waCenterHistoryData.length + ' data');
+
+  if (!waCenterHistoryData.length) {
+    wrap.innerHTML = '<div class="wa-history-empty">📭 Belum ada log WhatsApp untuk filter yang dipilih.</div>';
+    return;
+  }
+
+  wrap.innerHTML = `
+    <div class="wa-history-table-scroll">
+      <table class="wa-history-table">
+        <thead>
+          <tr>
+            <th>Waktu</th>
+            <th>Siswa</th>
+            <th>Orang Tua / WA</th>
+            <th>Jenis</th>
+            <th>Status</th>
+            <th>Pesan</th>
+            <th>Petugas</th>
+            <th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${waCenterHistoryData.map(renderWAHistoryRow).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  wrap.querySelectorAll('[data-wa-resend]').forEach(function(button) {
+    button.addEventListener('click', function() {
+      resendWAFromDashboard(button.dataset.waResend);
+    });
+  });
+}
+
+
+function renderWAHistoryRow(item) {
+  const status = String(item.statusKirim || '').trim().toUpperCase();
+  const canResend = status === 'GAGAL' || status === 'FAILED';
+  const statusClass = status === 'TERKIRIM' || status === 'SENT'
+    ? 'sent'
+    : (status === 'GAGAL' || status === 'FAILED' ? 'failed' : 'pending');
+
+  const message = String(item.pesan || '');
+  const shortMessage = message.length > 100 ? message.slice(0, 100) + '…' : message;
+
+  return `
+    <tr>
+      <td><strong>${escapeHTML(item.jam || '-')}</strong><small>${escapeHTML(item.tanggal || '-')}</small></td>
+      <td><strong>${escapeHTML(item.nama || '-')}</strong><small>${escapeHTML(item.studentId || '-')} • ${escapeHTML(item.kelas || '-')}</small></td>
+      <td>${escapeHTML(item.noWa || '-')}</td>
+      <td><span class="wa-type-badge">${escapeHTML(item.jenisWA || '-')}</span></td>
+      <td><span class="wa-status-badge ${statusClass}">${escapeHTML(item.statusKirim || '-')}</span></td>
+      <td><div class="wa-message-preview" title="${escapeHTML(message)}">${escapeHTML(shortMessage || '-')}</div></td>
+      <td>${escapeHTML(item.petugas || '-')}</td>
+      <td>
+        ${canResend
+          ? '<button type="button" class="wa-resend-button" data-wa-resend="' + escapeHTML(item.waLogId) + '">🔄 Kirim Ulang</button>'
+          : '<span class="wa-no-action">-</span>'}
+      </td>
+    </tr>
+  `;
+}
+
+
+async function resendWAFromDashboard(waLogId) {
+
+  if (!waLogId || !currentToken) return;
+  if (!confirm('Kirim ulang pesan WhatsApp yang gagal?')) return;
+
+  try {
+    const result = await apiGet({
+      action: 'resendWA',
+      token: currentToken,
+      waLogId: waLogId
+    }, { timeoutMs: 30000 });
+
+    if (result?.status === 'SESSION_EXPIRED') {
+      handleSessionExpired();
+      return;
+    }
+
+    if (!result || !result.success) {
+      throw new Error(result?.message || 'Pesan gagal dikirim ulang.');
+    }
+
+    setWAMessage('waHistoryMessage', '✅ Pesan berhasil dikirim ulang.', 'success');
+    await loadWACenterDashboard(true);
+
+  } catch (error) {
+    console.error('WA RESEND ERROR:', error);
+    setWAMessage('waHistoryMessage', error.message || 'Gagal mengirim ulang.', 'error');
+  }
+}
+
+
+function setWAMessage(id, text, type) {
+  const el = $(id);
+  if (!el) return;
+  el.textContent = text || '';
+  el.className = 'wa-message-box' + (type ? ' ' + type : '');
+}
+
+
 /* ============================================================
    43. CSS DINAMIS DASHBOARD
 ============================================================ */
@@ -5149,6 +5976,184 @@ function injectDashboardStyles() {
 
 
   style.textContent = `
+
+    /* ==========================================================
+       WHATSAPP CENTER ADMIN - STANDALONE PAGE
+    ========================================================== */
+    .wa-center-page {
+      display:flex;
+      flex-direction:column;
+      width:100%;
+      min-height:100vh;
+      box-sizing:border-box;
+      padding:20px 16px 0;
+      background:#f1f5f9;
+      color:#0f172a;
+    }
+    .wa-page-shell {
+      width:min(1220px,100%);
+      margin:0 auto;
+      flex:1 0 auto;
+    }
+    .wa-page-footer {
+      width:min(1220px,100%);
+      margin:24px auto 0;
+      padding:18px 12px 22px;
+      text-align:center;
+      box-sizing:border-box;
+      color:#64748b;
+      border-top:1px solid #e2e8f0;
+    }
+    .wa-page-footer-name {
+      font-size:13px;
+      font-weight:800;
+      letter-spacing:.25px;
+      color:#0f766e;
+    }
+    .wa-page-footer-meta {
+      margin-top:4px;
+      font-size:11px;
+      line-height:1.5;
+    }
+    .wa-page-topbar {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      padding:20px 22px;
+      border-radius:18px;
+      background:#ffffff;
+      border:1px solid #e2e8f0;
+      box-shadow:0 8px 24px rgba(15,23,42,.06);
+    }
+    .wa-page-kicker {font-size:11px;font-weight:800;letter-spacing:.08em;color:#64748b;}
+    .wa-page-title {font-size:26px;font-weight:850;color:#0f172a;margin-top:3px;}
+    .wa-page-subtitle {font-size:13px;color:#64748b;margin-top:4px;}
+    .wa-page-top-actions {display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap;}
+    .wa-back-button {border:1px solid #cbd5e1;border-radius:10px;padding:10px 13px;background:#0f172a;color:#fff;font-weight:700;cursor:pointer;font:inherit;}
+    .wa-back-button:hover {filter:brightness(1.08);}
+    .wa-launcher {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin:0 0 14px;
+      padding:15px 17px;
+      border:1px solid #dbeafe;
+      border-radius:16px;
+      background:linear-gradient(135deg,#eff6ff,#ffffff);
+      box-shadow:0 7px 20px rgba(15,23,42,.05);
+    }
+    .wa-launcher-title {font-size:16px;font-weight:800;color:#0f172a;}
+    .wa-launcher-subtitle {font-size:12px;color:#64748b;margin-top:3px;line-height:1.45;}
+    .wa-open-button {border:0;border-radius:10px;padding:11px 15px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;font:inherit;white-space:nowrap;box-shadow:0 5px 12px rgba(37,99,235,.18);}
+    .wa-open-button:hover {filter:brightness(.97);}
+    .wa-center-page .wa-center-panel {margin-top:0;}
+    .wa-center-page .wa-stat-grid {grid-template-columns:repeat(6,minmax(0,1fr));}
+    @media (max-width: 1050px) {
+      .wa-center-page .wa-stat-grid {grid-template-columns:repeat(3,minmax(0,1fr));}
+      .wa-page-topbar {align-items:flex-start;flex-direction:column;}
+      .wa-page-top-actions {justify-content:flex-start;}
+    }
+    @media (max-width: relative) {
+      .wa-center-page {padding:12px 10px 0; width : 720px}
+      .wa-page-topbar {padding:16px;}
+      .wa-page-title {font-size:22px;}
+      .wa-page-top-actions {width:100%;}
+      .wa-page-top-actions > * {flex:1 1 auto;}
+      .wa-center-page .wa-stat-grid {grid-template-columns:repeat(2,minmax(0,1fr));}
+      .wa-launcher {align-items:stretch;flex-direction:column;}
+      .wa-open-button {width:100%;}
+    }
+    @media (max-width: 480px) {
+      .wa-center-page .wa-stat-grid {grid-template-columns:1fr 1fr;}
+      .wa-page-top-actions {display:grid;grid-template-columns:1fr 1fr;}
+      .wa-page-top-actions .wa-connection-badge {grid-column:1 / -1;}
+    }
+
+    /* ==========================================================
+       WHATSAPP CENTER ADMIN - LEGACY COMPONENT STYLES
+    ========================================================== */
+    .wa-center-panel {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid #dbeafe;
+      border-radius: 20px;
+      background: linear-gradient(145deg,#ffffff,#f8fbff);
+      box-shadow: 0 10px 30px rgba(15,23,42,.07);
+    }
+    .wa-center-header,.wa-history-header {
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
+    }
+    .wa-center-title {font-size:22px;font-weight:800;color:#0f172a;}
+    .wa-center-subtitle,.wa-box-subtitle {margin-top:4px;color:#64748b;font-size:13px;line-height:1.5;}
+    .wa-center-header-actions {display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .wa-connection-badge,.wa-status-badge,.wa-type-badge {display:inline-flex;align-items:center;justify-content:center;border-radius:999px;font-weight:700;font-size:12px;}
+    .wa-connection-badge {padding:8px 12px;background:#f1f5f9;color:#475569;}
+    .wa-connection-badge.success {background:#dcfce7;color:#166534;}
+    .wa-connection-badge.warning {background:#fef3c7;color:#92400e;}
+    .wa-connection-badge.danger {background:#fee2e2;color:#991b1b;}
+    .wa-date-row {display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin-top:16px;}
+    .wa-field {display:flex;flex-direction:column;gap:6px;min-width:0;}
+    .wa-field > span {font-size:12px;font-weight:700;color:#475569;}
+    .wa-field input,.wa-field select,.wa-field textarea {box-sizing:border-box;width:100%;border:1px solid #cbd5e1;border-radius:10px;background:#fff;padding:10px 11px;color:#0f172a;font:inherit;outline:none;}
+    .wa-field input:focus,.wa-field select:focus,.wa-field textarea:focus {border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.10);}
+    .wa-date-field {width:180px;}
+    .wa-inline-message {font-size:12px;color:#64748b;min-height:20px;padding-bottom:3px;}
+    .wa-inline-message.success {color:#15803d;}
+    .wa-inline-message.error {color:#b91c1c;}
+    .wa-stat-grid {display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:16px;}
+    .wa-stat-card {padding:13px;border:1px solid #e2e8f0;border-radius:14px;background:#fff;min-width:0;}
+    .wa-stat-card span {display:block;font-size:12px;color:#475569;font-weight:700;}
+    .wa-stat-card strong {display:block;font-size:27px;line-height:1.15;margin-top:4px;color:#0f172a;}
+    .wa-stat-card small {display:block;color:#94a3b8;font-size:11px;margin-top:4px;}
+    .wa-stat-sent strong {color:#15803d;}.wa-stat-failed strong{color:#dc2626;}.wa-stat-pending strong{color:#d97706;}.wa-stat-manual strong{color:#2563eb;}
+    .wa-center-grid {display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:14px;margin-top:14px;}
+    .wa-box {padding:16px;border:1px solid #e2e8f0;border-radius:16px;background:#fff;}
+    .wa-box-title {font-size:17px;font-weight:800;color:#0f172a;}
+    .wa-manual-box .wa-field,.wa-settings-box .wa-field {margin-top:13px;}
+    .wa-recipient-info {display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;padding:11px;border-radius:11px;background:#f8fafc;border:1px solid #e2e8f0;font-size:12px;color:#475569;}
+    .wa-recipient-info strong {color:#0f172a;}.wa-recipient-info span {padding-left:8px;border-left:1px solid #cbd5e1;}
+    .wa-char-counter {text-align:right;color:#94a3b8;font-size:11px;margin-top:3px;}
+    .wa-message-box {min-height:20px;margin-top:10px;font-size:12px;color:#64748b;line-height:1.5;}
+    .wa-message-box.success {color:#15803d;background:#f0fdf4;border:1px solid #bbf7d0;padding:9px;border-radius:9px;}
+    .wa-message-box.error {color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;padding:9px;border-radius:9px;}
+    .wa-primary-button,.wa-secondary-button,.wa-resend-button {border:0;border-radius:10px;padding:10px 13px;font-weight:700;cursor:pointer;font:inherit;}
+    .wa-primary-button {background:#2563eb;color:#fff;width:100%;margin-top:7px;box-shadow:0 5px 12px rgba(37,99,235,.18);}
+    .wa-primary-button:hover {filter:brightness(.97);}.wa-primary-button:disabled,.wa-secondary-button:disabled{opacity:.6;cursor:wait;}
+    .wa-secondary-button {background:#f1f5f9;color:#334155;border:1px solid #e2e8f0;}
+    .wa-setting-main {margin-top:14px;padding:11px;border-radius:12px;background:#eff6ff;border:1px solid #bfdbfe;}
+    .wa-setting-list {margin-top:9px;display:grid;gap:7px;}
+    .wa-switch-row {display:flex;align-items:center;gap:9px;cursor:pointer;}
+    .wa-switch-row input {position:absolute;opacity:0;pointer-events:none;}
+    .wa-switch-ui {width:38px;height:21px;border-radius:99px;background:#cbd5e1;position:relative;flex:none;transition:.18s;}
+    .wa-switch-ui:after {content:"";position:absolute;width:17px;height:17px;left:2px;top:2px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:.18s;}
+    .wa-switch-row input:checked + .wa-switch-ui {background:#16a34a;}.wa-switch-row input:checked + .wa-switch-ui:after {transform:translateX(17px);}
+    .wa-switch-row strong {display:block;font-size:13px;color:#0f172a;}.wa-switch-row small {display:block;color:#64748b;font-size:11px;margin-top:2px;}
+    .wa-rule-title {margin-top:15px;font-size:13px;font-weight:800;color:#334155;}
+    .wa-rule-grid {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:9px;}
+    .wa-rule-item {display:flex;align-items:center;gap:8px;padding:8px 9px;border:1px solid #e2e8f0;border-radius:9px;background:#fafafa;font-size:12px;font-weight:700;color:#475569;cursor:pointer;}
+    .wa-rule-item input {accent-color:#2563eb;}
+    .wa-history-box {margin-top:14px;}
+    .wa-history-count {padding:7px 10px;border-radius:999px;background:#f1f5f9;color:#475569;font-size:12px;font-weight:700;}
+    .wa-history-filters {display:grid;grid-template-columns:170px 170px minmax(180px,1fr) auto;gap:9px;align-items:end;margin-top:14px;}
+    .wa-history-table-wrap {margin-top:10px;}
+    .wa-history-table-scroll {overflow-x:auto;border:1px solid #e2e8f0;border-radius:12px;}
+    .wa-history-table {width:100%;min-width:1050px;border-collapse:collapse;font-size:12px;}
+    .wa-history-table th,.wa-history-table td {padding:9px 10px;border-bottom:1px solid #e2e8f0;text-align:left;vertical-align:top;}
+    .wa-history-table th {background:#f8fafc;color:#475569;font-size:11px;white-space:nowrap;}
+    .wa-history-table tbody tr:hover {background:#f8fafc;}
+    .wa-history-table td strong {display:block;color:#0f172a;}.wa-history-table td small {display:block;color:#94a3b8;margin-top:2px;}
+    .wa-status-badge {padding:5px 8px;}.wa-status-badge.sent {background:#dcfce7;color:#166534;}.wa-status-badge.failed{background:#fee2e2;color:#991b1b;}.wa-status-badge.pending{background:#fef3c7;color:#92400e;}
+    .wa-type-badge {padding:5px 8px;background:#eff6ff;color:#1d4ed8;}
+    .wa-message-preview {max-width:280px;white-space:normal;line-height:1.45;color:#475569;}
+    .wa-resend-button {padding:7px 9px;background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;white-space:nowrap;font-size:11px;}
+    .wa-no-action {color:#cbd5e1;}
+    .wa-history-empty {padding:28px;text-align:center;color:#64748b;background:#f8fafc;border-radius:12px;}
 
     .app-loading {
       padding: 20px;
@@ -6097,7 +7102,9 @@ function startAutoRefresh() {
             dashboard &&
             dashboard.style.display !== 'none';
 
-          if (!dashboardVisible) {
+          if (waCenterStandaloneVisible && currentToken && String(currentUser?.role || '').toUpperCase() === 'ADMIN') {
+            await loadWACenterDashboard(false);
+          } else if (!dashboardVisible) {
             await loadTodaySummary();
             await loadTodayAttendance();
           }
@@ -6281,6 +7288,18 @@ window.selectTeacherSchedule =
 window.showAllAttendance =
   showAllAttendance;
 
+window.loadWACenterDashboard =
+  loadWACenterDashboard;
+
+window.sendManualWAMessageFromDashboard =
+  sendManualWAMessageFromDashboard;
+
+window.loadWAHistory =
+  loadWAHistory;
+
+window.resendWAFromDashboard =
+  resendWAFromDashboard;
+
 window.rebuildMonthlyRecapFromDashboard =
   rebuildMonthlyRecapFromDashboard;
 
@@ -6298,5 +7317,5 @@ window.loadTeacherRecapOptions =
 
 
 /* ============================================================
-   END APP.JS FINAL V14
+   END APP.JS V20.1 - WHATSAPP CENTER STANDALONE
 ============================================================ */

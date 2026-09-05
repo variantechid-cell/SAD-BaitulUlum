@@ -42,7 +42,7 @@ body {
 .container {
   width: calc(100% - 30px);
 
-  max-width: 700px;
+  max-width: relative;
 
   margin: 20px auto;
 }
@@ -1707,12 +1707,6 @@ body {
 }
 
 /* ============================================================
-   LOGIN & DASHBOARD GURU
-   V7.0
-============================================================ */
-
-
-/* ============================================================
    HEADER LOGIN
 ============================================================ */
 
@@ -1724,8 +1718,7 @@ body {
 }
 
 
-.login-button,
-.logout-button {
+.login-button {
   border: none;
   border-radius: 10px;
   padding: 10px 14px;
@@ -1745,7 +1738,16 @@ body {
 .logout-button {
   background: #fee2e2;
   color: #b91c1c;
-  text-align: right;
+  position: relative;
+   border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 18px;
+  font-weight: 900;
+  padding: 10px 14px;
+  cursor: pointer;
+ 
+  
+
 }
 
 
@@ -1926,6 +1928,7 @@ body {
 
 .dashboard {
   margin-top: 18px;
+  max-width: relative;
 }
 
 

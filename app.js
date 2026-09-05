@@ -5241,8 +5241,6 @@ function injectAdminWhatsAppPanel() {
         <div class="wa-history-header"><div><div class="wa-box-title">📋 Riwayat WhatsApp</div><div class="wa-box-subtitle">Data bersumber dari sheet LOG_WA.</div></div><span id="waHistoryCount" class="wa-history-count">0 data</span></div>
         <div class="wa-history-filters">
           <label class="wa-field"><span>Status Kirim</span><select id="waHistoryStatus"><option value="">Semua Status</option><option value="TERKIRIM">Terkirim</option><option value="GAGAL">Gagal</option><option value="PENDING">Pending</option></select></label>
-          <label class="wa-field"><span>Jenis WA</span><select id="waHistoryType"><option value="">Semua Jenis</option><option value="ABSENSI">Absensi</option><option value="MANUAL">Manual</option><option value="RESEND">Kirim Ulang</option><option value="TEST">Test</option></select></label>
-          <label class="wa-field wa-history-search"><span>Pencarian</span><input type="search" id="waHistorySearch" placeholder="Nama/ID/kelas..." autocomplete="off"></label>
           <button type="button" id="waHistoryLoadButton" class="wa-secondary-button">🔍 Tampilkan</button>
         </div>
         <div id="waHistoryMessage" class="wa-inline-message" aria-live="polite"></div>

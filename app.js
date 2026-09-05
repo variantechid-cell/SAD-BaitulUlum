@@ -5277,11 +5277,13 @@ function injectAdminWhatsAppButton() {
   launcher.id = 'adminWhatsAppLauncher';
   launcher.className = 'wa-launcher';
   launcher.innerHTML = `
-    <div class="wa-launcher-text">
+    <div class="dashboard-section">
+
       <div class="wa-launcher-title">💬 WhatsApp Center</div>
       <div class="wa-launcher-subtitle">Kelola notifikasi WhatsApp orang tua/wali siswa tanpa memenuhi Dashboard Administrator.</div>
     </div>
     <button type="button" id="openAdminWhatsAppButton" class="wa-open-button">Buka WhatsApp Center →</button>
+  
   `;
 
   const adminRecap = $('adminMonthlyRecapPanel');
@@ -6046,7 +6048,7 @@ function injectDashboardStyles() {
     }
     .wa-launcher-title {font-size:16px;font-weight:800;color:#0f172a;}
     .wa-launcher-subtitle {font-size:12px;color:#64748b;margin-top:3px;line-height:1.45;}
-    .wa-open-button {border:0;border-radius:10px;padding:11px 15px;background:#2563eb;color:#fff;font-weight:800;cursor:pointer;font:inherit;white-space:nowrap;box-shadow:0 5px 12px rgba(37,99,235,.18);}
+    .wa-open-button {border:0;border-radius:10px;padding:11px 15px;background:#2563eb;color:#fff;font-weight:400;cursor:pointer;font:inherit;white-space:nowrap;box-shadow:0 5px 12px rgba(37,99,235,.18);}
     .wa-open-button:hover {filter:brightness(.97);}
     .wa-center-page .wa-center-panel {margin-top:0;}
     .wa-center-page .wa-stat-grid {grid-template-columns:repeat(6,minmax(0,1fr));}
@@ -6055,8 +6057,8 @@ function injectDashboardStyles() {
       .wa-page-topbar {align-items:flex-start;flex-direction:column;}
       .wa-page-top-actions {justify-content:flex-start;}
     }
-    @media (max-width: relative) {
-      .wa-center-page {padding:12px 10px 0; width : 720px}
+    @media (max-width: 760px) {
+      .wa-center-page {padding:12px 10px 0;}
       .wa-page-topbar {padding:16px;}
       .wa-page-title {font-size:22px;}
       .wa-page-top-actions {width:100%;}
